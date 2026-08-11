@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+import {sendOtp,verifyOtp,signup} from "@/Service/authService";
+
 const GoogleIcon = () => (
   <svg width={20} height={20} viewBox="0 0 24 24">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -310,18 +312,29 @@ function OtpModal({ email, onClose, onSuccess }) {
     e.preventDefault();
   };
 
-  const handleVerify = (code) => {
+  const handleVerify = async (code) => {
+  if (code.length !== 6) {
+    setOtpErr("Please enter the complete OTP");
+    return;
+  }
+
+  try {
     setVerifying(true);
-    setOtpErr('');
-    setTimeout(() => {
-      setVerifying(false);
-      if (code === '000000') {
-        setOtpErr('Invalid verification code. Please try again.');
-      } else {
-        onSuccess();
-      }
-    }, 1000);
-  };
+    setOtpErr("");
+
+    await verifyOtp({
+      email,
+      otp: code,
+    });
+
+    onSuccess();
+
+  } catch (error) {
+    setOtpErr(error.message);
+  } finally {
+    setVerifying(false);
+  }
+};
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all duration-200">
@@ -432,41 +445,81 @@ export default function SignupPage({ onAuth }) {
     return '';
   };
 
-  const handleSendOtp = () => {
-    let hasError = false;
-    if (!firstName.trim()) {
-      setFirstNameErr('First name is required');
-      hasError = true;
-    }
-    if (!lastName.trim()) {
-      setLastNameErr('Last name is required');
-      hasError = true;
-    }
-    const eErr = validateEmail(email);
-    if (eErr) {
-      setEmailErr(eErr);
-      hasError = true;
-    }
-    if (hasError) return;
+  const handleSendOtp = async () => {
+  let hasError = false;
 
-    load(() => {
-      setShowOtpModal(true);
+  if (!firstName.trim()) {
+    setFirstNameErr("First name is required");
+    hasError = true;
+  }
+
+  if (!lastName.trim()) {
+    setLastNameErr("Last name is required");
+    hasError = true;
+  }
+
+  const eErr = validateEmail(email);
+
+  if (eErr) {
+    setEmailErr(eErr);
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  try {
+    setLoading(true);
+
+    await sendOtp({
+      firstName,
+      lastName,
+      email,
     });
-  };
 
-  const handleFinalSubmit = () => {
-    let hasError = false;
-    if (password.length < 8) {
-      setPwErr('At least 8 characters');
-      hasError = true;
-    }
-    if (password !== confirmPw) {
-      setCPwErr("Passwords don't match");
-      hasError = true;
-    }
-    if (hasError) return;
-    load(onAuth);
-  };
+    setShowOtpModal(true);
+
+  } catch (error) {
+    setEmailErr(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  const handleFinalSubmit = async () => {
+  let hasError = false;
+
+  if (password.length < 8) {
+    setPwErr("At least 8 characters");
+    hasError = true;
+  }
+
+  if (password !== confirmPw) {
+    setCPwErr("Passwords don't match");
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  try {
+    setLoading(true);
+
+    await signup({
+      firstName,
+      lastName,
+      email,
+      password,
+    });
+
+    onAuth();
+
+    router.push('/');
+
+  } catch (error) {
+    setPwErr(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen bg-[#f8f7ff] relative">
