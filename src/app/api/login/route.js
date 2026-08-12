@@ -8,14 +8,14 @@ async function POST(request){
     try{
         const {email,password} = await request.json();
 
-        if(!email,!password){
+        if(!email || !password){
             return NextResponse.json({
                 success:false,
                 message:"Please fill all the fields"
             },{status:400})
         }
 
-        const [user] = await db.query(`Select email from users where email = ?`,[email]);
+        const [user] = await db.query(`Select email,password from users where email = ?`,[email]);
 
 
         if(user.length === 0){
