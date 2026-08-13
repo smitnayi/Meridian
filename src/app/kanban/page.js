@@ -12,8 +12,6 @@ const priorityConfig = {
   Low:      { text: 'text-slate-400', bg: 'bg-slate-50' },
 }
 
-console.log({ Sidebar, CreateTaskModal, PlusIcon, FilterIcon, ClockIcon })
-
 const tagColors = {
   Auth:       'text-indigo-500 bg-indigo-50',
   Backend:    'text-sky-500 bg-sky-50',
@@ -160,13 +158,8 @@ function TaskCard({ task, onClick }) {
   )
 }
 
-export default function Kanban({
-  columns = defaultColumns,
-  onTaskClick,
-  onAddTask,
-  navigate,
-  currentPage = 'kanban'
-}) {
+export default function Kanban() {
+  const [columns, setColumns] = useState(defaultColumns)
   const [activeFilter, setActiveFilter] = useState('All')
   const [modalOpen, setModalOpen] = useState(false)
   const [defaultCol, setDefaultCol] = useState('backlog')
@@ -184,16 +177,21 @@ export default function Kanban({
     setModalOpen(true)
   }
 
+  const handleAddTask = (task, colId) => {
+    setColumns(prev => prev.map(col =>
+      col.id === colId
+        ? { ...col, tasks: [...col.tasks, task] }
+        : col
+    ))
+    toast.success(
+      `"${task.title}" added to ${columns.find((c) => c.id === colId)?.title || colId}`
+    )
+  }
+
   return (
     <div className="flex min-h-screen w-full bg-[#f0f3ff] text-slate-800">
-      {/* Integrated Sidebar */}
-      <Sidebar
-        currentPage={currentPage}
-        navigate={navigate}
-        onNotificationClick={() => toast.info('Notifications clicked')}
-        onProfileClick={() => toast.info('Profile clicked')}
-        onCommandPalette={() => toast.info('Command Palette opened')}
-      />
+      {/* Sidebar */}
+      <Sidebar />
 
       {/* Main Board Content */}
       <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto">
@@ -304,7 +302,7 @@ export default function Kanban({
                     <TaskCard
                       key={task.id}
                       task={task}
-                      onClick={() => onTaskClick?.(task)}
+                      onClick={() => toast.info(`Opening task: ${task.title}`)}
                     />
                   ))}
                 </div>
@@ -318,14 +316,7 @@ export default function Kanban({
         open={modalOpen}
         defaultColumnId={defaultCol}
         onClose={() => setModalOpen(false)}
-        onAdd={(task, colId) => {
-          onAddTask?.(task, colId)
-          toast.success(
-            `"${task.title}" added to ${
-              columns.find((c) => c.id === colId)?.title || colId
-            }`
-          )
-        }}
+        onAdd={handleAddTask}
       />
     </div>
   )

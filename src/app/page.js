@@ -239,7 +239,7 @@ function LeftPanel() {
 }
 
 /* ── Main Login Component ── */
-export default function LoginPage({ onAuth, onNavigateToOtp }) {
+export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -272,7 +272,7 @@ export default function LoginPage({ onAuth, onNavigateToOtp }) {
       setPwErr('Password is required');
       return;
     }
-    load(onAuth);
+    load(() => router.push('/dashboard'));
   };
 
   return (
@@ -295,11 +295,11 @@ export default function LoginPage({ onAuth, onNavigateToOtp }) {
 
           {/* Social Logins */}
           <div className="flex flex-col gap-2.5 mb-1">
-            <SocialBtn onClick={() => load(onAuth)}>
+            <SocialBtn onClick={() => load(() => router.push('/dashboard'))}>
               <GoogleIcon />
               Continue with Google
             </SocialBtn>
-            <SocialBtn onClick={() => load(onAuth)}>
+            <SocialBtn onClick={() => load(() => router.push('/dashboard'))}>
               <GitHubIcon />
               Continue with GitHub
             </SocialBtn>
@@ -365,7 +365,8 @@ export default function LoginPage({ onAuth, onNavigateToOtp }) {
           <Divider />
 
           {/* OTP Alternate Login */}
-          <SocialBtn onClick={onNavigateToOtp}>
+          <SocialBtn onClick={() => toast.info('OTP login coming soon')}
+          >
             <MailIcon />
             Sign in with email OTP instead
           </SocialBtn>

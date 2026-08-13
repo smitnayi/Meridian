@@ -394,7 +394,7 @@ function OtpModal({ email, onClose, onSuccess }) {
         </div>
 
         <div className="text-center text-xs text-slate-500">
-          Didn't receive the code?{' '}
+          Didnt receive the code?{' '}
           {countdown > 0 ? (
             <span className="text-slate-400 font-medium">Resend in {countdown}s</span>
           ) : (
@@ -523,13 +523,11 @@ export default function SignupPage({ onAuth }) {
 
   return (
     <div className="flex min-h-screen bg-[#f8f7ff] relative">
-      {/* Marketing Left Panel */}
       <LeftPanel />
 
-      {/* Form Right Panel */}
       <div className="w-full lg:w-[500px] shrink-0 flex items-start justify-center bg-white px-7 py-8 md:px-14 md:py-10 shadow-2xl lg:shadow-[-4px_0_32px_rgba(99,102,241,0.06)] min-h-screen overflow-y-auto">
         <div className="w-full max-w-[380px] py-6 md:py-10 transition-all duration-200 ease-out">
-          {/* Header */}
+
           <div className="mb-6">
             <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1.5">
               {step === 3 ? 'Create your password' : 'Create your account'}
@@ -541,7 +539,7 @@ export default function SignupPage({ onAuth }) {
 
           {step === 1 && (
             <>
-              {/* Social Logins */}
+
               <div className="grid grid-cols-2 gap-2.5 mb-2.5">
                 <SocialBtn onClick={() => load(onAuth)}>
                   <GoogleIcon />
@@ -555,7 +553,7 @@ export default function SignupPage({ onAuth }) {
 
               <Divider />
 
-              {/* Input Form Fields */}
+
               <div className="grid grid-cols-2 gap-3">
                 <Field
                   label="First name"

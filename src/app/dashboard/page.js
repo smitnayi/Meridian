@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/sidebar'
 import {
   TrendingUpIcon, CheckIcon, ZapIcon, PlusIcon,
   CalendarIcon, ChevronRightIcon, MoreHorizontalIcon,
 } from '@/components/Icons'
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast'
+import CreateTaskModal from '@/components/CreateTaskModal'
 
 const stats = [
   { label: 'Active Projects', value: '24', delta: '+3 this month', color: '#6366f1', bg: '#eef2ff', icon: <ZapIcon size={20} /> },
@@ -46,19 +48,15 @@ const Card = ({ children, className = '' }) => (
   </div>
 )
 
-export default function Dashboard({ navigate, onNewTask, currentPage = 'dashboard' }) {
+export default function Dashboard() {
+  const router = useRouter()
   const [activeDay] = useState(6)
+  const [modalOpen, setModalOpen] = useState(false)
 
   return (
     <div className="flex min-h-screen w-full">
       {/* 1. Sidebar Component */}
-      <Sidebar 
-        currentPage={currentPage} 
-        navigate={navigate} 
-        onNotificationClick={() => toast.info('Notifications clicked')}
-        onProfileClick={() => toast.info('Profile clicked')}
-        onCommandPalette={() => toast.info('Command Palette opened')}
-      />
+      <Sidebar />
 
       {/* 2. Main Dashboard Layout */}
       <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto">
@@ -74,13 +72,13 @@ export default function Dashboard({ navigate, onNewTask, currentPage = 'dashboar
           </div>
           <div className="flex flex-wrap gap-2.5">
             <button
-              onClick={() => navigate?.('analytics')}
+              onClick={() => router.push('/analytics')}
               className="flex-1 sm:flex-none justify-center px-4.5 py-2.5 rounded-xl border border-slate-200/80 bg-white/80 backdrop-blur-sm text-[13.5px] font-medium text-slate-600 hover:bg-white transition-colors cursor-pointer"
             >
               View Analytics
             </button>
             <button
-              onClick={() => onNewTask?.()}
+              onClick={() => setModalOpen(true)}
               className="flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl border-none bg-gradient-to-br from-indigo-500 to-indigo-400 text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(99,102,241,0.35)] hover:shadow-[0_6px_18px_rgba(99,102,241,0.45)] transition-shadow cursor-pointer"
             >
               <PlusIcon size={15} strokeWidth={2.5} />
@@ -182,7 +180,7 @@ export default function Dashboard({ navigate, onNewTask, currentPage = 'dashboar
               ))}
             </div>
             <button
-              onClick={() => navigate?.('kanban')}
+              onClick={() => router.push('/kanban')}
               className="w-full mt-3 py-2.5 border border-dashed border-indigo-500/30 rounded-[10px] bg-transparent text-indigo-500 text-[12.5px] font-medium cursor-pointer hover:bg-indigo-500/[0.06] transition-colors"
             >
               View all tasks →
@@ -227,10 +225,10 @@ export default function Dashboard({ navigate, onNewTask, currentPage = 'dashboar
               <div className="text-[15px] font-semibold text-slate-900 mb-3.5">Quick Actions</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
-                  { label: 'New Task', color: '#6366f1', bg: '#eef2ff', onClick: () => onNewTask?.() },
-                  { label: 'Invite Member', color: '#10b981', bg: '#d1fae5', onClick: () => { navigate?.('team'); toast.info('Invite members from the Team page') } },
-                  { label: 'New Sprint', color: '#f59e0b', bg: '#fef3c7', onClick: () => { navigate?.('kanban'); toast.info('Sprint planning opened') } },
-                  { label: 'View Reports', color: '#8b5cf6', bg: '#ede9fe', onClick: () => navigate?.('analytics') },
+                  { label: 'New Task', color: '#6366f1', bg: '#eef2ff', onClick: () => setModalOpen(true) },
+                  { label: 'Invite Member', color: '#10b981', bg: '#d1fae5', onClick: () => { router.push('/team'); toast.info('Invite members from the Team page') } },
+                  { label: 'New Sprint', color: '#f59e0b', bg: '#fef3c7', onClick: () => { router.push('/kanban'); toast.info('Sprint planning opened') } },
+                  { label: 'View Reports', color: '#8b5cf6', bg: '#ede9fe', onClick: () => router.push('/analytics') },
                 ].map(a => (
                   <button
                     key={a.label}
@@ -271,6 +269,15 @@ export default function Dashboard({ navigate, onNewTask, currentPage = 'dashboar
           </div>
         </div>
       </main>
+
+      <CreateTaskModal
+        open={modalOpen}
+        defaultColumnId="backlog"
+        onClose={() => setModalOpen(false)}
+        onAdd={(task) => {
+          toast.success(`"${task.title}" created successfully!`)
+        }}
+      />
     </div>
   )
 }

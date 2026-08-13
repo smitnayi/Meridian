@@ -332,7 +332,7 @@ function LeftPanel() {
 }
 
 /* ── Main Forgot Password Component ── */
-export default function ForgotPasswordPage({ onNavigateToLogin }) {
+export default function ForgotPasswordPage() {
     const router = useRouter();
   const [step, setStep] = useState('request'); // 'request' | 'verify' | 'reset' | 'success'
   const [loading, setLoading] = useState(false);
@@ -526,7 +526,7 @@ export default function ForgotPasswordPage({ onNavigateToLogin }) {
               <p className="text-sm text-slate-500 mb-8 leading-relaxed">
                 Your password has been changed. You can now sign in with your new credentials.
               </p>
-              <PrimaryBtn loading={false} onClick={onNavigateToLogin}>
+              <PrimaryBtn loading={false} onClick={() => router.push('/')}>
                 Back to Sign In
               </PrimaryBtn>
             </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import {
   HomeIcon, GridIcon, BarChartIcon, UsersIcon, MessageIcon,
   CreditCardIcon, SettingsIcon, BellIcon, SearchIcon, ChevronDownIcon,
@@ -15,14 +16,14 @@ const CollapseIcon = ({ collapsed }) => (
 )
 
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: <HomeIcon /> },
-  { id: 'kanban', label: 'Kanban Board', icon: <GridIcon />, badge: 4 },
-  { id: 'calendar', label: 'Calendar', icon: <CalendarIcon /> },
-  { id: 'analytics', label: 'Analytics', icon: <BarChartIcon /> },
-  { id: 'team', label: 'Team', icon: <UsersIcon /> },
-  { id: 'chat', label: 'Messages', icon: <MessageIcon />, badge: 7 },
-  { id: 'billing', label: 'Billing', icon: <CreditCardIcon /> },
-  { id: 'settings', label: 'Settings', icon: <SettingsIcon /> },
+  { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: <HomeIcon /> },
+  { id: 'kanban', label: 'Kanban Board', href: '/kanban', icon: <GridIcon />, badge: 4 },
+  { id: 'calendar', label: 'Calendar', href: '/calander', icon: <CalendarIcon /> },
+  { id: 'analytics', label: 'Analytics', href: '/analytics', icon: <BarChartIcon /> },
+  { id: 'team', label: 'Team', href: '/team', icon: <UsersIcon /> },
+  { id: 'chat', label: 'Messages', href: '/messages', icon: <MessageIcon />, badge: 7 },
+  { id: 'billing', label: 'Billing', href: '/billing', icon: <CreditCardIcon /> },
+  { id: 'settings', label: 'Settings', href: '/settings', icon: <SettingsIcon /> },
 ]
 
 const projects = [
@@ -32,7 +33,9 @@ const projects = [
   { name: 'Mobile App v2', color: '#ef4444', progress: 28 },
 ]
 
-export default function Sidebar({ currentPage, navigate, onNotificationClick, onProfileClick, onCommandPalette }) {
+export default function Sidebar() {
+  const router = useRouter()
+  const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [projectsOpen, setProjectsOpen] = useState(true)
   const [notifHover, setNotifHover] = useState(false)
@@ -75,7 +78,7 @@ export default function Sidebar({ currentPage, navigate, onNotificationClick, on
       {/* Search / Command palette */}
       {!collapsed && (
         <div style={{ padding: '0 12px 12px' }}>
-          <button type="button" onClick={onCommandPalette} aria-label="Open command palette" style={{
+          <button type="button" onClick={() => toast.info('Command palette opened')} aria-label="Open command palette" style={{
             display: 'flex', alignItems: 'center', gap: 8, width: '100%',
             background: 'rgba(241, 245, 249, 0.8)', borderRadius: 10, padding: '7px 12px',
             border: '1px solid rgba(226, 232, 240, 0.8)', cursor: 'pointer', textAlign: 'left',
@@ -91,12 +94,13 @@ export default function Sidebar({ currentPage, navigate, onNotificationClick, on
       <nav aria-label="Main navigation" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: '0 8px' }}>
         {!collapsed && <div style={{ fontSize: 10, fontWeight: 600, color: '#94a3b8', padding: '4px 12px 6px', letterSpacing: '0.08em' }}>NAVIGATION</div>}
         {navItems.map(item => {
-          const active = currentPage === item.id
+          // Determine active: pathname starts with item href
+          const active = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
             <div key={item.id} className="tooltip" data-tip={collapsed ? item.label : undefined} style={{ position: 'relative', marginBottom: 1 }}>
               <button
                 type="button"
-                onClick={() => navigate(item.id)}
+                onClick={() => router.push(item.href)}
                 className={`nav-item${active ? ' active' : ''}`}
                 aria-current={active ? 'page' : undefined}
                 aria-label={collapsed ? item.label : undefined}
@@ -149,7 +153,7 @@ export default function Sidebar({ currentPage, navigate, onNotificationClick, on
               <button
                 key={p.name}
                 type="button"
-                onClick={() => navigate('kanban')}
+                onClick={() => router.push('/kanban')}
                 aria-label={`Open ${p.name}, ${p.progress}% complete`}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 9, width: '100%', padding: '6px 12px',
@@ -180,7 +184,7 @@ export default function Sidebar({ currentPage, navigate, onNotificationClick, on
       {/* Notification bell when collapsed */}
       {collapsed && (
         <div style={{ padding: '8px', position: 'relative' }}>
-          <button type="button" onClick={onNotificationClick} aria-label="View notifications" style={{ width: 44, height: 44, borderRadius: 10, border: 'none', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b', position: 'relative', margin: '0 auto' }}>
+          <button type="button" onClick={() => toast.info('Notifications clicked')} aria-label="View notifications" style={{ width: 44, height: 44, borderRadius: 10, border: 'none', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b', position: 'relative', margin: '0 auto' }}>
             <BellIcon size={18} />
             <span style={{ position: 'absolute', top: 6, right: 6, width: 7, height: 7, borderRadius: '50%', background: '#ef4444', border: '1.5px solid white' }} />
           </button>
@@ -193,7 +197,7 @@ export default function Sidebar({ currentPage, navigate, onNotificationClick, on
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
             <button
               type="button"
-              onClick={onNotificationClick}
+              onClick={() => toast.info('Notifications clicked')}
               onMouseEnter={() => setNotifHover(true)}
               onMouseLeave={() => setNotifHover(false)}
               aria-label="View notifications"
@@ -206,7 +210,7 @@ export default function Sidebar({ currentPage, navigate, onNotificationClick, on
         )}
         <button
           type="button"
-          onClick={onProfileClick}
+          onClick={() => router.push('/profile')}
           aria-label="Open profile menu for Alex Johnson"
           title={collapsed ? 'Alex Johnson' : undefined}
           style={{
