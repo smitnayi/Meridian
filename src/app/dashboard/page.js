@@ -3,281 +3,353 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/sidebar'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import {
-  TrendingUpIcon, CheckIcon, ZapIcon, PlusIcon,
-  CalendarIcon, ChevronRightIcon, MoreHorizontalIcon,
+  CheckIcon, ClockIcon, UsersIcon, BarChartIcon,
+  ChevronRightIcon, PlusIcon, MoreHorizontalIcon, FilterIcon
 } from '@/components/Icons'
-import { toast } from 'react-hot-toast'
 import CreateTaskModal from '@/components/CreateTaskModal'
+import { toast } from 'react-hot-toast'
 
 const stats = [
-  { label: 'Active Projects', value: '24', delta: '+3 this month', color: '#6366f1', bg: '#eef2ff', icon: <ZapIcon size={20} /> },
-  { label: 'Total Tasks', value: '187', delta: '42 completed today', color: '#10b981', bg: '#d1fae5', icon: <CheckIcon size={20} /> },
-  { label: 'Sprint Velocity', value: '94 pts', delta: '↑ 12% vs last sprint', color: '#f59e0b', bg: '#fef3c7', icon: <TrendingUpIcon size={20} /> },
-  { label: 'Completion Rate', value: '78%', delta: 'On track for Q3', color: '#8b5cf6', bg: '#ede9fe', icon: <TrendingUpIcon size={20} /> },
+  { label: 'Active Tasks', value: '47', delta: '+12%', sub: 'vs last week', color: '#6366f1', bg: '#eef2ff', icon: <CheckIcon size={20} />, href: '/kanban' },
+  { label: 'Hours Tracked', value: '184h', delta: '+8%', sub: 'this sprint', color: '#10b981', bg: '#ecfdf5', icon: <ClockIcon size={20} />, href: '/analytics' },
+  { label: 'Team Velocity', value: '94%', delta: '+5%', sub: 'efficiency', color: '#f59e0b', bg: '#fffbeb', icon: <BarChartIcon size={20} />, href: '/analytics' },
+  { label: 'Active Members', value: '12', delta: '+2', sub: 'online now', color: '#8b5cf6', bg: '#f5f3ff', icon: <UsersIcon size={20} />, href: '/team' },
 ]
 
-const activity = [
-  { user: 'Sarah Chen', avatar: '#6366f1', action: 'completed', item: 'User Auth Flow redesign', time: '4m ago', type: 'success' },
-  { user: 'Marcus Webb', avatar: '#10b981', action: 'commented on', item: 'Payment Gateway API', time: '12m ago', type: 'comment' },
-  { user: 'Priya Nair', avatar: '#f59e0b', action: 'moved', item: 'Database Migration to Review', time: '28m ago', type: 'move' },
-  { user: 'Kai Okafor', avatar: '#ef4444', action: 'created', item: 'Sprint 14 Planning doc', time: '1h ago', type: 'create' },
-  { user: 'Alex Johnson', avatar: '#8b5cf6', action: 'resolved', item: '3 critical bugs in prod', time: '2h ago', type: 'success' },
-  { user: 'Jordan Lee', avatar: '#0ea5e9', action: 'assigned', item: 'Mobile App auth task to Priya', time: '3h ago', type: 'assign' },
+const weekData = [45, 68, 85, 92, 78, 60, 40]
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+const initialActivity = [
+  { user: 'Sarah Chen', avatar: '#6366f1', action: 'moved task to In Review', item: 'MRD-032 OAuth2 Social Login', time: '8m ago', type: 'task' },
+  { user: 'Marcus Webb', avatar: '#10b981', action: 'completed subtask', item: 'Verify Stripe webhook signatures', time: '24m ago', type: 'task' },
+  { user: 'Jordan Lee', avatar: '#0ea5e9', action: 'deployed to staging', item: 'Homepage Redesign v2', time: '1h ago', type: 'deploy' },
+  { user: 'Priya Nair', avatar: '#f59e0b', action: 'commented on', item: 'MRD-028 Design System components', time: '2h ago', type: 'comment' },
+  { user: 'Kai Okafor', avatar: '#ef4444', action: 'merged pull request #148', item: 'fix: auth token expiry check', time: '3h ago', type: 'deploy' },
 ]
 
 const deadlines = [
-  { project: 'Authentication Service', task: 'OAuth2 Integration', due: 'Tomorrow', priority: 'Critical', color: '#ef4444' },
-  { project: 'Payment Gateway', task: 'Stripe Webhook Setup', due: 'Aug 10', priority: 'High', color: '#f59e0b' },
-  { project: 'Customer Portal', task: 'Dashboard v2 Launch', due: 'Aug 14', priority: 'High', color: '#f59e0b' },
-  { project: 'Mobile App v2', task: 'Push Notifications', due: 'Aug 18', priority: 'Medium', color: '#6366f1' },
+  { title: 'Sprint 14 Review', project: 'Auth Service', due: 'Tomorrow, 3pm', priority: 'Critical', color: '#ef4444' },
+  { title: 'Stripe Integration QA', project: 'Payment Gateway', due: 'Friday, EOD', priority: 'High', color: '#f59e0b' },
+  { title: 'Customer Portal Beta', project: 'Customer Portal', due: 'Aug 14', priority: 'Medium', color: '#6366f1' },
 ]
 
-const weekData = [65, 80, 72, 90, 85, 78, 94]
-const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
 const dotColor = {
-  success: 'bg-emerald-500',
-  comment: 'bg-indigo-500',
-  move: 'bg-amber-500',
+  task: 'bg-indigo-500',
+  deploy: 'bg-emerald-500',
+  comment: 'bg-amber-500',
 }
 
-const Card = ({ children, className = '' }) => (
-  <div className={`rounded-[20px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_24px_rgba(99,102,241,0.06)] transition-transform hover:-translate-y-0.5 ${className}`}>
-    {children}
-  </div>
-)
+function Card({ children, className = '', style = {} }) {
+  return (
+    <div
+      className={`rounded-[20px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_24px_rgba(99,102,241,0.06)] ${className}`}
+      style={style}
+    >
+      {children}
+    </div>
+  )
+}
 
 export default function Dashboard() {
   const router = useRouter()
-  const [activeDay] = useState(6)
   const [modalOpen, setModalOpen] = useState(false)
+  const [activeDay] = useState(3) // Thu
+  const [activityFilter, setActivityFilter] = useState('all') // 'all' | 'task' | 'deploy' | 'comment'
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
+
+  const filteredActivity = initialActivity.filter(a => {
+    if (activityFilter === 'all') return true
+    return a.type === activityFilter
+  })
 
   return (
-    <div className="flex min-h-screen w-full">
-      {/* 1. Sidebar Component */}
-      <Sidebar />
+    <ProtectedRoute>
+      <div className="flex min-h-screen w-full bg-slate-50/50">
+        {/* 1. Sidebar Component */}
+        <Sidebar />
 
-      {/* 2. Main Dashboard Layout */}
-      <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto">
-        {/* Header */}
-        <div className="flex flex-col items-stretch justify-between gap-3 mb-7 sm:flex-row sm:items-start sm:gap-3">
-          <div>
-            <div className="text-[21px] sm:text-[26px] font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Good morning, Alex 👋
+        {/* 2. Main Dashboard Layout */}
+        <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
+          {/* Header */}
+          <div className="flex flex-col items-stretch justify-between gap-3 mb-7 sm:flex-row sm:items-start sm:gap-3">
+            <div>
+              <div className="text-[21px] sm:text-[26px] font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                Good morning, Alex 👋
+              </div>
+              <div className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
+                Thursday, August 7, 2026 · Sprint 14 is ending in 3 days
+              </div>
             </div>
-            <div className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
-              Thursday, August 7, 2026 · Sprint 14 is ending in 3 days
+            <div className="flex flex-wrap gap-2.5">
+              <button
+                onClick={() => router.push('/analytics')}
+                className="flex-1 sm:flex-none justify-center px-4.5 py-2.5 rounded-xl border border-slate-200/80 bg-white/80 backdrop-blur-sm text-[13.5px] font-medium text-slate-600 hover:bg-white transition-colors cursor-pointer"
+              >
+                View Analytics
+              </button>
+              <button
+                onClick={() => setModalOpen(true)}
+                className="flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl border-none bg-gradient-to-br from-indigo-500 to-indigo-400 text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(99,102,241,0.35)] hover:shadow-[0_6px_18px_rgba(99,102,241,0.45)] transition-shadow cursor-pointer"
+              >
+                <PlusIcon size={15} strokeWidth={2.5} />
+                New Task
+              </button>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2.5">
-            <button
-              onClick={() => router.push('/analytics')}
-              className="flex-1 sm:flex-none justify-center px-4.5 py-2.5 rounded-xl border border-slate-200/80 bg-white/80 backdrop-blur-sm text-[13.5px] font-medium text-slate-600 hover:bg-white transition-colors cursor-pointer"
-            >
-              View Analytics
-            </button>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl border-none bg-gradient-to-br from-indigo-500 to-indigo-400 text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(99,102,241,0.35)] hover:shadow-[0_6px_18px_rgba(99,102,241,0.45)] transition-shadow cursor-pointer"
-            >
-              <PlusIcon size={15} strokeWidth={2.5} />
-              New Task
-            </button>
-          </div>
-        </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-          {stats.map(s => (
-            <div key={s.label} className="rounded-[20px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_24px_rgba(99,102,241,0.06)] p-5 transition-transform hover:-translate-y-0.5">
-              <div className="flex items-start justify-between mb-3.5">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: s.bg, color: s.color }}>
-                  {s.icon}
-                </div>
-                <MoreHorizontalIcon size={16} />
-              </div>
-              <div className="text-[28px] font-bold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                {s.value}
-              </div>
-              <div className="text-[12.5px] text-slate-500 mt-1">{s.label}</div>
-              <div className="text-[11.5px] mt-1.5 font-medium" style={{ color: s.color }}>{s.delta}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Main content: chart + deadlines */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 mb-5">
-          {/* Weekly chart */}
-          <Card className="p-6">
-            <div className="flex items-center justify-between flex-wrap gap-2.5 mb-6">
-              <div>
-                <div className="text-[15px] font-semibold text-slate-900">Weekly Progress</div>
-                <div className="text-[12.5px] text-slate-400 mt-0.5">Tasks completed per day this week</div>
-              </div>
-              <select className="text-[12.5px] px-3 py-1.5 rounded-lg border border-slate-200/80 bg-white/80 text-slate-600 outline-none">
-                <option>This Week</option>
-                <option>Last Week</option>
-              </select>
-            </div>
-            <div className="flex items-end gap-3 h-[140px]">
-              {weekData.map((v, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                  <span className={`text-[11px] font-mono ${i === activeDay ? 'text-indigo-500 font-semibold' : 'text-slate-400 font-normal'}`}>{v}</span>
-                  <div
-                    className="bar-animate w-full max-w-[36px] rounded-lg"
-                    style={{
-                      height: `${(v / 100) * 110}px`,
-                      background: i === activeDay
-                        ? 'linear-gradient(to top, #6366f1, #818cf8)'
-                        : 'linear-gradient(to top, rgba(99,102,241,0.25), rgba(129,140,248,0.1))',
-                      boxShadow: i === activeDay ? '0 4px 14px rgba(99,102,241,0.3)' : 'none',
-                      animationDelay: `${i * 60}ms`,
+          {/* Stats Cards with Working Action Menus */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+            {stats.map(s => (
+              <div
+                key={s.label}
+                onClick={() => router.push(s.href)}
+                className="rounded-[20px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_24px_rgba(99,102,241,0.06)] p-5 transition-transform hover:-translate-y-0.5 cursor-pointer group"
+              >
+                <div className="flex items-start justify-between mb-3.5">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-xs" style={{ background: s.bg, color: s.color }}>
+                    {s.icon}
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push(s.href)
+                      toast.info(`Opening ${s.label} view`)
                     }}
-                  />
-                  <span className={`text-[11px] ${i === activeDay ? 'text-indigo-500 font-semibold' : 'text-slate-400 font-normal'}`}>{days[i]}</span>
+                    className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 transition-colors"
+                  >
+                    <MoreHorizontalIcon size={16} />
+                  </button>
                 </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-6 mt-5 pt-4 border-t border-slate-200/50">
-              {[{ l: 'Avg Daily', v: '81 tasks' }, { l: 'Best Day', v: 'Thu 94' }, { l: 'Trend', v: '↑ 14%' }].map(m => (
-                <div key={m.l}>
-                  <div className="text-[11px] text-slate-400">{m.l}</div>
-                  <div className="text-sm font-semibold text-slate-900 font-mono">{m.v}</div>
+                <div className="text-[28px] font-bold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  {s.value}
                 </div>
-              ))}
-            </div>
-          </Card>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-[13px] font-medium text-slate-500 group-hover:text-indigo-600 transition-colors">{s.label}</span>
+                  <span className="text-[11.5px] font-semibold text-slate-600 bg-white/80 px-2 py-0.5 rounded-md border border-slate-200/50">
+                    {s.delta}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
 
-          {/* Deadlines */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="text-[15px] font-semibold text-slate-900">Upcoming Deadlines</div>
-              <CalendarIcon size={16} />
-            </div>
-            <div className="flex flex-col gap-2.5">
-              {deadlines.map((d, i) => (
-                <div
-                  key={i}
-                  className="px-3.5 py-3 rounded-xl bg-slate-50/80 border border-slate-200/50 cursor-pointer transition-colors hover:bg-indigo-500/[0.06]"
+          {/* Middle: Velocity Chart + Deadlines */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+            {/* Chart */}
+            <Card className="lg:col-span-2 p-6 flex flex-col justify-between">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <div className="text-base font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                    Sprint 14 Throughput
+                  </div>
+                  <div className="text-xs text-slate-500 mt-0.5">Story points delivered per day vs target (80 pts)</div>
+                </div>
+                <button
+                  onClick={() => router.push('/analytics')}
+                  className="flex items-center gap-1 text-xs font-semibold text-indigo-600 bg-transparent border-none cursor-pointer hover:underline p-0"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="text-[12.5px] font-semibold text-slate-900">{d.task}</div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">{d.project}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-[11px] font-semibold" style={{ color: d.color }}>{d.due}</div>
-                      <span
-                        className="text-[9.5px] px-1.5 py-0.5 rounded-md font-semibold"
-                        style={{ background: `${d.color}18`, color: d.color }}
-                      >
-                        {d.priority}
+                  Full Report <ChevronRightIcon size={13} />
+                </button>
+              </div>
+
+              {/* Bar Chart */}
+              <div className="flex items-end gap-3 sm:gap-6 h-36 px-2 pb-2">
+                {weekData.map((val, i) => {
+                  const h = Math.round((val / 100) * 120)
+                  const isCur = i === activeDay
+                  return (
+                    <div
+                      key={days[i]}
+                      onClick={() => toast.info(`${days[i]}: ${val} story points delivered`)}
+                      className="flex-1 flex flex-col items-center gap-2 h-full justify-end group cursor-pointer"
+                    >
+                      <span className="text-[11px] font-mono text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {val}
+                      </span>
+                      <div
+                        className={`w-full rounded-t-lg transition-all duration-300 ${
+                          isCur
+                            ? 'bg-gradient-to-t from-indigo-600 to-indigo-400 shadow-[0_4px_12px_rgba(99,102,241,0.35)]'
+                            : 'bg-indigo-100 group-hover:bg-indigo-200'
+                        }`}
+                        style={{ height: `${h}px` }}
+                      />
+                      <span className={`text-xs font-medium ${isCur ? 'text-indigo-600 font-bold' : 'text-slate-500'}`}>
+                        {days[i]}
                       </span>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => router.push('/kanban')}
-              className="w-full mt-3 py-2.5 border border-dashed border-indigo-500/30 rounded-[10px] bg-transparent text-indigo-500 text-[12.5px] font-medium cursor-pointer hover:bg-indigo-500/[0.06] transition-colors"
-            >
-              View all tasks →
-            </button>
-          </Card>
-        </div>
+                  )
+                })}
+              </div>
+            </Card>
 
-        {/* Activity + Quick actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5">
-          {/* Activity feed */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="text-[15px] font-semibold text-slate-900">Team Activity</div>
-              <button className="text-xs text-indigo-500 bg-transparent border-none cursor-pointer font-medium hover:underline">View all</button>
-            </div>
-            <div className="flex flex-col">
-              {activity.map((a, i) => (
-                <div key={i} className="flex items-start gap-3 py-2.5 px-2 rounded-lg hover:bg-slate-50/80 transition-colors">
+            {/* Upcoming Deadlines */}
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-base font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Upcoming Deadlines
+                </div>
+                <button
+                  onClick={() => router.push('/calendar')}
+                  className="text-xs text-indigo-600 font-semibold bg-transparent border-none cursor-pointer hover:underline p-0"
+                >
+                  View All
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {deadlines.map((d, i) => (
                   <div
-                    className="w-8 h-8 rounded-[9px] flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                    style={{ background: a.avatar }}
+                    key={i}
+                    onClick={() => router.push('/calendar')}
+                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50/80 border border-slate-100 hover:border-indigo-200 cursor-pointer transition-colors"
                   >
-                    {a.user.split(' ').map(w => w[0]).join('')}
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-[12.5px] text-slate-900 leading-relaxed">
-                      <span className="font-semibold">{a.user}</span>
-                      <span className="text-slate-500 font-normal"> {a.action} </span>
-                      <span className="font-medium">{a.item}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
+                      <div>
+                        <div className="text-[13px] font-semibold text-slate-900">{d.title}</div>
+                        <div className="text-[11px] text-slate-400 mt-0.5">{d.project}</div>
+                      </div>
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">{a.time}</div>
+                    <span
+                      className="text-[11px] font-bold px-2 py-0.5 rounded-md"
+                      style={{
+                        background: d.priority === 'Critical' ? '#fee2e2' : '#fef3c7',
+                        color: d.priority === 'Critical' ? '#ef4444' : '#d97706',
+                      }}
+                    >
+                      {d.due}
+                    </span>
                   </div>
-                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${dotColor[a.type] ?? 'bg-slate-400'}`} />
-                </div>
-              ))}
-            </div>
-          </Card>
+                ))}
+              </div>
+            </Card>
+          </div>
 
-          {/* Quick actions + project overview */}
-          <div className="flex flex-col gap-4">
-            <Card className="p-5">
-              <div className="text-[15px] font-semibold text-slate-900 mb-3.5">Quick Actions</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {[
-                  { label: 'New Task', color: '#6366f1', bg: '#eef2ff', onClick: () => setModalOpen(true) },
-                  { label: 'Invite Member', color: '#10b981', bg: '#d1fae5', onClick: () => { router.push('/team'); toast.info('Invite members from the Team page') } },
-                  { label: 'New Sprint', color: '#f59e0b', bg: '#fef3c7', onClick: () => { router.push('/kanban'); toast.info('Sprint planning opened') } },
-                  { label: 'View Reports', color: '#8b5cf6', bg: '#ede9fe', onClick: () => router.push('/analytics') },
-                ].map(a => (
+          {/* Bottom: Activity Feed + Active Projects */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {/* Activity Feed */}
+            <Card className="lg:col-span-2 p-6">
+              <div className="flex items-center justify-between mb-5 relative">
+                <div>
+                  <div className="text-base font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                    Team Activity
+                  </div>
+                  <div className="text-xs text-slate-500 mt-0.5">Real-time updates from your workspace</div>
+                </div>
+
+                {/* Filter Dropdown */}
+                <div className="relative">
                   <button
-                    key={a.label}
-                    onClick={a.onClick}
-                    className="px-2.5 py-3 rounded-xl border-none text-[12.5px] font-semibold cursor-pointer transition-transform hover:scale-[1.02]"
-                    style={{ background: a.bg, color: a.color }}
+                    onClick={() => setShowFilterDropdown(p => !p)}
+                    className="text-xs text-slate-600 font-semibold bg-white px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer shadow-xs"
                   >
-                    {a.label}
+                    <FilterIcon size={12} />
+                    <span className="capitalize">{activityFilter === 'all' ? 'All Activity' : activityFilter}</span>
                   </button>
+
+                  {showFilterDropdown && (
+                    <div className="absolute right-0 top-9 w-36 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-20 animate-in fade-in">
+                      {['all', 'task', 'deploy', 'comment'].map(f => (
+                        <button
+                          key={f}
+                          onClick={() => {
+                            setActivityFilter(f)
+                            setShowFilterDropdown(false)
+                            toast.success(`Filter: ${f}`)
+                          }}
+                          className={`w-full text-left px-3 py-1.5 text-xs capitalize hover:bg-slate-50 ${
+                            activityFilter === f ? 'text-indigo-600 font-bold bg-indigo-50/50' : 'text-slate-600'
+                          }`}
+                        >
+                          {f === 'all' ? 'All Activity' : f}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                {filteredActivity.map((a, i) => (
+                  <div key={i} className="flex items-center gap-3.5">
+                    <div
+                      className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-xs"
+                      style={{ background: a.avatar }}
+                    >
+                      {a.user.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] text-slate-800 leading-tight truncate">
+                        <strong className="font-semibold text-slate-900">{a.user}</strong> {a.action}{' '}
+                        <span className="font-medium text-slate-700">{a.item}</span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">{a.time}</div>
+                    </div>
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${dotColor[a.type] || 'bg-slate-300'}`} />
+                  </div>
                 ))}
               </div>
             </Card>
 
-            <Card className="p-5">
-              <div className="flex items-center justify-between mb-3.5">
-                <div className="text-[15px] font-semibold text-slate-900">Project Progress</div>
-                <ChevronRightIcon size={16} />
-              </div>
-              {[
-                { name: 'Auth Service', p: 82, color: '#6366f1' },
-                { name: 'Payment Gateway', p: 61, color: '#10b981' },
-                { name: 'Customer Portal', p: 45, color: '#f59e0b' },
-              ].map(pr => (
-                <div key={pr.name} className="mb-3">
-                  <div className="flex justify-between mb-1">
-                    <span className="text-[12.5px] text-slate-900 font-medium">{pr.name}</span>
-                    <span className="text-[11.5px] text-slate-400 font-mono">{pr.p}%</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-slate-200/80">
-                    <div
-                      className="progress-fill h-full rounded-full"
-                      style={{ background: `linear-gradient(90deg, ${pr.color}, ${pr.color}99)`, width: `${pr.p}%` }}
-                    />
-                  </div>
+            {/* Active Projects Status */}
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-5">
+                <div className="text-base font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Project Status
                 </div>
-              ))}
+                <button
+                  onClick={() => router.push('/kanban')}
+                  className="text-xs text-indigo-600 font-semibold bg-transparent border-none cursor-pointer hover:underline p-0"
+                >
+                  Boards
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                {[
+                  { name: 'Auth Service', color: '#6366f1', progress: 82, badge: 'Sprint 14' },
+                  { name: 'Payment Gateway', color: '#10b981', progress: 61, badge: 'Staging' },
+                  { name: 'Analytics Dashboard', color: '#f59e0b', progress: 45, badge: 'In Dev' },
+                  { name: 'Mobile App v2', color: '#ef4444', progress: 28, badge: 'Design' },
+                ].map((p) => (
+                  <div
+                    key={p.name}
+                    onClick={() => router.push('/kanban')}
+                    className="p-3 rounded-xl bg-slate-50/80 border border-slate-100 hover:border-indigo-200 cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[13px] font-bold text-slate-900">{p.name}</span>
+                      <span className="text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200/60">
+                        {p.badge}
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${p.progress}%`, backgroundColor: p.color }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </Card>
           </div>
-        </div>
-      </main>
+        </main>
 
-      <CreateTaskModal
-        open={modalOpen}
-        defaultColumnId="backlog"
-        onClose={() => setModalOpen(false)}
-        onAdd={(task) => {
-          toast.success(`"${task.title}" created successfully!`)
-        }}
-      />
-    </div>
+        {/* Create Task Modal */}
+        <CreateTaskModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onCreateTask={() => {
+            setModalOpen(false)
+            toast.success('Task created successfully')
+            router.push('/kanban')
+          }}
+        />
+      </div>
+    </ProtectedRoute>
   )
 }

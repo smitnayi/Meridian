@@ -1,334 +1,348 @@
 "use client"
 
 import { useState } from 'react'
-import Sidebar from '../../components/sidebar'
-import { UserIcon, LockIcon, GlobeIcon, BellIcon, ShieldIcon } from '../../components/Icons'
+import Sidebar from '@/components/sidebar'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import { useAuth } from '@/context/AuthContext'
+import {
+  UsersIcon, SettingsIcon, CreditCardIcon, MessageIcon,
+  CheckIcon, ZapIcon, ShieldIcon, BellIcon
+} from '@/components/Icons'
+import { toast } from 'react-hot-toast'
 
 const tabs = [
-  { id: 'profile', label: 'Profile', icon: <UserIcon size={15} /> },
-  { id: 'workspace', label: 'Workspace', icon: <GlobeIcon size={15} /> },
-  { id: 'security', label: 'Security', icon: <LockIcon size={15} /> },
-  { id: 'notifications', label: 'Notifications', icon: <BellIcon size={15} /> },
+  { id: 'profile', label: 'My Profile', icon: <UsersIcon size={16} /> },
+  { id: 'notifications', label: 'Notifications', icon: <BellIcon size={16} /> },
+  { id: 'security', label: 'Security & 2FA', icon: <ShieldIcon size={16} /> },
+  { id: 'workspace', label: 'Workspace', icon: <ZapIcon size={16} /> },
 ]
 
-function Field({ label, type = 'text', value, hint, readOnly }) {
-  const [val, setVal] = useState(value)
-  return (
-    <div style={{ marginBottom: 20 }}>
-      <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#475569', marginBottom: 6, letterSpacing: '0.01em' }}>{label}</label>
-      <input
-        type={type}
-        value={val}
-        onChange={e => setVal(e.target.value)}
-        readOnly={readOnly}
-        style={{
-          width: '100%', padding: '10px 14px', borderRadius: 10,
-          border: '1px solid rgba(226,232,240,0.8)',
-          background: readOnly ? 'rgba(248,250,252,0.8)' : 'rgba(255,255,255,0.9)',
-          backdropFilter: 'blur(10px)',
-          fontSize: 13.5, color: readOnly ? '#94a3b8' : '#0f172a',
-          outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s',
-          fontFamily: 'Inter, sans-serif',
-          boxSizing: 'border-box',
-        }}
-        onFocus={e => { if (!readOnly) { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.12)' }}}
-        onBlur={e => { e.currentTarget.style.borderColor = 'rgba(226,232,240,0.8)'; e.currentTarget.style.boxShadow = 'none' }}
-      />
-      {hint && <div style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 5 }}>{hint}</div>}
-    </div>
-  )
-}
-
-function Toggle({ label, description, defaultOn }) {
-  const [on, setOn] = useState(defaultOn ?? false)
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(226,232,240,0.4)', gap: 16 }}>
-      <div>
-        <div style={{ fontSize: 13.5, fontWeight: 500, color: '#0f172a' }}>{label}</div>
-        <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{description}</div>
-      </div>
-      <button
-        onClick={() => setOn(o => !o)}
-        style={{
-          width: 44, height: 24, borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
-          background: on ? 'linear-gradient(135deg, #6366f1, #818cf8)' : 'rgba(226,232,240,0.8)',
-          position: 'relative', transition: 'background 0.2s',
-          boxShadow: on ? '0 2px 8px rgba(99,102,241,0.3)' : 'none',
-        }}
-      >
-        <div style={{
-          position: 'absolute', top: 3, left: on ? 23 : 3,
-          width: 18, height: 18, borderRadius: '50%', background: 'white',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.15)', transition: 'left 0.2s',
-        }} />
-      </button>
-    </div>
-  )
-}
-
-export default function Settings({ currentPage = 'settings', navigate }) {
+export default function Settings() {
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
-  const [saved, setSaved] = useState(false)
+  const [firstName, setFirstName] = useState('Alex')
+  const [lastName, setLastName] = useState('Johnson')
+  const [email, setEmail] = useState(user?.email || 'alex.johnson@meridian.io')
+  const [title, setTitle] = useState('Lead Product Engineer')
+  const [avatarInitials, setAvatarInitials] = useState('AJ')
+  const [emailNotifs, setEmailNotifs] = useState(true)
+  const [slackNotifs, setSlackNotifs] = useState(true)
+  const [twoFactor, setTwoFactor] = useState(false)
+  const [language, setLanguage] = useState('English (US)')
+  const [timezone, setTimezone] = useState('PST (UTC-8)')
 
-  const handleSave = () => {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2500)
+  const handleSaveProfile = (e) => {
+    e.preventDefault()
+    setAvatarInitials(`${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase() || 'AJ')
+    toast.success('Account settings saved successfully!')
+  }
+
+  const handleUploadPhoto = () => {
+    toast.success('Avatar updated to latest snapshot!')
   }
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar currentPage={currentPage} navigate={navigate} />
+    <ProtectedRoute>
+      <div className="flex min-h-screen w-full bg-[#f4f6fb] text-slate-800">
+        {/* Sidebar */}
+        <Sidebar />
 
-      <main className="page-content settings-page flex-1 min-w-0 overflow-y-auto">
-        <div style={{ marginBottom: 32 }}>
-          <div style={{ fontSize: 26, fontFamily: 'Outfit, sans-serif', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.02em' }}>Settings</div>
-          <div style={{ fontSize: 14, color: '#64748b', marginTop: 4 }}>Manage your account and workspace preferences</div>
-        </div>
-
-        <div className="settings-layout" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 24 }}>
-          {/* Tabs sidebar */}
-          <div className="glass settings-sidebar-panel" style={{ borderRadius: 18, padding: 8, alignSelf: 'start' }}>
-            {tabs.map(t => (
-              <button key={t.id} className="settings-tab-btn" onClick={() => setActiveTab(t.id)} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none',
-                background: activeTab === t.id ? 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(129,140,248,0.06))' : 'transparent',
-                color: activeTab === t.id ? '#6366f1' : '#475569',
-                fontSize: 13.5, fontWeight: activeTab === t.id ? 600 : 400,
-                cursor: 'pointer', textAlign: 'left', marginBottom: 2,
-                transition: 'background 0.15s', whiteSpace: 'nowrap', flexShrink: 0,
-              }}
-                onMouseEnter={e => { if (activeTab !== t.id) e.currentTarget.style.background = 'rgba(99,102,241,0.05)' }}
-                onMouseLeave={e => { if (activeTab !== t.id) e.currentTarget.style.background = 'transparent' }}
-              >
-                <span style={{ opacity: activeTab === t.id ? 1 : 0.6 }}>{t.icon}</span>
-                {t.label}
-              </button>
-            ))}
+        {/* Main Settings Layout */}
+        <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Account & Workspace Settings
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+              Manage your personal credentials, security keys, notification preferences, and team defaults
+            </p>
           </div>
 
-          {/* Content */}
-          <div className="glass settings-content-panel" style={{ borderRadius: 20, padding: 32 }}>
-            {activeTab === 'profile' && (
-              <div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 24 }}>Profile Information</div>
-                {/* Avatar */}
-                <div className="settings-avatar-row" style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28, padding: 20, background: 'rgba(248,250,252,0.8)', borderRadius: 14 }}>
-                  <div style={{
-                    width: 68, height: 68, borderRadius: 18,
-                    background: 'linear-gradient(135deg, #6366f1, #a78bfa)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 24, fontWeight: 700, color: 'white',
-                    boxShadow: '0 6px 18px rgba(99,102,241,0.3)',
-                    flexShrink: 0,
-                  }}>AJ</div>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', marginBottom: 4 }}>Alex Johnson</div>
-                    <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 10 }}>JPG, PNG or GIF · Max 2MB</div>
-                    <button style={{
-                      padding: '7px 16px', borderRadius: 8, fontSize: 12.5,
-                      border: '1px solid rgba(226,232,240,0.8)',
-                      background: 'rgba(255,255,255,0.9)', color: '#475569',
-                      fontWeight: 500, cursor: 'pointer',
-                    }}>Upload Photo</button>
-                  </div>
-                </div>
-
-                <div className="settings-name-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
-                  <Field label="First Name" value="Alex" />
-                  <Field label="Last Name" value="Johnson" />
-                </div>
-                <Field label="Email Address" type="email" value="alex@meridian.io" hint="Changing your email will require verification." />
-                <Field label="Role / Title" value="Engineering Lead" />
-                <div style={{ marginBottom: 20 }}>
-                  <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#475569', marginBottom: 6 }}>Bio</label>
-                  <textarea
-                    defaultValue="Engineering Lead at Meridian Labs. Building scalable systems that help teams ship faster."
-                    rows={3}
-                    style={{
-                      width: '100%', padding: '10px 14px', borderRadius: 10,
-                      border: '1px solid rgba(226,232,240,0.8)',
-                      background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)',
-                      fontSize: 13.5, color: '#0f172a', outline: 'none', resize: 'vertical',
-                      fontFamily: 'Inter, sans-serif', lineHeight: 1.5,
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-                <Field label="Timezone" value="America/New_York (UTC-5)" />
+          {/* Settings Container: Tab Rail + Active Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left Tabs Navigation (3 cols on desktop, horizontal bar on mobile) */}
+            <div className="lg:col-span-3 bg-white/80 backdrop-blur-md rounded-2xl p-2 border border-slate-200/80 shadow-xs">
+              <div className="flex lg:flex-col gap-1 overflow-x-auto">
+                {tabs.map(t => {
+                  const isActive = activeTab === t.id
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setActiveTab(t.id)}
+                      className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap text-left ${
+                        isActive
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
+                    >
+                      <span className={isActive ? 'text-white' : 'text-slate-400'}>{t.icon}</span>
+                      <span>{t.label}</span>
+                    </button>
+                  )
+                })}
               </div>
-            )}
+            </div>
 
-            {activeTab === 'workspace' && (
-              <div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 24 }}>Workspace Settings</div>
-                <Field label="Workspace Name" value="Meridian Labs" />
-                <Field label="Workspace URL" value="meridian-labs.meridian.io" hint="This is your unique workspace URL. Changing it will break existing links." />
-                <Field label="Team Size" value="8–25 employees" />
-                <div style={{ marginBottom: 20 }}>
-                  <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#475569', marginBottom: 6 }}>Default Project View</label>
-                  <select style={{
-                    width: '100%', padding: '10px 14px', borderRadius: 10,
-                    border: '1px solid rgba(226,232,240,0.8)',
-                    background: 'rgba(255,255,255,0.9)', fontSize: 13.5, color: '#0f172a', outline: 'none',
-                    fontFamily: 'Inter, sans-serif',
-                    boxSizing: 'border-box',
-                  }}>
-                    <option>Kanban Board</option>
-                    <option>List View</option>
-                    <option>Timeline</option>
-                    <option>Calendar</option>
-                  </select>
-                </div>
-                <div style={{ borderTop: '1px solid rgba(226,232,240,0.5)', paddingTop: 24, marginTop: 8 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#ef4444', marginBottom: 8 }}>Danger Zone</div>
-                  <div style={{ background: 'rgba(254,242,242,0.8)', borderRadius: 12, padding: 16, border: '1px solid rgba(239,68,68,0.15)' }}>
-                    <div style={{ fontSize: 13.5, fontWeight: 500, color: '#0f172a', marginBottom: 4 }}>Delete Workspace</div>
-                    <div style={{ fontSize: 12.5, color: '#64748b', marginBottom: 12 }}>This will permanently delete all projects, tasks, and data. This action cannot be undone.</div>
-                    <button style={{
-                      padding: '8px 16px', borderRadius: 8, border: '1px solid rgba(239,68,68,0.3)',
-                      background: 'transparent', color: '#ef4444', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                    }}>Delete Workspace</button>
+            {/* Right Settings Body (9 cols) */}
+            <div className="lg:col-span-9 space-y-6">
+              {/* ── 1. Profile Tab ── */}
+              {activeTab === 'profile' && (
+                <div className="rounded-2xl bg-white p-6 sm:p-7 border border-slate-200/80 shadow-xs">
+                  <div className="pb-4 border-b border-slate-100 mb-6">
+                    <h2 className="text-base font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                      Profile Information
+                    </h2>
+                    <p className="text-xs text-slate-400">Update your avatar, full name, and workspace contact details</p>
                   </div>
-                </div>
-              </div>
-            )}
 
-            {activeTab === 'security' && (
-              <div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 24 }}>Security Settings</div>
-                <Field label="Current Password" type="password" value="••••••••••••" />
-                <Field label="New Password" type="password" value="" hint="Must be at least 12 characters with uppercase, numbers, and symbols." />
-                <Field label="Confirm New Password" type="password" value="" />
-
-                <div style={{ borderTop: '1px solid rgba(226,232,240,0.5)', paddingTop: 24, marginTop: 8, marginBottom: 24 }}>
-                  <div className="settings-2fa-header" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-                    <ShieldIcon size={18} />
-                    <div style={{ fontSize: 15, fontWeight: 600, color: '#0f172a' }}>Two-Factor Authentication</div>
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#ecfdf5', color: '#10b981', fontWeight: 700 }}>Enabled</span>
-                  </div>
-                  <div style={{ fontSize: 13, color: '#64748b', marginBottom: 14 }}>Your account is protected with 2FA using an authenticator app.</div>
-                  <button style={{
-                    padding: '9px 18px', borderRadius: 10, border: '1px solid rgba(226,232,240,0.8)',
-                    background: 'rgba(255,255,255,0.8)', fontSize: 13, color: '#475569', fontWeight: 500, cursor: 'pointer',
-                  }}>Manage 2FA</button>
-                </div>
-
-                <div style={{ borderTop: '1px solid rgba(226,232,240,0.5)', paddingTop: 20 }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0f172a', marginBottom: 14 }}>Active Sessions</div>
-                  {[
-                    { device: 'MacBook Pro 14" (M3 Max)', location: 'New York, USA', time: 'Current session', current: true },
-                    { device: 'iPhone 16 Pro', location: 'New York, USA', time: '2 hours ago', current: false },
-                    { device: 'Chrome on Windows', location: 'Chicago, USA', time: 'Yesterday at 4:22 PM', current: false },
-                  ].map(s => (
-                    <div key={s.device} className="settings-session-row" style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      padding: '12px 14px', borderRadius: 10, marginBottom: 8, gap: 12,
-                      background: s.current ? 'rgba(99,102,241,0.06)' : 'rgba(248,250,252,0.8)',
-                      border: s.current ? '1px solid rgba(99,102,241,0.15)' : '1px solid rgba(226,232,240,0.5)',
-                    }}>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: '#0f172a' }}>{s.device}</div>
-                        <div style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 2 }}>{s.location} · {s.time}</div>
+                  <form onSubmit={handleSaveProfile} className="space-y-6">
+                    {/* Avatar Header Row */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white font-extrabold text-xl flex items-center justify-center shadow-md">
+                        {avatarInitials}
                       </div>
-                      {s.current ? (
-                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#ecfdf5', color: '#10b981', fontWeight: 600, flexShrink: 0 }}>Active</span>
-                      ) : (
-                        <button style={{ padding: '5px 12px', borderRadius: 8, border: '1px solid rgba(239,68,68,0.2)', background: 'transparent', color: '#ef4444', fontSize: 12, cursor: 'pointer', flexShrink: 0 }}>Revoke</button>
-                      )}
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-slate-900 mb-0.5">Profile Photo</div>
+                        <div className="text-[11px] text-slate-400 mb-2.5">JPG, GIF or PNG. Max file size 2MB.</div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={handleUploadPhoto}
+                            className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-2xs"
+                          >
+                            Upload New Photo
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toast.info('Default avatar selected')}
+                            className="px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
-            {activeTab === 'notifications' && (
-              <div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 24 }}>Notification Preferences</div>
-                <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 600, color: '#475569', marginBottom: 12, letterSpacing: '0.02em' }}>TASK NOTIFICATIONS</div>
-                  <Toggle label="Task assigned to you" description="Get notified when you're assigned a new task" defaultOn />
-                  <Toggle label="Task due date reminder" description="Reminder 24 hours before a task is due" defaultOn />
-                  <Toggle label="Task comments" description="When someone comments on your tasks" defaultOn />
-                  <Toggle label="Subtask completed" description="When a subtask you own is completed" />
-                </div>
-                <div style={{ marginBottom: 20, paddingTop: 8 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 600, color: '#475569', marginBottom: 12, letterSpacing: '0.02em' }}>TEAM & PROJECT</div>
-                  <Toggle label="New team member joined" description="When someone joins your workspace" defaultOn />
-                  <Toggle label="Sprint started or ended" description="Sprint lifecycle notifications" defaultOn />
-                  <Toggle label="Project status changes" description="When a project moves to a new status" />
-                  <Toggle label="Weekly digest" description="Summary of your team's progress every Monday" defaultOn />
-                </div>
-                <div style={{ paddingTop: 8 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 600, color: '#475569', marginBottom: 12, letterSpacing: '0.02em' }}>CHANNELS</div>
-                  <Toggle label="Email notifications" description="Send notifications to alex@meridian.io" defaultOn />
-                  <Toggle label="Slack integration" description="Forward notifications to Slack" />
-                  <Toggle label="Mobile push notifications" description="Push to your iOS and Android devices" defaultOn />
-                </div>
-              </div>
-            )}
+                    {/* Inputs */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">First Name</label>
+                        <input
+                          type="text"
+                          value={firstName}
+                          onChange={e => setFirstName(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name</label>
+                        <input
+                          type="text"
+                          value={lastName}
+                          onChange={e => setLastName(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        />
+                      </div>
+                    </div>
 
-            {/* Save button */}
-            <div className="settings-save-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, marginTop: 28, paddingTop: 24, borderTop: '1px solid rgba(226,232,240,0.5)', flexWrap: 'wrap' }}>
-              {saved && (
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, color: '#10b981', fontWeight: 500,
-                  animation: 'pageFadeIn 0.2s ease both',
-                }}>
-                  <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    ✓
-                  </div>
-                  Saved successfully
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={e => setEmail(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Job Title</label>
+                        <input
+                          type="text"
+                          value={title}
+                          onChange={e => setTitle(e.target.value)}
+                          className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
+                      <button
+                        type="submit"
+                        className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition-all cursor-pointer"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </form>
                 </div>
               )}
-              <button style={{
-                padding: '10px 22px', borderRadius: 11, border: 'none',
-                background: 'linear-gradient(135deg, #6366f1, #818cf8)', color: 'white',
-                fontSize: 13.5, fontWeight: 600, cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(99,102,241,0.3)',
-                transition: 'all 0.15s',
-              }}
-                onClick={handleSave}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 20px rgba(99,102,241,0.4)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 4px 14px rgba(99,102,241,0.3)'; e.currentTarget.style.transform = 'translateY(0)' }}
-              >
-                Save Changes
-              </button>
+
+              {/* ── 2. Notifications Tab ── */}
+              {activeTab === 'notifications' && (
+                <div className="rounded-2xl bg-white p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-6">
+                  <div className="pb-4 border-b border-slate-100">
+                    <h2 className="text-base font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                      Notification Preferences
+                    </h2>
+                    <p className="text-xs text-slate-400">Choose what updates you want to receive and where</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50">
+                      <div>
+                        <div className="text-xs font-bold text-slate-900">Email Digest Notifications</div>
+                        <div className="text-[11px] text-slate-500">Receive daily sprint updates, review requests, and task assignments</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEmailNotifs(p => !p)
+                          toast.success(`Email notifications ${!emailNotifs ? 'enabled' : 'disabled'}`)
+                        }}
+                        className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                          emailNotifs ? 'bg-indigo-600' : 'bg-slate-300'
+                        }`}
+                      >
+                        <div className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 ${
+                          emailNotifs ? 'right-1' : 'left-1'
+                        }`} />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50">
+                      <div>
+                        <div className="text-xs font-bold text-slate-900">Slack & Real-time Webhook Alerts</div>
+                        <div className="text-[11px] text-slate-500">Post instant notifications into your company Slack channels</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSlackNotifs(p => !p)
+                          toast.success(`Slack alerts ${!slackNotifs ? 'enabled' : 'disabled'}`)
+                        }}
+                        className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                          slackNotifs ? 'bg-indigo-600' : 'bg-slate-300'
+                        }`}
+                      >
+                        <div className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 ${
+                          slackNotifs ? 'right-1' : 'left-1'
+                        }`} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── 3. Security Tab ── */}
+              {activeTab === 'security' && (
+                <div className="rounded-2xl bg-white p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-6">
+                  <div className="pb-4 border-b border-slate-100">
+                    <h2 className="text-base font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                      Security & Two-Factor Authentication
+                    </h2>
+                    <p className="text-xs text-slate-400">Keep your account safe with multi-factor authentication and active session management</p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">Two-Factor Authentication (2FA)</div>
+                      <div className="text-[11px] text-slate-500">Require an authenticator app code (TOTP) when logging in</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTwoFactor(p => !p)
+                        toast.success(`Two-factor authentication ${!twoFactor ? 'enabled' : 'disabled'}`)
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                        twoFactor
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-indigo-600 text-white shadow-xs'
+                      }`}
+                    >
+                      {twoFactor ? '✓ 2FA Enabled' : 'Enable 2FA'}
+                    </button>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100">
+                    <div className="text-xs font-bold text-slate-900 mb-2">Active Sessions</div>
+                    <div className="p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 font-bold text-xs flex items-center justify-center">
+                          💻
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-slate-800">Chrome on macOS (Current Session)</div>
+                          <div className="text-[10px] text-slate-400">San Francisco, US · IP 192.168.1.1</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        Active Now
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── 4. Workspace Tab ── */}
+              {activeTab === 'workspace' && (
+                <div className="rounded-2xl bg-white p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-6">
+                  <div className="pb-4 border-b border-slate-100">
+                    <h2 className="text-base font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                      Workspace Localization & Preferences
+                    </h2>
+                    <p className="text-xs text-slate-400">Configure default timezone, language, and workspace sprint cadence</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Display Language</label>
+                      <select
+                        value={language}
+                        onChange={e => setLanguage(e.target.value)}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 outline-none focus:border-indigo-500"
+                      >
+                        <option value="English (US)">English (US)</option>
+                        <option value="English (UK)">English (UK)</option>
+                        <option value="Spanish">Spanish (Español)</option>
+                        <option value="French">French (Français)</option>
+                        <option value="German">German (Deutsch)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Timezone</label>
+                      <select
+                        value={timezone}
+                        onChange={e => setTimezone(e.target.value)}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 outline-none focus:border-indigo-500"
+                      >
+                        <option value="PST (UTC-8)">PST (Pacific Standard Time, UTC-8)</option>
+                        <option value="EST (UTC-5)">EST (Eastern Standard Time, UTC-5)</option>
+                        <option value="UTC (UTC+0)">UTC (Coordinated Universal Time)</option>
+                        <option value="CET (UTC+1)">CET (Central European Time, UTC+1)</option>
+                        <option value="IST (UTC+5:30)">IST (India Standard Time, UTC+5:30)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => toast.success('Workspace preferences updated!')}
+                      className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition-all cursor-pointer"
+                    >
+                      Save Preferences
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      </main>
-
-      <style>{`
-        .settings-page { padding: 24px; }
-
-        /* Tablet: tighten padding, keep the 220px tab rail but shrink content padding */
-        @media (max-width: 900px) {
-          .settings-page { padding: 18px; }
-          .settings-content-panel { padding: 24px !important; }
-        }
-
-        /* Phone: tab rail becomes a horizontally scrollable strip above the content,
-           instead of a fixed-width left column that would crush the page */
-        @media (max-width: 640px) {
-          .settings-page { padding: 14px; }
-          .settings-layout { display: flex !important; flex-direction: column; gap: 16px !important; }
-          .settings-sidebar-panel {
-            display: flex !important;
-            flex-direction: row !important;
-            gap: 4px;
-            overflow-x: auto;
-            padding: 6px !important;
-          }
-          .settings-tab-btn { width: auto !important; }
-          .settings-content-panel { padding: 18px !important; border-radius: 16px !important; }
-          .settings-name-grid { grid-template-columns: 1fr !important; }
-          .settings-avatar-row { flex-wrap: wrap; }
-          .settings-session-row { flex-wrap: wrap; }
-          .settings-save-row { justify-content: stretch !important; }
-          .settings-save-row button { flex: 1; }
-        }
-      `}</style>
-    </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   )
 }

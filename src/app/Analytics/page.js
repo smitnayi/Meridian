@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Sidebar from '@/components/sidebar'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import {
   TrendingUpIcon, CheckIcon, ZapIcon,
   DownloadIcon, MoreHorizontalIcon,
@@ -52,31 +53,33 @@ function DonutChart({ data }) {
   const cx = 80
   const cy = 80
   const circumference = 2 * Math.PI * r
-  let offset = 0
+
+  const slices = data.map((d, i) => {
+    const prevTotal = data.slice(0, i).reduce((sum, item) => sum + item.value, 0)
+    const runningOffset = total > 0 ? (prevTotal / total) * circumference : 0
+    const dasharray = total > 0 ? (d.value / total) * circumference : 0
+    const dashoffset = circumference - runningOffset
+    return { ...d, dasharray, dashoffset }
+  })
 
   return (
     <svg viewBox="0 0 160 160" className="w-40 h-40">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e2e8f0" strokeOpacity={0.5} strokeWidth={22} />
-      {data.map((d, i) => {
-        const dasharray = (d.value / total) * circumference
-        const dashoffset = circumference - offset
-        offset = offset + dasharray
-        return (
-          <circle
-            key={i}
-            cx={cx}
-            cy={cy}
-            r={r}
-            fill="none"
-            stroke={d.color}
-            strokeWidth={22}
-            strokeDasharray={`${dasharray} ${circumference - dasharray}`}
-            strokeDashoffset={dashoffset}
-            strokeLinecap="round"
-            className="transition-all duration-700 ease-out origin-center -rotate-90"
-          />
-        )
-      })}
+      {slices.map((d, i) => (
+        <circle
+          key={i}
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill="none"
+          stroke={d.color}
+          strokeWidth={22}
+          strokeDasharray={`${d.dasharray} ${circumference - d.dasharray}`}
+          strokeDashoffset={d.dashoffset}
+          strokeLinecap="round"
+          className="transition-all duration-700 ease-out origin-center -rotate-90"
+        />
+      ))}
       <text x={cx} y={cy - 4} textAnchor="middle" className="text-xl font-bold fill-slate-900 font-sans">
         {total}
       </text>
@@ -148,22 +151,17 @@ function AreaChart() {
 }
 
 // --- Main Analytics Component ---
-export default function Analytics({ navigate, currentPage = 'analytics' }) {
+export default function Analytics() {
   const [range, setRange] = useState('8 Weeks')
 
   return (
-    <div className="flex min-h-screen w-full">
-      {/* 1. Sidebar Component (Uses your exact props and handlers) */}
-      <Sidebar 
-        currentPage={currentPage} 
-        navigate={navigate} 
-        onNotificationClick={() => toast.info('Notifications clicked')}
-        onProfileClick={() => toast.info('Profile clicked')}
-        onCommandPalette={() => toast.info('Command Palette opened')}
-      />
+    <ProtectedRoute>
+      <div className="flex min-h-screen w-full">
+        {/* 1. Sidebar Component */}
+        <Sidebar />
 
-      {/* 2. Main Analytics Content */}
-      <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto">
+        {/* 2. Main Analytics Content */}
+        <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
         {/* Header */}
         <div className="flex flex-col items-stretch justify-between gap-3 mb-7 sm:flex-row sm:items-start sm:gap-3">
           <div>
@@ -341,5 +339,6 @@ export default function Analytics({ navigate, currentPage = 'analytics' }) {
         </Card>
       </main>
     </div>
+    </ProtectedRoute>
   )
 }

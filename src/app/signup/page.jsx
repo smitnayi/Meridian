@@ -355,7 +355,7 @@ function OtpModal({ email, onClose, onSuccess }) {
             Verify your email
           </h3>
           <p className="text-sm text-slate-500 m-0">
-            We've sent a 6-digit verification code to <strong className="text-slate-900">{email}</strong>.
+            We&apos;ve sent a 6-digit verification code to <strong className="text-slate-900">{email}</strong>.
           </p>
         </div>
 

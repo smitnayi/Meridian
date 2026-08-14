@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 
-async function POST(request){
+export async function POST(request){
     try{
         const {email,password} = await request.json();
 
@@ -15,7 +15,7 @@ async function POST(request){
             },{status:400})
         }
 
-        const [user] = await db.query(`Select email,password from users where email = ?`,[email]);
+        const [user] = await db.query(`Select first_name,last_name,email,password from users where email = ?`,[email]);
 
 
         if(user.length === 0){
@@ -34,15 +34,21 @@ async function POST(request){
             },{status:400})
         }
 
-        const token = jwt.sign({email:user[0].email},process.env.JWT_SECRET,{expiresIn:"7d"});
+        const token = jwt.sign({userId:user[0].id,email:user[0].email},process.env.JWT_SECRET,{expiresIn:"7d"});
 
         return NextResponse.json({
             success:true,
             message:"Login successful",
+            user:{
+                firstName:user[0].first_name,
+                lastName:user[0].last_name,
+                email:user[0].email,
+            },
             token
         },{status:200})
 
     }catch(error){
+        console.log(error);
         return NextResponse.json({
             success:false,
             message:"Something went wrong",

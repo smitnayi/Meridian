@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState } from 'react';
-import {useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import {login as loginApi} from '../Service/authService'
+import {toast} from 'react-hot-toast'
 
 /* ── Tiny Icons ── */
 const GoogleIcon = () => (
@@ -241,6 +244,7 @@ function LeftPanel() {
 /* ── Main Login Component ── */
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -248,21 +252,13 @@ export default function LoginPage() {
   const [emailErr, setEmailErr] = useState('');
   const [pwErr, setPwErr] = useState('');
 
-  const load = (fn) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (fn) fn();
-    }, 1000);
-  };
-
   const validateEmail = (v) => {
     if (!v) return 'Email is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Please enter a valid email address';
     return '';
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const e = validateEmail(email);
     if (e) {
       setEmailErr(e);
@@ -272,7 +268,18 @@ export default function LoginPage() {
       setPwErr('Password is required');
       return;
     }
-    load(() => router.push('/dashboard'));
+
+    setLoading(true);
+    setEmailErr('');
+    setPwErr('');
+    try {
+      const result = await loginApi({email,password})
+      router.push('/dashboard');
+    } catch(error) {
+      setPwErr(error.message || 'Invalid email or password');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -361,7 +368,6 @@ export default function LoginPage() {
           <PrimaryBtn loading={loading} onClick={handleSubmit}>
             Sign in
           </PrimaryBtn>
-
           <Divider />
 
           {/* OTP Alternate Login */}
