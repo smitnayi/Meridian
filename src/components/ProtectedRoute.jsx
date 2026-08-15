@@ -4,6 +4,14 @@ import React, { useEffect, useSyncExternalStore } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 
+const params = new URLSearchParams(window.location.search);
+const token = params.get("token");
+
+if (token) {
+    localStorage.setItem("meridian_token", token);
+    window.history.replaceState({}, "", "/dashboard");
+}
+
 const emptySubscribe = () => () => {}
 
 export default function ProtectedRoute({ children }) {

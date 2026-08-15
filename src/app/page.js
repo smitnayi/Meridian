@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import {login as loginApi} from '../Service/authService'
+import {login as loginApi, googleLogin} from '../Service/authService'
 import {toast} from 'react-hot-toast'
 
 /* ── Tiny Icons ── */
@@ -302,7 +302,7 @@ export default function LoginPage() {
 
           {/* Social Logins */}
           <div className="flex flex-col gap-2.5 mb-1">
-            <SocialBtn onClick={() => load(() => router.push('/dashboard'))}>
+            <SocialBtn onClick={googleLogin}>
               <GoogleIcon />
               Continue with Google
             </SocialBtn>

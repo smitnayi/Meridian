@@ -1,0 +1,81 @@
+import { NextResponse } from "next/server";
+import db from "@/Lib/db";
+import jwt from "jsonwebtoken";
+
+export async function GET(request){
+    try{
+        const url = new URL(request.url)
+        const code = url.searchParams.get("code");
+
+        if(!code){
+            return NextResponse.json({
+                success:false,
+                message:"Code not found"
+            },{status:400})
+        }
+
+
+        const tokenResponse = await fetch(`https://oauth2.googleapis.com/token`,{
+            method:"POST",
+            headers:{
+                "content-Type" :"application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                code: code,
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+                grant_type:"authorization_code"
+            })
+        })
+
+        const tokenData = await tokenResponse.json();
+
+        const userResponse = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo`,
+            {
+                headers:{
+                    Authorization:`Bearer ${tokenData.access_token}`
+                }
+            }
+        )
+
+        const userInfo = await userResponse.json();
+
+        const googleId = userInfo.id;
+        const email = userInfo.email;
+        const firstName = userInfo.given_name;
+        const lastName = userInfo.family_name;
+
+        const [user] = await db.query(`Select * from users where email = ?`,[email]);
+
+        if(user.length > 0){
+            await db.query(`update users set google_id = ? WHERE email = ?`, [googleId,email]);
+        }else{
+            await db.query(`Insert into users (google_id,email,first_name,last_name) values (?,?,?,?)`,[googleId,email,firstName,lastName]);
+        }
+
+        const token = jwt.sign({email:email},process.env.JWT_SECRET ,{expiresIn:"7d"});
+
+        const response = NextResponse.redirect(new URL("/dashboard",request.url));
+
+        //storing JWT in http-cookies
+        response.cookies.set("token",token,{
+            httpOnly:true,
+            secure:"production",
+            sameSite:"lax",
+            maxAge: 7 * 24 * 60 * 60,
+            path: "/"
+        })
+
+        return NextResponse.redirect(
+        new URL(`/dashboard?token=${token}`, request.url)
+        );  
+
+
+    }catch(error){
+        return NextResponse.json({
+            success:false,
+            message:error.message},
+            {status:500})
+    }
+}

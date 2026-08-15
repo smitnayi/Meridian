@@ -71,3 +71,7 @@ export async function login(data){
 
     return result
 }
+
+export async function googleLogin(){
+    window.location.href = '/api/auth/google';
+}
