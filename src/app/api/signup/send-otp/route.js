@@ -7,6 +7,8 @@ import { BrevoClient } from "@getbrevo/brevo";
 const brevo = new BrevoClient({
   apiKey: process.env.BREVO_API_KEY,
 });
+
+
 export async function POST(request) {
   try {
     const { firstName, lastName, email } = await request.json();

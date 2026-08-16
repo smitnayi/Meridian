@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { login as loginApi } from '../Service/authService';
+import { login as loginApi, googleLogin } from '../Service/authService';
 import { toast } from 'react-hot-toast';
 import { ZapIcon, ArrowRightIcon, CheckIcon, ShieldIcon } from '@/components/Icons';
 
@@ -208,10 +208,7 @@ export default function LoginPage() {
           {/* Social Logins */}
           <div className="grid grid-cols-2 gap-2 mb-4">
             <button
-              onClick={() => {
-                demoLogin();
-                toast.success('Signed in with Google');
-              }}
+              onClick={googleLogin}
               type="button"
               className="py-2.5 px-3 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 text-xs font-bold text-stone-700 flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
             >
