@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=GFS+Didot&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* For Tailwind v4 */
 @import 'tailwindcss';
@@ -8,17 +8,18 @@
   --bg-canvas-subtle: #f2efe7;
   --card-bg: #ffffff;
   --card-border: rgba(0, 0, 0, 0.05);
-  --text-primary: #121316;
-  --text-secondary: #57534e;
-  --text-muted: #8c827a;
-  
-  /* ── World-Class Luxury Typography Hierarchy ── */
-  --font-serif: 'Instrument Serif', 'Newsreader', 'Bodoni Moda', 'Playfair Display', Georgia, serif;
-  --font-didot: 'Instrument Serif', 'Newsreader', 'Bodoni Moda', 'Playfair Display', serif;
-  --font-sans-display: 'Inter Tight', 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-num: 'Inter Tight', 'Plus Jakarta Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  --text-primary: #111318;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+
+  /* ── Modern Aesthetic Sans-Serif Typography Hierarchy ── */
+  --font-display: 'Outfit', 'Space Grotesk', -apple-system, sans-serif;
+  --font-serif: 'Outfit', 'Space Grotesk', -apple-system, sans-serif;
+  --font-didot: 'Outfit', 'Space Grotesk', -apple-system, sans-serif;
+  --font-sans-display: 'Outfit', 'Space Grotesk', sans-serif;
+  --font-body: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-num: 'Outfit', 'Space Grotesk', 'DM Sans', sans-serif;
+  --font-mono: 'Space Mono', 'JetBrains Mono', 'SF Mono', Menlo, monospace;
 
   /* Signature Pastels */
   --pastel-lavender: #ede9fe;
@@ -36,11 +37,15 @@
   --dark-dock: #111318;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -54,19 +59,38 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-optical-sizing: auto;
   font-feature-settings: "cv02" 1, "cv03" 1, "cv04" 1, "cv11" 1, "ss01" 1, "tnum" 1;
 }
 
-/* ── Specific Editorial Display Headings ── */
-.font-serif, .display-serif, .editorial-heading {
-  font-family: var(--font-serif);
-  letter-spacing: -0.025em;
-  font-feature-settings: "kern" 1, "liga" 1, "dlig" 1;
+/* ── Modern Aesthetic Display Headings ── */
+.font-serif,
+.display-serif,
+.editorial-heading,
+h1,
+h2,
+h3 {
+  font-family: var(--font-display) !important;
+  letter-spacing: -0.032em !important;
+  font-weight: 700;
+}
+
+/* Modern non-cursive emphasis */
+.font-serif em,
+h1 em,
+h2 em,
+h3 em {
+  font-style: normal !important;
+  font-family: var(--font-display) !important;
+  color: #111318;
+  font-weight: 800;
 }
 
 /* ── Standard Interface Font Refinements ── */
-button, input, select, textarea, .font-body {
+button,
+input,
+select,
+textarea,
+.font-body {
   font-family: var(--font-body);
   font-feature-settings: "cv02" 1, "cv03" 1, "cv04" 1, "cv11" 1;
 }
@@ -75,19 +99,21 @@ button, input, select, textarea, .font-body {
 .text-\[9px\] {
   font-size: 9px;
   line-height: 1.25;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.035em;
+  font-weight: 700;
 }
 
 .text-\[10px\] {
   font-size: 10px;
   line-height: 1.35;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.025em;
+  font-weight: 600;
 }
 
 .text-\[11px\] {
   font-size: 11px;
   line-height: 1.4;
-  letter-spacing: -0.008em;
+  letter-spacing: -0.01em;
 }
 
 .text-xs {
@@ -95,14 +121,17 @@ button, input, select, textarea, .font-body {
 }
 
 .text-sm {
-  letter-spacing: -0.015em;
+  letter-spacing: -0.018em;
 }
 
 /* ── Crisp, High-Contrast Modern Sans Metrics (Cards, Charts, KPI Dials) ── */
-.stat-number, .kpi-number, .kpi-val, .luxury-num {
+.stat-number,
+.kpi-number,
+.kpi-val,
+.luxury-num {
   font-family: var(--font-num) !important;
   font-weight: 800 !important;
-  letter-spacing: -0.045em !important;
+  letter-spacing: -0.04em !important;
   font-variant-numeric: tabular-nums lining-nums;
   line-height: 1;
 }
@@ -112,7 +141,7 @@ button, input, select, textarea, .font-body {
   font-size: 11px !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em !important;
-  color: #78716c !important;
+  color: #71717a !important;
 }
 
 .chart-percentage-badge {
@@ -126,21 +155,25 @@ button, input, select, textarea, .font-body {
 .mono-tag {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
+
 
 /* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(18, 19, 22, 0.15);
   border-radius: 99px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(18, 19, 22, 0.3);
 }
@@ -200,39 +233,38 @@ button, input, select, textarea, .font-body {
 
 /* Striped Animated Bar */
 .striped-bar-green {
-  background: repeating-linear-gradient(
-    -45deg,
-    #a3e635,
-    #a3e635 6px,
-    #84cc16 6px,
-    #84cc16 12px
-  );
+  background: repeating-linear-gradient(-45deg,
+      #a3e635,
+      #a3e635 6px,
+      #84cc16 6px,
+      #84cc16 12px);
 }
 
 .striped-bar-orange {
-  background: repeating-linear-gradient(
-    -45deg,
-    #fb923c,
-    #fb923c 6px,
-    #f97316 6px,
-    #f97316 12px
-  );
+  background: repeating-linear-gradient(-45deg,
+      #fb923c,
+      #fb923c 6px,
+      #f97316 6px,
+      #f97316 12px);
 }
 
 .striped-bar-purple {
-  background: repeating-linear-gradient(
-    -45deg,
-    #c084fc,
-    #c084fc 6px,
-    #a855f7 6px,
-    #a855f7 12px
-  );
+  background: repeating-linear-gradient(-45deg,
+      #c084fc,
+      #c084fc 6px,
+      #a855f7 6px,
+      #a855f7 12px);
 }
 
 /* Animations */
 @keyframes barGrow {
-  from { transform: scaleY(0); }
-  to { transform: scaleY(1); }
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
 }
 
 .bar-animate {
