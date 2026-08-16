@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=GFS+Didot&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=GFS+Didot&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* For Tailwind v4 */
 @import 'tailwindcss';
@@ -12,13 +12,13 @@
   --text-secondary: #57534e;
   --text-muted: #8c827a;
   
-  /* ── World-Class Typography Hierarchy ── */
-  --font-serif: 'Instrument Serif', 'Bodoni Moda', 'Playfair Display', serif;
-  --font-didot: 'Instrument Serif', 'Bodoni Moda', 'Playfair Display', serif;
+  /* ── World-Class Luxury Typography Hierarchy ── */
+  --font-serif: 'Instrument Serif', 'Newsreader', 'Bodoni Moda', 'Playfair Display', Georgia, serif;
+  --font-didot: 'Instrument Serif', 'Newsreader', 'Bodoni Moda', 'Playfair Display', serif;
   --font-sans-display: 'Inter Tight', 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-num: 'Inter Tight', 'Plus Jakarta Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
 
   /* Signature Pastels */
   --pastel-lavender: #ede9fe;
@@ -54,19 +54,55 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
+  font-feature-settings: "cv02" 1, "cv03" 1, "cv04" 1, "cv11" 1, "ss01" 1, "tnum" 1;
 }
 
 /* ── Specific Editorial Display Headings ── */
 .font-serif, .display-serif, .editorial-heading {
   font-family: var(--font-serif);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  font-feature-settings: "kern" 1, "liga" 1, "dlig" 1;
+}
+
+/* ── Standard Interface Font Refinements ── */
+button, input, select, textarea, .font-body {
+  font-family: var(--font-body);
+  font-feature-settings: "cv02" 1, "cv03" 1, "cv04" 1, "cv11" 1;
+}
+
+/* ── Optical Micro-Typography & Badges ── */
+.text-\[9px\] {
+  font-size: 9px;
+  line-height: 1.25;
+  letter-spacing: 0.03em;
+}
+
+.text-\[10px\] {
+  font-size: 10px;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+}
+
+.text-\[11px\] {
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: -0.008em;
+}
+
+.text-xs {
+  letter-spacing: -0.012em;
+}
+
+.text-sm {
+  letter-spacing: -0.015em;
 }
 
 /* ── Crisp, High-Contrast Modern Sans Metrics (Cards, Charts, KPI Dials) ── */
 .stat-number, .kpi-number, .kpi-val, .luxury-num {
   font-family: var(--font-num) !important;
   font-weight: 800 !important;
-  letter-spacing: -0.04em !important;
+  letter-spacing: -0.045em !important;
   font-variant-numeric: tabular-nums lining-nums;
   line-height: 1;
 }
@@ -90,10 +126,7 @@ body {
 .mono-tag {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-}
-
-button, input, select, textarea, .font-body {
-  font-family: var(--font-body);
+  letter-spacing: -0.015em;
 }
 
 /* Custom Sleek Scrollbar */
