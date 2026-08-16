@@ -4,14 +4,6 @@ import React, { useEffect, useSyncExternalStore } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 
-const params = new URLSearchParams(window.location.search);
-const token = params.get("token");
-
-if (token) {
-    localStorage.setItem("meridian_token", token);
-    window.history.replaceState({}, "", "/dashboard");
-}
-
 const emptySubscribe = () => () => {}
 
 export default function ProtectedRoute({ children }) {
@@ -21,7 +13,16 @@ export default function ProtectedRoute({ children }) {
   const isHydrated = useSyncExternalStore(emptySubscribe, () => true, () => false)
 
   useEffect(() => {
+    const  params = new URLSearchParams(window.location.search)
+    const tokenFromUrl = params.get('token')
+    if(!tokenFromUrl) {
+      localStorage.setItem('meridian_token', tokenFormUrl);
+      window.history.replaceState({}, "", "/dashboard");
+      window.location.reload();
+    }
     if (!loading && isHydrated && !isAuthenticated) {
+
+    
       if (typeof window !== 'undefined') {
         try {
           sessionStorage.setItem('meridian_redirect_after_login', pathname)

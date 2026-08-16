@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import {login as loginApi, googleLogin} from '../Service/authService'
+import {login as loginApi, googleLogin, githubLogin} from '../Service/authService'
 import {toast} from 'react-hot-toast'
 
 /* ── Tiny Icons ── */
@@ -306,7 +306,7 @@ export default function LoginPage() {
               <GoogleIcon />
               Continue with Google
             </SocialBtn>
-            <SocialBtn onClick={() => load(() => router.push('/dashboard'))}>
+            <SocialBtn onClick={githubLogin}>
               <GitHubIcon />
               Continue with GitHub
             </SocialBtn>
