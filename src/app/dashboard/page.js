@@ -1,355 +1,627 @@
 "use client"
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/sidebar'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import DynamicHeader from '@/components/DynamicHeader'
+import CreateTaskModal from '@/components/CreateTaskModal'
+import TaskDetailDrawer from '@/components/TaskDetailDrawer'
 import {
   CheckIcon, ClockIcon, UsersIcon, BarChartIcon,
-  ChevronRightIcon, PlusIcon, MoreHorizontalIcon, FilterIcon
+  ChevronRightIcon, PlusIcon, MoreHorizontalIcon, FilterIcon,
+  ArrowUpRightIcon, SearchIcon, SparklesIcon, ZapIcon, CheckCircleIcon,
+  ClipboardIcon, TargetIcon, RocketIcon
 } from '@/components/Icons'
-import CreateTaskModal from '@/components/CreateTaskModal'
 import { toast } from 'react-hot-toast'
 
-const stats = [
-  { label: 'Active Tasks', value: '47', delta: '+12%', sub: 'vs last week', color: '#6366f1', bg: '#eef2ff', icon: <CheckIcon size={20} />, href: '/kanban' },
-  { label: 'Hours Tracked', value: '184h', delta: '+8%', sub: 'this sprint', color: '#10b981', bg: '#ecfdf5', icon: <ClockIcon size={20} />, href: '/analytics' },
-  { label: 'Team Velocity', value: '94%', delta: '+5%', sub: 'efficiency', color: '#f59e0b', bg: '#fffbeb', icon: <BarChartIcon size={20} />, href: '/analytics' },
-  { label: 'Active Members', value: '12', delta: '+2', sub: 'online now', color: '#8b5cf6', bg: '#f5f3ff', icon: <UsersIcon size={20} />, href: '/team' },
+// Pastel Bento KPIs (from Reference 1 "Clarity")
+const bentoKPIs = [
+  {
+    id: 'tasks',
+    label: 'Total Tasks',
+    value: '137',
+    delta: '+20% vs last month',
+    bg: 'bg-[#EDE9FE]',
+    text: 'text-[#6D28D9]',
+    border: 'border-[#DDD6FE]',
+    icon: <ClipboardIcon size={18} />,
+    sparkline: [30, 45, 60, 55, 80, 95, 137]
+  },
+  {
+    id: 'efficiency',
+    label: 'Efficiency Score',
+    value: '8.6',
+    delta: '+0.5 vs last month',
+    bg: 'bg-[#FFEDD5]',
+    text: 'text-[#C2410C]',
+    border: 'border-[#FDBA74]',
+    icon: <ZapIcon size={18} />,
+    sparkline: [6.8, 7.2, 7.5, 7.9, 8.1, 8.4, 8.6]
+  },
+  {
+    id: 'completion',
+    label: 'Sprint Completion',
+    value: '74%',
+    delta: '+10% vs last month',
+    bg: 'bg-[#E0F2FE]',
+    text: 'text-[#0369A1]',
+    border: 'border-[#BAE6FD]',
+    icon: <TargetIcon size={18} />,
+    sparkline: [40, 52, 58, 62, 68, 70, 74]
+  },
+  {
+    id: 'velocity',
+    label: 'Team Velocity',
+    value: '94%',
+    delta: 'Top 5% speed',
+    bg: 'bg-[#ECFCCB]',
+    text: 'text-[#3F6212]',
+    border: 'border-[#D9F99D]',
+    icon: <RocketIcon size={18} />,
+    sparkline: [50, 60, 75, 80, 88, 91, 94]
+  },
 ]
 
-const weekData = [45, 68, 85, 92, 78, 60, 40]
-const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-const initialActivity = [
-  { user: 'Sarah Chen', avatar: '#6366f1', action: 'moved task to In Review', item: 'MRD-032 OAuth2 Social Login', time: '8m ago', type: 'task' },
-  { user: 'Marcus Webb', avatar: '#10b981', action: 'completed subtask', item: 'Verify Stripe webhook signatures', time: '24m ago', type: 'task' },
-  { user: 'Jordan Lee', avatar: '#0ea5e9', action: 'deployed to staging', item: 'Homepage Redesign v2', time: '1h ago', type: 'deploy' },
-  { user: 'Priya Nair', avatar: '#f59e0b', action: 'commented on', item: 'MRD-028 Design System components', time: '2h ago', type: 'comment' },
-  { user: 'Kai Okafor', avatar: '#ef4444', action: 'merged pull request #148', item: 'fix: auth token expiry check', time: '3h ago', type: 'deploy' },
+const initialLineUp = [
+  {
+    id: 'lu-1',
+    taskId: 'MRD-012',
+    category: 'Commercial',
+    title: 'Financial Mobile Banking App UI Kit',
+    pct: 68,
+    timeSpent: '14:20:00',
+    color: '#f97316',
+    border: 'border-orange-200',
+    bg: 'bg-orange-50/50',
+    assignees: [
+      { name: 'Sarah Chen', color: '#6366f1' },
+      { name: 'Alex Johnson', color: '#8b5cf6' }
+    ]
+  },
+  {
+    id: 'lu-2',
+    taskId: 'MRD-014',
+    category: 'Publications',
+    title: 'Design System 2.0 Typography & Tokens',
+    pct: 92,
+    timeSpent: '28:45:10',
+    color: '#8b5cf6',
+    border: 'border-violet-200',
+    bg: 'bg-violet-50/50',
+    assignees: [
+      { name: 'Kacie Velasquez', color: '#f43f5e' }
+    ]
+  }
 ]
 
-const deadlines = [
-  { title: 'Sprint 14 Review', project: 'Auth Service', due: 'Tomorrow, 3pm', priority: 'Critical', color: '#ef4444' },
-  { title: 'Stripe Integration QA', project: 'Payment Gateway', due: 'Friday, EOD', priority: 'High', color: '#f59e0b' },
-  { title: 'Customer Portal Beta', project: 'Customer Portal', due: 'Aug 14', priority: 'Medium', color: '#6366f1' },
+const myWorkInitial = [
+  {
+    id: 'mw-1',
+    taskId: 'MRD-021',
+    path: 'Publications / Shots',
+    title: 'Design 3 variations for iOS widget card mockup',
+    subtasksCompleted: 3,
+    subtasksTotal: 10,
+    due: 'Today 5pm',
+    tab: 'todo',
+    priority: 'High',
+    assignees: [{ initials: 'SC', color: '#6366f1' }, { initials: 'AJ', color: '#8b5cf6' }],
+    description: 'Deliverable required for marketing hero shots on Dribbble and social publication channels.',
+    subtasks: [
+      { text: 'Dark mode contrast audit', done: true },
+      { text: 'Export PNG assets @2x and @3x', done: true },
+      { text: 'Create motion preview in AfterEffects', done: true },
+      { text: 'Figma review with team lead', done: false },
+      { text: 'Client signoff', done: false }
+    ]
+  },
+  {
+    id: 'mw-2',
+    taskId: 'MRD-022',
+    path: 'Commercial / Portals',
+    title: 'Implement OAuth2 token refresh & user session handler',
+    subtasksCompleted: 4,
+    subtasksTotal: 6,
+    due: 'Tomorrow',
+    tab: 'todo',
+    priority: 'Critical',
+    assignees: [{ initials: 'MW', color: '#10b981' }],
+    description: 'Secure JWT rotation with Redis distributed cache for fast token validation.',
+    subtasks: [
+      { text: 'Write Redis session adapter', done: true },
+      { text: 'Setup cookie encryption', done: true },
+      { text: 'Write unit tests for token expiration', done: true },
+      { text: 'Security penetration test', done: true },
+      { text: 'Deploy to staging cluster', done: false }
+    ]
+  },
+  {
+    id: 'mw-3',
+    taskId: 'MRD-038',
+    path: 'Design internal / Exploration',
+    title: 'Explore responsive tablet layouts for task board view',
+    subtasksCompleted: 1,
+    subtasksTotal: 4,
+    due: 'July 30',
+    tab: 'todo',
+    priority: 'Medium',
+    assignees: [{ initials: 'KV', color: '#f43f5e' }],
+    description: 'Provide seamless touch gestures and drag-and-drop column handling for iPad Pro and Galaxy Tab.',
+    subtasks: [
+      { text: 'Touch drag gesture prototypes', done: true },
+      { text: 'Test on Safari Mobile', done: false }
+    ]
+  },
+  {
+    id: 'mw-4',
+    taskId: 'MRD-044',
+    path: 'Commercial / Portals',
+    title: 'Client Review & Feedback on v2 redesign',
+    subtasksCompleted: 5,
+    subtasksTotal: 5,
+    due: 'July 28',
+    tab: 'done',
+    priority: 'Low',
+    assignees: [{ initials: 'SC', color: '#6366f1' }],
+    description: 'Signed off by enterprise stakeholder committee.',
+    subtasks: [
+      { text: 'Final client signoff', done: true }
+    ]
+  }
 ]
-
-const dotColor = {
-  task: 'bg-indigo-500',
-  deploy: 'bg-emerald-500',
-  comment: 'bg-amber-500',
-}
-
-function Card({ children, className = '', style = {} }) {
-  return (
-    <div
-      className={`rounded-[20px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_24px_rgba(99,102,241,0.06)] ${className}`}
-      style={style}
-    >
-      {children}
-    </div>
-  )
-}
 
 export default function Dashboard() {
   const router = useRouter()
   const [modalOpen, setModalOpen] = useState(false)
-  const [activeDay] = useState(3) // Thu
-  const [activityFilter, setActivityFilter] = useState('all') // 'all' | 'task' | 'deploy' | 'comment'
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
+  const [selectedTask, setSelectedTask] = useState(null)
+  const [workTab, setWorkTab] = useState('todo')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [myWork, setMyWork] = useState(myWorkInitial)
+  const [hoveredBar, setHoveredBar] = useState(null)
 
-  const filteredActivity = initialActivity.filter(a => {
-    if (activityFilter === 'all') return true
-    return a.type === activityFilter
+  const filteredWork = myWork.filter(w => {
+    if (workTab === 'todo') return w.tab === 'todo'
+    if (workTab === 'done') return w.tab === 'done'
+    return true
+  }).filter(w => {
+    if (!searchQuery.trim()) return true
+    return w.title.toLowerCase().includes(searchQuery.toLowerCase()) || w.path.toLowerCase().includes(searchQuery.toLowerCase())
   })
+
+  const toggleTaskDone = (e, id) => {
+    e.stopPropagation()
+    setMyWork(prev => prev.map(t => {
+      if (t.id === id) {
+        const nextTab = t.tab === 'done' ? 'todo' : 'done'
+        toast.success(nextTab === 'done' ? 'Task moved to Done' : 'Task restored to Active')
+        return { ...t, tab: nextTab }
+      }
+      return t
+    }))
+  }
 
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen w-full bg-slate-50/50">
-        {/* 1. Sidebar Component */}
+      <div className="flex min-h-screen w-full bg-[#FAF8F5]">
+        {/* 1. Global Left Sidebar */}
         <Sidebar />
 
-        {/* 2. Main Dashboard Layout */}
+        {/* 2. Main Executive Canvas */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          {/* Header */}
-          <div className="flex flex-col items-stretch justify-between gap-3 mb-7 sm:flex-row sm:items-start sm:gap-3">
+          
+          {/* Dynamic Top Header & Schedule Island */}
+          <DynamicHeader
+            onOpenNewTask={() => setModalOpen(true)}
+            onOpenSearch={() => {
+              const evt = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
+              window.dispatchEvent(evt)
+            }}
+          />
+
+          {/* ── Greeting & Top Headline ── */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-              <div className="text-[21px] sm:text-[26px] font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                Good morning, Alex 👋
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                  Good morning, <em className="italic font-serif font-normal">Alex</em>
+                </h1>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-lime-200 text-lime-900 font-mono">
+                  Sprint 14
+                </span>
               </div>
-              <div className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
-                Thursday, August 7, 2026 · Sprint 14 is ending in 3 days
-              </div>
+              <p className="text-xs sm:text-sm text-stone-500 font-medium mt-1">
+                Let&apos;s make this day productive · 3 active high-priority deliverables queued
+              </p>
             </div>
-            <div className="flex flex-wrap gap-2.5">
-              <button
-                onClick={() => router.push('/analytics')}
-                className="flex-1 sm:flex-none justify-center px-4.5 py-2.5 rounded-xl border border-slate-200/80 bg-white/80 backdrop-blur-sm text-[13.5px] font-medium text-slate-600 hover:bg-white transition-colors cursor-pointer"
-              >
-                View Analytics
-              </button>
-              <button
-                onClick={() => setModalOpen(true)}
-                className="flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl border-none bg-gradient-to-br from-indigo-500 to-indigo-400 text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(99,102,241,0.35)] hover:shadow-[0_6px_18px_rgba(99,102,241,0.45)] transition-shadow cursor-pointer"
-              >
-                <PlusIcon size={15} strokeWidth={2.5} />
-                New Task
-              </button>
+
+            {/* Quick Summary Pill Badge */}
+            <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl border border-stone-200/80 shadow-2xs">
+              <div className="text-right">
+                <span className="text-[10px] uppercase tracking-wider font-bold text-stone-400 block">Tasks done</span>
+                <span className="text-base font-extrabold text-stone-950 stat-number">2,543</span>
+              </div>
+              <div className="w-8 h-8 rounded-xl bg-lime-100 text-lime-800 flex items-center justify-center font-bold text-xs">
+                <ArrowUpRightIcon size={14} />
+              </div>
             </div>
           </div>
 
-          {/* Stats Cards with Working Action Menus */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-            {stats.map(s => (
+          {/* ── 1. Bento KPI Metric Cards (Ref 1 "Clarity") ── */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
+            {bentoKPIs.map(kpi => (
               <div
-                key={s.label}
-                onClick={() => router.push(s.href)}
-                className="rounded-[20px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_24px_rgba(99,102,241,0.06)] p-5 transition-transform hover:-translate-y-0.5 cursor-pointer group"
+                key={kpi.id}
+                onClick={() => router.push(kpi.id === 'tasks' ? '/kanban' : '/Analytics')}
+                className={`rounded-3xl p-5 border ${kpi.border} ${kpi.bg} bento-card-interactive cursor-pointer relative overflow-hidden group`}
               >
-                <div className="flex items-start justify-between mb-3.5">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-xs" style={{ background: s.bg, color: s.color }}>
-                    {s.icon}
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      router.push(s.href)
-                      toast.info(`Opening ${s.label} view`)
-                    }}
-                    className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 transition-colors"
-                  >
-                    <MoreHorizontalIcon size={16} />
-                  </button>
-                </div>
-                <div className="text-[28px] font-bold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  {s.value}
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-[13px] font-medium text-slate-500 group-hover:text-indigo-600 transition-colors">{s.label}</span>
-                  <span className="text-[11.5px] font-semibold text-slate-600 bg-white/80 px-2 py-0.5 rounded-md border border-slate-200/50">
-                    {s.delta}
+                <div className="flex items-start justify-between mb-3">
+                  <span className="p-2 rounded-2xl bg-white/80 backdrop-blur-xs shadow-2xs text-stone-800">
+                    {kpi.icon}
                   </span>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/90 text-stone-700 shadow-2xs">
+                    {kpi.delta}
+                  </span>
+                </div>
+
+                <div className="text-4xl font-extrabold text-stone-950 tracking-tight mb-1 stat-number">
+                  {kpi.value}
+                </div>
+
+                <div className="text-xs font-semibold text-stone-700">
+                  {kpi.label}
+                </div>
+
+                {/* Micro sparkline visualizer */}
+                <div className="mt-3 flex items-end gap-1 h-5 pt-1">
+                  {kpi.sparkline.map((val, idx) => (
+                    <div
+                      key={idx}
+                      className="flex-1 bg-stone-900/20 rounded-full transition-all duration-300 group-hover:bg-stone-900/40"
+                      style={{ height: `${(val / Math.max(...kpi.sparkline)) * 100}%` }}
+                    />
+                  ))}
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Middle: Velocity Chart + Deadlines */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-            {/* Chart */}
-            <Card className="lg:col-span-2 p-6 flex flex-col justify-between">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <div className="text-base font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                    Sprint 14 Throughput
+          {/* ── 2. Middle Grid: LineUp (Ref 3) + Working Activity Schedule ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-7">
+            
+            {/* Left 2 Cols: LineUp & Trending Section */}
+            <div className="lg:col-span-2 space-y-6">
+              
+              {/* LineUp Cards */}
+              <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                      LineUp & <em className="italic font-serif font-normal">Focal Points</em>
+                    </h2>
+                    <span className="text-xs font-bold text-stone-400 stat-number">(2 active)</span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-0.5">Story points delivered per day vs target (80 pts)</div>
-                </div>
-                <button
-                  onClick={() => router.push('/analytics')}
-                  className="flex items-center gap-1 text-xs font-semibold text-indigo-600 bg-transparent border-none cursor-pointer hover:underline p-0"
-                >
-                  Full Report <ChevronRightIcon size={13} />
-                </button>
-              </div>
 
-              {/* Bar Chart */}
-              <div className="flex items-end gap-3 sm:gap-6 h-36 px-2 pb-2">
-                {weekData.map((val, i) => {
-                  const h = Math.round((val / 100) * 120)
-                  const isCur = i === activeDay
-                  return (
-                    <div
-                      key={days[i]}
-                      onClick={() => toast.info(`${days[i]}: ${val} story points delivered`)}
-                      className="flex-1 flex flex-col items-center gap-2 h-full justify-end group cursor-pointer"
-                    >
-                      <span className="text-[11px] font-mono text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {val}
-                      </span>
-                      <div
-                        className={`w-full rounded-t-lg transition-all duration-300 ${
-                          isCur
-                            ? 'bg-gradient-to-t from-indigo-600 to-indigo-400 shadow-[0_4px_12px_rgba(99,102,241,0.35)]'
-                            : 'bg-indigo-100 group-hover:bg-indigo-200'
-                        }`}
-                        style={{ height: `${h}px` }}
-                      />
-                      <span className={`text-xs font-medium ${isCur ? 'text-indigo-600 font-bold' : 'text-slate-500'}`}>
-                        {days[i]}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-            </Card>
-
-            {/* Upcoming Deadlines */}
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-base font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  Upcoming Deadlines
-                </div>
-                <button
-                  onClick={() => router.push('/calendar')}
-                  className="text-xs text-indigo-600 font-semibold bg-transparent border-none cursor-pointer hover:underline p-0"
-                >
-                  View All
-                </button>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                {deadlines.map((d, i) => (
-                  <div
-                    key={i}
-                    onClick={() => router.push('/calendar')}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50/80 border border-slate-100 hover:border-indigo-200 cursor-pointer transition-colors"
+                  <button
+                    onClick={() => router.push('/kanban')}
+                    className="text-xs font-semibold text-stone-500 hover:text-stone-900 flex items-center gap-1 transition-colors"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
-                      <div>
-                        <div className="text-[13px] font-semibold text-slate-900">{d.title}</div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">{d.project}</div>
+                    <span>View all</span>
+                    <ArrowUpRightIcon size={13} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {initialLineUp.map(item => (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setSelectedTask({
+                          id: item.id,
+                          taskId: item.taskId,
+                          title: item.title,
+                          priority: 'High',
+                          due: 'Today 5pm',
+                          assigneeName: 'Alex Johnson',
+                          assigneeColor: item.color,
+                          tags: ['Design', item.category],
+                          description: 'Active sprint focal point deliverable with live timer sync.'
+                        })
+                      }}
+                      className={`p-4 rounded-2xl border ${item.border} ${item.bg} hover:shadow-xs transition-all cursor-pointer group`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 font-mono">
+                          {item.category}
+                        </span>
+                        <span className="text-xl font-bold text-stone-900 stat-number">
+                          {item.pct}%
+                        </span>
+                      </div>
+
+                      <div className="text-xs font-bold text-stone-900 group-hover:text-stone-700 leading-snug mb-3">
+                        {item.title}
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-stone-500 pt-2 border-t border-stone-900/5">
+                        <div className="flex items-center gap-1 text-[11px]">
+                          <ClockIcon size={12} />
+                          <span className="stat-number">{item.timeSpent}</span>
+                        </div>
+
+                        <div className="flex -space-x-1.5 overflow-hidden">
+                          {item.assignees.map((a, i) => (
+                            <div
+                              key={i}
+                              className="w-5 h-5 rounded-full ring-1 ring-white text-[9px] font-bold text-white flex items-center justify-center"
+                              style={{ backgroundColor: a.color }}
+                            >
+                              {a.name[0]}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    <span
-                      className="text-[11px] font-bold px-2 py-0.5 rounded-md"
-                      style={{
-                        background: d.priority === 'Critical' ? '#fee2e2' : '#fef3c7',
-                        color: d.priority === 'Critical' ? '#ef4444' : '#d97706',
-                      }}
-                    >
-                      {d.due}
-                    </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </Card>
-          </div>
 
-          {/* Bottom: Activity Feed + Active Projects */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {/* Activity Feed */}
-            <Card className="lg:col-span-2 p-6">
-              <div className="flex items-center justify-between mb-5 relative">
-                <div>
-                  <div className="text-base font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                    Team Activity
+              {/* Trending Projects Strip */}
+              <div className="bg-white rounded-3xl p-5 border border-stone-200/80 shadow-2xs">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                      Trending <em className="italic font-serif font-normal">Initiatives</em>
+                    </h3>
+                    <span className="text-xs font-bold text-stone-400 stat-number">(3)</span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-0.5">Real-time updates from your workspace</div>
                 </div>
 
-                {/* Filter Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowFilterDropdown(p => !p)}
-                    className="text-xs text-slate-600 font-semibold bg-white px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer shadow-xs"
-                  >
-                    <FilterIcon size={12} />
-                    <span className="capitalize">{activityFilter === 'all' ? 'All Activity' : activityFilter}</span>
-                  </button>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200/60">
+                    <div className="text-[10px] text-stone-400 font-bold uppercase">Dribbble</div>
+                    <div className="font-bold text-stone-800 truncate">Banking App Animation</div>
+                    <div className="text-lg font-bold text-stone-900 stat-number mt-1">12%</div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200/60">
+                    <div className="text-[10px] text-stone-400 font-bold uppercase">Behance</div>
+                    <div className="font-bold text-stone-800 truncate">AI chat app case</div>
+                    <div className="text-lg font-bold text-stone-900 stat-number mt-1">36%</div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200/60">
+                    <div className="text-[10px] text-stone-400 font-bold uppercase">Meridian Internal</div>
+                    <div className="font-bold text-stone-800 truncate">Logotype & Token Design</div>
+                    <div className="text-lg font-bold text-stone-900 stat-number mt-1">98%</div>
+                  </div>
+                </div>
+              </div>
 
-                  {showFilterDropdown && (
-                    <div className="absolute right-0 top-9 w-36 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-20 animate-in fade-in">
-                      {['all', 'task', 'deploy', 'comment'].map(f => (
-                        <button
-                          key={f}
-                          onClick={() => {
-                            setActivityFilter(f)
-                            setShowFilterDropdown(false)
-                            toast.success(`Filter: ${f}`)
-                          }}
-                          className={`w-full text-left px-3 py-1.5 text-xs capitalize hover:bg-slate-50 ${
-                            activityFilter === f ? 'text-indigo-600 font-bold bg-indigo-50/50' : 'text-slate-600'
-                          }`}
+            </div>
+
+            {/* Right Col: Working Activity Timeline Schedule (Ref 3 & Ref 5) */}
+            <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-base font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                    Working <em className="italic font-serif font-normal">Activity</em>
+                  </h2>
+                  <span className="text-[11px] font-semibold text-stone-500 font-mono bg-stone-100 px-2 py-0.5 rounded-md">
+                    July 24 – 28
+                  </span>
+                </div>
+                <p className="text-xs text-stone-400 mb-5">Sprint hours logged across active days</p>
+
+                {/* Day Labels */}
+                <div className="grid grid-cols-5 text-center text-xs font-bold text-stone-600 mb-3">
+                  <div>Wed<span className="block text-stone-400 stat-number text-[10px]">24</span></div>
+                  <div>Thu<span className="block text-stone-400 stat-number text-[10px]">25</span></div>
+                  <div className="text-stone-900">Fri<span className="block text-rose-500 stat-number text-[10px]">26</span></div>
+                  <div>Sat<span className="block text-stone-400 stat-number text-[10px]">27</span></div>
+                  <div>Sun<span className="block text-stone-400 stat-number text-[10px]">28</span></div>
+                </div>
+
+                {/* Multi-Colored Vertical Time Blocks */}
+                <div className="grid grid-cols-5 gap-2 h-44 items-end relative py-2 border-b border-stone-100">
+                  
+                  {/* Wed 24 */}
+                  <div className="flex flex-col gap-1.5 h-full justify-end">
+                    <div className="w-full h-8 bg-rose-200 rounded-lg" />
+                    <div className="w-full h-14 bg-orange-400 rounded-lg" />
+                  </div>
+
+                  {/* Thu 25 */}
+                  <div className="flex flex-col gap-1.5 h-full justify-end">
+                    <div className="w-full h-12 bg-lime-400 rounded-lg" />
+                    <div className="w-full h-16 bg-orange-500 rounded-lg" />
+                  </div>
+
+                  {/* Fri 26 (Active Focus Day) */}
+                  <div
+                    className="flex flex-col gap-1.5 h-full justify-end relative cursor-pointer group"
+                    onMouseEnter={() => setHoveredBar('fri')}
+                    onMouseLeave={() => setHoveredBar(null)}
+                  >
+                    {hoveredBar === 'fri' && (
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#111318] text-white text-[10px] font-mono px-2.5 py-1 rounded-xl shadow-lg whitespace-nowrap z-20">
+                        10:59:16 Banking App
+                      </div>
+                    )}
+                    <div className="w-full h-6 bg-pink-400 rounded-lg" />
+                    <div className="w-full h-16 striped-bar-orange rounded-lg shadow-xs ring-2 ring-stone-900" />
+                    <div className="w-full h-8 bg-lime-300 rounded-lg" />
+                  </div>
+
+                  {/* Sat 27 */}
+                  <div className="flex flex-col gap-1.5 h-full justify-end">
+                    <div className="w-full h-10 bg-lime-400 rounded-lg" />
+                    <div className="w-full h-6 bg-violet-300 rounded-lg" />
+                  </div>
+
+                  {/* Sun 28 */}
+                  <div className="flex flex-col gap-1.5 h-full justify-end">
+                    <div className="w-full h-8 bg-pink-300 rounded-lg" />
+                    <div className="w-full h-14 bg-orange-400 rounded-lg" />
+                    <div className="w-full h-6 bg-lime-400 rounded-lg" />
+                  </div>
+
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 text-xs font-semibold text-stone-600">
+                <span>Total logged:</span>
+                <span className="text-stone-900 font-bold stat-number text-sm">24.5 hours</span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* ── 3. "My Work" Interactive Filter Table (Ref 3 & Ref 1) ── */}
+          <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs mb-10">
+            
+            {/* Header & Filter Pills */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-stone-100">
+              <div className="flex items-center gap-3">
+                <h2 className="text-base font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                  My <em className="italic font-serif font-normal">Work</em> & Deliverables
+                </h2>
+                <span className="text-xs font-bold text-stone-400 stat-number">({filteredWork.length})</span>
+              </div>
+
+              {/* Segmented Control Pills */}
+              <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-2xl">
+                <button
+                  onClick={() => setWorkTab('todo')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    workTab === 'todo'
+                      ? 'bg-[#111318] text-white shadow-xs'
+                      : 'text-stone-500 hover:text-stone-800'
+                  }`}
+                >
+                  To do ({myWork.filter(w => w.tab === 'todo').length})
+                </button>
+                <button
+                  onClick={() => setWorkTab('done')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    workTab === 'done'
+                      ? 'bg-[#111318] text-white shadow-xs'
+                      : 'text-stone-500 hover:text-stone-800'
+                  }`}
+                >
+                  Done ({myWork.filter(w => w.tab === 'done').length})
+                </button>
+              </div>
+            </div>
+
+            {/* List Rows */}
+            <div className="space-y-2">
+              {filteredWork.map(task => (
+                <div
+                  key={task.id}
+                  onClick={() => setSelectedTask(task)}
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-stone-50/70 hover:bg-stone-100/80 border border-stone-200/50 transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Checkbox Toggle */}
+                    <button
+                      type="button"
+                      onClick={(e) => toggleTaskDone(e, task.id)}
+                      className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-colors shrink-0 ${
+                        task.tab === 'done'
+                          ? 'bg-lime-500 border-lime-600 text-white'
+                          : 'border-stone-300 bg-white hover:border-stone-400'
+                      }`}
+                    >
+                      {task.tab === 'done' && <CheckIcon size={12} strokeWidth={3} />}
+                    </button>
+
+                    <div className="min-w-0">
+                      <div className="text-[10px] text-stone-400 font-mono tracking-tight">
+                        {task.path}
+                      </div>
+                      <div className={`text-xs font-bold text-stone-900 group-hover:text-stone-700 truncate ${
+                        task.tab === 'done' ? 'line-through text-stone-400' : ''
+                      }`}>
+                        {task.title}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 shrink-0">
+                    {/* Subtask Ratio */}
+                    <div className="hidden sm:flex items-center gap-1 text-[11px] font-semibold text-stone-500 bg-white px-2 py-0.5 rounded-md border border-stone-200/60">
+                      <span>✓</span>
+                      <span className="stat-number">{task.subtasksCompleted}/{task.subtasksTotal}</span>
+                    </div>
+
+                    {/* Assignee Avatars */}
+                    <div className="flex -space-x-1.5 overflow-hidden">
+                      {task.assignees.map((a, i) => (
+                        <div
+                          key={i}
+                          className="w-5 h-5 rounded-full ring-1 ring-white text-[9px] font-bold text-white flex items-center justify-center"
+                          style={{ backgroundColor: a.color }}
                         >
-                          {f === 'all' ? 'All Activity' : f}
-                        </button>
+                          {a.initials}
+                        </div>
                       ))}
                     </div>
-                  )}
-                </div>
-              </div>
 
-              <div className="flex flex-col gap-4">
-                {filteredActivity.map((a, i) => (
-                  <div key={i} className="flex items-center gap-3.5">
-                    <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-xs"
-                      style={{ background: a.avatar }}
-                    >
-                      {a.user.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] text-slate-800 leading-tight truncate">
-                        <strong className="font-semibold text-slate-900">{a.user}</strong> {a.action}{' '}
-                        <span className="font-medium text-slate-700">{a.item}</span>
-                      </div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">{a.time}</div>
-                    </div>
-                    <div className={`w-2 h-2 rounded-full shrink-0 ${dotColor[a.type] || 'bg-slate-300'}`} />
+                    {/* Due Date */}
+                    <span className="text-[11px] text-stone-400 font-mono hidden md:inline">
+                      {task.due}
+                    </span>
+
+                    <button className="text-stone-400 hover:text-stone-700 p-1">
+                      <MoreHorizontalIcon size={16} />
+                    </button>
                   </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Active Projects Status */}
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-5">
-                <div className="text-base font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  Project Status
                 </div>
-                <button
-                  onClick={() => router.push('/kanban')}
-                  className="text-xs text-indigo-600 font-semibold bg-transparent border-none cursor-pointer hover:underline p-0"
-                >
-                  Boards
-                </button>
-              </div>
+              ))}
+            </div>
 
-              <div className="flex flex-col gap-4">
-                {[
-                  { name: 'Auth Service', color: '#6366f1', progress: 82, badge: 'Sprint 14' },
-                  { name: 'Payment Gateway', color: '#10b981', progress: 61, badge: 'Staging' },
-                  { name: 'Analytics Dashboard', color: '#f59e0b', progress: 45, badge: 'In Dev' },
-                  { name: 'Mobile App v2', color: '#ef4444', progress: 28, badge: 'Design' },
-                ].map((p) => (
-                  <div
-                    key={p.name}
-                    onClick={() => router.push('/kanban')}
-                    className="p-3 rounded-xl bg-slate-50/80 border border-slate-100 hover:border-indigo-200 cursor-pointer transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[13px] font-bold text-slate-900">{p.name}</span>
-                      <span className="text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200/60">
-                        {p.badge}
-                      </span>
-                    </div>
-                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${p.progress}%`, backgroundColor: p.color }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
           </div>
-        </main>
 
-        {/* Create Task Modal */}
-        <CreateTaskModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onCreateTask={() => {
-            setModalOpen(false)
-            toast.success('Task created successfully')
-            router.push('/kanban')
-          }}
-        />
+        </main>
       </div>
+
+      {/* Create Task Modal */}
+      <CreateTaskModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onAdd={(newTask) => {
+          setMyWork(prev => [
+            {
+              id: newTask.id,
+              taskId: newTask.taskId,
+              path: 'Internal / Tasks',
+              title: newTask.title,
+              subtasksCompleted: 0,
+              subtasksTotal: 2,
+              due: newTask.due,
+              tab: 'todo',
+              priority: newTask.priority,
+              assignees: [{ initials: newTask.assignee, color: newTask.assigneeColor }],
+              description: newTask.description,
+              subtasks: newTask.subtasks
+            },
+            ...prev
+          ])
+          toast.success('Task created successfully!')
+        }}
+      />
+
+      {/* Task Inspection Drawer */}
+      <TaskDetailDrawer
+        task={selectedTask}
+        open={Boolean(selectedTask)}
+        onClose={() => setSelectedTask(null)}
+        onUpdateTask={(updated) => {
+          setMyWork(prev => prev.map(t => t.id === updated.id ? { ...t, ...updated } : t))
+        }}
+        onDeleteTask={(id) => {
+          setMyWork(prev => prev.filter(t => t.id !== id))
+        }}
+      />
     </ProtectedRoute>
   )
 }

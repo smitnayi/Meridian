@@ -5,13 +5,15 @@ import { useRouter, usePathname } from 'next/navigation'
 import {
   HomeIcon, GridIcon, BarChartIcon, UsersIcon, MessageIcon,
   CreditCardIcon, SettingsIcon, BellIcon, SearchIcon, ChevronDownIcon,
-  ZapIcon, FolderIcon, CalendarIcon, PlusIcon
+  ChevronRightIcon, ZapIcon, FolderIcon, CalendarIcon, PlusIcon,
+  SparklesIcon
 } from './Icons'
 import toast from 'react-hot-toast'
 import CommandPalette from './CommandPalette'
+import { useAuth } from '@/context/AuthContext'
 
 const CollapseIcon = ({ collapsed }) => (
-  <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" style={{ transform: collapsed ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s ease' }}>
+  <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ transform: collapsed ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s ease' }}>
     <polyline points="15,18 9,12 15,6"/>
   </svg>
 )
@@ -29,31 +31,38 @@ const CloseIcon = ({ size = 20 }) => (
 )
 
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: <HomeIcon /> },
-  { id: 'kanban', label: 'Kanban Board', href: '/kanban', icon: <GridIcon />, badge: 4 },
-  { id: 'calendar', label: 'Calendar', href: '/calendar', icon: <CalendarIcon /> },
-  { id: 'analytics', label: 'Analytics', href: '/analytics', icon: <BarChartIcon /> },
-  { id: 'team', label: 'Team', href: '/team', icon: <UsersIcon /> },
-  { id: 'chat', label: 'Messages', href: '/messages', icon: <MessageIcon />, badge: 7 },
-  { id: 'billing', label: 'Billing', href: '/billing', icon: <CreditCardIcon /> },
-  { id: 'settings', label: 'Settings', href: '/settings', icon: <SettingsIcon /> },
+  { id: 'dashboard', label: 'Overview', href: '/dashboard', icon: <HomeIcon size={17} /> },
+  { id: 'kanban', label: 'Tasks Board', href: '/kanban', icon: <GridIcon size={17} />, badge: '12' },
+  { id: 'calendar', label: 'Schedule', href: '/calendar', icon: <CalendarIcon size={17} /> },
+  { id: 'analytics', label: 'Activity', href: '/Analytics', icon: <BarChartIcon size={17} /> },
+  { id: 'team', label: 'Members', href: '/team', icon: <UsersIcon size={17} /> },
+  { id: 'chat', label: 'Chat', href: '/messages', icon: <MessageIcon size={17} />, badge: '3' },
+  { id: 'billing', label: 'Billing', href: '/billing', icon: <CreditCardIcon size={17} /> },
+  { id: 'settings', label: 'Settings', href: '/settings', icon: <SettingsIcon size={17} /> },
 ]
 
-const projects = [
-  { name: 'Auth Service', color: '#6366f1', progress: 82 },
-  { name: 'Payment Gateway', color: '#10b981', progress: 61 },
-  { name: 'Analytics Dashboard', color: '#f59e0b', progress: 45 },
-  { name: 'Mobile App v2', color: '#ef4444', progress: 28 },
+const spaces = [
+  { id: 'pub', name: 'Publications', color: '#f43f5e', count: 8, expanded: true, sub: ['Dribbble Shots', 'Behance Case Study', 'Articles'] },
+  { id: 'comm', name: 'Commercial', color: '#8b5cf6', count: 12, expanded: false, sub: ['Client Portals', 'Pitch Decks'] },
+  { id: 'int', name: 'Design internal', color: '#10b981', count: 5, expanded: false, sub: ['Design System 2.0', 'Brand Assets'] },
+]
+
+const liveMembers = [
+  { name: 'Alex Johnson', initials: 'AJ', color: '#8b5cf6', time: '18:24:12', online: true },
+  { name: 'Sarah Chen', initials: 'SC', color: '#6366f1', time: '14:10:45', online: true },
+  { name: 'Marcus Webb', initials: 'MW', color: '#10b981', time: '11:05:00', online: true },
+  { name: 'Priya Nair', initials: 'PN', color: '#f59e0b', time: '09:42:18', online: false },
 ]
 
 export default function Sidebar() {
   const router = useRouter()
   const pathname = usePathname()
+  const { logout } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const [projectsOpen, setProjectsOpen] = useState(true)
-  const [notifHover, setNotifHover] = useState(false)
+  const [spaceList, setSpaceList] = useState(spaces)
+  const [selectedSpace, setSelectedSpace] = useState('Publications')
 
   // Global shortcut (Cmd+K / Ctrl+K) listener
   useEffect(() => {
@@ -72,260 +81,324 @@ export default function Sidebar() {
     setMobileOpen(false)
   }
 
-  const sidebarWidth = collapsed ? 'w-[72px]' : 'w-[256px]'
+  const toggleSpaceExpand = (id) => {
+    setSpaceList(prev => prev.map(s => s.id === id ? { ...s, expanded: !s.expanded } : s))
+  }
+
+  const sidebarWidth = collapsed ? 'w-[76px]' : 'w-[260px]'
+
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-[#FAF8F5] border-r border-stone-200/80 select-none">
+      {/* ── Brand Header ── */}
+      <div className="p-4 border-b border-stone-200/60 flex items-center justify-between">
+        {!collapsed ? (
+          <div
+            onClick={() => router.push('/dashboard')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-[#111318] text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+              <ZapIcon size={16} strokeWidth={2.5} />
+            </div>
+            <div>
+              <div className="font-bold text-lg tracking-tight text-stone-900 leading-none font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
+                Clarity <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-full bg-lime-200 text-lime-800 ml-1">PRO</span>
+              </div>
+              <div className="text-[11px] text-stone-400 font-medium mt-0.5">Meridian Workspace</div>
+            </div>
+          </div>
+        ) : (
+          <div
+            onClick={() => router.push('/dashboard')}
+            className="w-9 h-9 mx-auto rounded-xl bg-[#111318] text-white flex items-center justify-center shadow-xs cursor-pointer"
+          >
+            <ZapIcon size={16} strokeWidth={2.5} />
+          </div>
+        )}
+
+        {/* Desktop Collapse Toggle */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="hidden lg:flex p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-200/50 transition-colors"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <CollapseIcon collapsed={collapsed} />
+        </button>
+      </div>
+
+      {/* ── Search Bar Trigger ── */}
+      {!collapsed && (
+        <div className="px-3 pt-3">
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-white border border-stone-200/80 text-stone-400 hover:text-stone-700 hover:border-stone-300 shadow-2xs text-xs transition-all cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <SearchIcon size={14} />
+              <span>Quick Search...</span>
+            </div>
+            <kbd className="px-1.5 py-0.5 text-[10px] font-semibold text-stone-400 bg-stone-100 rounded-md">
+              ⌘K
+            </kbd>
+          </button>
+        </div>
+      )}
+
+      {/* ── Main Navigation List ── */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 px-3 py-1">
+          {!collapsed ? 'Main Menu' : '•••'}
+        </div>
+
+        {navItems.map(item => {
+          const active = pathname.toLowerCase() === item.href.toLowerCase() || (item.href === '/dashboard' && pathname === '/')
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleNavClick(item.href)}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
+                active
+                  ? 'bg-[#111318] text-white shadow-sm'
+                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/50'
+              } ${collapsed ? 'justify-center px-0' : 'justify-between'}`}
+              title={collapsed ? item.label : ''}
+            >
+              <div className="flex items-center gap-2.5">
+                <span className={active ? 'text-white' : 'text-stone-500'}>
+                  {item.icon}
+                </span>
+                {!collapsed && <span>{item.label}</span>}
+              </div>
+
+              {!collapsed && item.badge && (
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                  active ? 'bg-white/20 text-white' : 'bg-stone-200 text-stone-700'
+                }`}>
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          )
+        })}
+
+        {/* ── Collapsible Spaces / Projects Tree (Ref 1 & Ref 3) ── */}
+        {!collapsed && (
+          <div className="pt-4">
+            <div className="flex items-center justify-between px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">
+              <span>Projects</span>
+              <button
+                onClick={() => toast.success('New Project Space creation dialog')}
+                className="hover:text-stone-800 p-0.5 rounded hover:bg-stone-200 transition-colors"
+                title="Add new space"
+              >
+                <PlusIcon size={12} strokeWidth={2.5} />
+              </button>
+            </div>
+
+            <div className="mt-1 space-y-0.5">
+              {spaceList.map(s => (
+                <div key={s.id}>
+                  <div
+                    onClick={() => {
+                      setSelectedSpace(s.name)
+                      router.push('/kanban')
+                    }}
+                    className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium cursor-pointer transition-colors ${
+                      selectedSpace === s.name
+                        ? 'bg-rose-50 text-rose-800 font-semibold'
+                        : 'text-stone-600 hover:bg-stone-200/40 hover:text-stone-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
+                      <span className="truncate">{s.name}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] text-stone-400 font-mono">{s.count}</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleSpaceExpand(s.id)
+                        }}
+                        className="text-stone-400 hover:text-stone-700 p-0.5"
+                      >
+                        <ChevronRightIcon size={12} className={`transition-transform ${s.expanded ? 'rotate-90' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Sub-branches */}
+                  {s.expanded && (
+                    <div className="ml-5 pl-2 border-l border-stone-200 my-1 space-y-1">
+                      {s.sub.map(subItem => (
+                        <div
+                          key={subItem}
+                          onClick={() => {
+                            toast(`Filtered to ${subItem}`, { icon: '🔍' })
+                            router.push('/kanban')
+                          }}
+                          className="text-[11px] text-stone-500 hover:text-stone-900 py-1 px-2 rounded-md hover:bg-stone-200/50 cursor-pointer transition-colors"
+                        >
+                          {subItem}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Live Members with Tracked Time (Ref 1) ── */}
+        {!collapsed && (
+          <div className="pt-4">
+            <div className="flex items-center justify-between px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">
+              <span>Members</span>
+              <button
+                onClick={() => router.push('/team')}
+                className="hover:text-stone-800 p-0.5 rounded hover:bg-stone-200 transition-colors"
+              >
+                <PlusIcon size={12} strokeWidth={2.5} />
+              </button>
+            </div>
+
+            <div className="mt-1 space-y-1">
+              {liveMembers.map(m => (
+                <div
+                  key={m.name}
+                  onClick={() => router.push('/team')}
+                  className="flex items-center justify-between px-3 py-1.5 rounded-xl hover:bg-stone-200/50 cursor-pointer transition-colors group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <div
+                        className="w-5 h-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center"
+                        style={{ backgroundColor: m.color }}
+                      >
+                        {m.initials}
+                      </div>
+                      {m.online && (
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+                      )}
+                    </div>
+                    <span className="text-xs font-medium text-stone-700 group-hover:text-stone-900 truncate">
+                      {m.name}
+                    </span>
+                  </div>
+
+                  <span className="text-[10px] font-mono text-stone-400 group-hover:text-stone-600">
+                    {m.time}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── User Footer & Logout ── */}
+      <div className="p-3 border-t border-stone-200/60 bg-white/60">
+        {!collapsed ? (
+          <div className="flex items-center justify-between">
+            <div
+              onClick={() => router.push('/profile')}
+              className="flex items-center gap-2.5 cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center shadow-xs">
+                AJ
+              </div>
+              <div>
+                <div className="text-xs font-bold text-stone-800 leading-tight group-hover:text-violet-600 transition-colors">
+                  Alex Johnson
+                </div>
+                <div className="text-[10px] text-stone-400 font-mono">alex@meridian.io</div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                logout()
+                toast.success('Signed out successfully')
+              }}
+              className="p-1.5 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+              title="Log out"
+            >
+              <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <div
+            onClick={() => router.push('/profile')}
+            className="w-8 h-8 mx-auto rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center shadow-xs cursor-pointer"
+          >
+            AJ
+          </div>
+        )}
+      </div>
+    </div>
+  )
 
   return (
     <>
-      {/* ── Mobile Top Floating Navigation Bar (< lg screens) ── */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-white/85 backdrop-blur-xl border-b border-slate-200/80 shadow-xs">
+      {/* ── Mobile Top Bar (< lg) ── */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-stone-200 shadow-xs">
         <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-            aria-label="Open navigation menu"
+            className="p-2 rounded-xl bg-white border border-stone-200 text-stone-700 shadow-2xs"
           >
             <MenuIcon size={18} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white shadow-xs">
-              <ZapIcon size={14} strokeWidth={2} />
+            <div className="w-7 h-7 rounded-xl bg-[#111318] text-white flex items-center justify-center shadow-xs">
+              <ZapIcon size={14} strokeWidth={2.5} />
             </div>
-            <span className="font-bold text-sm text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Meridian
+            <span className="font-bold text-base text-stone-900 tracking-tight font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
+              Clarity
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Quick Mobile Search */}
-          <button
-            type="button"
-            onClick={() => setSearchOpen(true)}
-            className="p-2 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 transition-colors flex items-center gap-1.5 text-xs font-semibold"
-          >
-            <SearchIcon size={16} />
-            <span className="hidden sm:inline">Search</span>
-          </button>
-
-          {/* Profile link */}
-          <button
-            type="button"
-            onClick={() => router.push('/profile')}
-            className="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center"
-          >
-            AJ
-          </button>
-        </div>
+        <button
+          onClick={() => setSearchOpen(true)}
+          className="p-2 rounded-xl bg-white border border-stone-200 text-stone-600 shadow-2xs"
+        >
+          <SearchIcon size={16} />
+        </button>
       </div>
 
-      {/* ── Mobile Backdrop Overlay ── */}
+      {/* ── Mobile Slide-Over Drawer ── */}
       {mobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
-          onClick={() => setMobileOpen(false)}
-        />
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div
+            className="fixed inset-0 bg-stone-900/40 backdrop-blur-xs transition-opacity"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-[#FAF8F5] shadow-2xl">
+            <div className="absolute top-3 right-3">
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="p-2 rounded-xl text-stone-500 hover:bg-stone-200"
+              >
+                <CloseIcon size={18} />
+              </button>
+            </div>
+            {sidebarContent}
+          </div>
+        </div>
       )}
 
-      {/* ── Main Sidebar (Desktop Flex + Mobile Off-Canvas Drawer) ── */}
-      <aside
-        className={`
-          fixed top-0 bottom-0 left-0 z-50 lg:static flex flex-col shrink-0 h-screen max-h-screen box-border
-          bg-white/85 backdrop-blur-2xl border-r border-slate-200/80 shadow-[4px_0_24px_rgba(99,102,241,0.05)]
-          transition-all duration-300 ease-in-out overflow-hidden
-          ${mobileOpen ? 'translate-x-0 w-[270px]' : '-translate-x-full lg:translate-x-0'}
-          ${sidebarWidth}
-        `}
-      >
-        {/* Logo & Header */}
-        <div className="p-4 flex items-center justify-between gap-3 overflow-hidden border-b border-slate-100/80">
-          <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-md shadow-indigo-500/25 shrink-0 text-white">
-              <ZapIcon size={16} strokeWidth={2.5} />
-            </div>
-            {(!collapsed || mobileOpen) && (
-              <div className="flex-1 overflow-hidden">
-                <div className="font-bold text-sm text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  Meridian
-                </div>
-                <div className="text-[9.5px] text-slate-400 font-bold tracking-wider mt-1">
-                  WORKSPACE
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Desktop Collapse Button */}
-          <button
-            type="button"
-            onClick={() => setCollapsed(c => !c)}
-            className="hidden lg:flex w-7 h-7 rounded-lg border border-slate-200 bg-white items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors shrink-0"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <CollapseIcon collapsed={!collapsed} />
-          </button>
-
-          {/* Mobile Close Button */}
-          <button
-            type="button"
-            onClick={() => setMobileOpen(false)}
-            className="lg:hidden w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800"
-          >
-            <CloseIcon size={16} />
-          </button>
-        </div>
-
-        {/* Working Search Button in Sidebar */}
-        {(!collapsed || mobileOpen) ? (
-          <div className="px-3 py-2.5">
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Open command palette"
-              className="group flex items-center gap-2 w-full bg-slate-100/90 hover:bg-indigo-50/70 rounded-xl px-3 py-2 border border-slate-200/70 hover:border-indigo-200 transition-all text-left shadow-xs"
-            >
-              <SearchIcon size={14} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
-              <span className="text-xs text-slate-400 group-hover:text-slate-600 font-medium flex-1">
-                Search anything...
-              </span>
-              <span className="text-[10px] text-slate-400 bg-white group-hover:bg-indigo-600 group-hover:text-white px-1.5 py-0.5 rounded border border-slate-200 font-mono transition-colors">
-                ⌘K
-              </span>
-            </button>
-          </div>
-        ) : (
-          <div className="px-2 py-2 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              title="Search anything (⌘K)"
-              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-500 hover:text-indigo-600 flex items-center justify-center transition-colors"
-            >
-              <SearchIcon size={16} />
-            </button>
-          </div>
-        )}
-
-        {/* Navigation Items */}
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2.5 py-1 space-y-1">
-          {(!collapsed || mobileOpen) && (
-            <div className="text-[10px] font-bold text-slate-400 px-3 py-1.5 tracking-wider uppercase">
-              Navigation
-            </div>
-          )}
-
-          {navItems.map((item) => {
-            const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
-            return (
-              <div key={item.id} className="relative">
-                <button
-                  type="button"
-                  onClick={() => handleNavClick(item.href)}
-                  className={`
-                    flex items-center gap-3 w-full rounded-xl transition-all font-medium text-xs
-                    ${collapsed && !mobileOpen ? 'p-2.5 justify-center' : 'px-3 py-2 justify-start'}
-                    ${active
-                      ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-500/20'
-                      : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'}
-                  `}
-                  title={collapsed && !mobileOpen ? item.label : undefined}
-                >
-                  <span className={`shrink-0 ${active ? 'text-white' : 'text-slate-400'}`}>
-                    {item.icon}
-                  </span>
-
-                  {(!collapsed || mobileOpen) && (
-                    <span className="flex-1 text-left truncate">{item.label}</span>
-                  )}
-
-                  {(!collapsed || mobileOpen) && item.badge && (
-                    <span className={`
-                      text-[10px] font-bold px-1.5 py-0.5 rounded-full
-                      ${active ? 'bg-white/25 text-white' : 'bg-indigo-100 text-indigo-700'}
-                    `}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              </div>
-            )
-          })}
-
-          {/* Projects Section */}
-          {(!collapsed || mobileOpen) && (
-            <div className="pt-4">
-              <button
-                type="button"
-                onClick={() => setProjectsOpen(p => !p)}
-                className="flex items-center justify-between w-full px-3 py-1.5 text-[10px] font-bold text-slate-400 tracking-wider uppercase hover:text-slate-600"
-              >
-                <div className="flex items-center gap-1.5">
-                  <FolderIcon size={12} />
-                  <span>Projects</span>
-                </div>
-                <span className={`transition-transform duration-200 ${projectsOpen ? 'rotate-180' : ''}`}>
-                  <ChevronDownIcon size={12} />
-                </span>
-              </button>
-
-              {projectsOpen && (
-                <div className="space-y-0.5 mt-1">
-                  {projects.map((p) => (
-                    <button
-                      key={p.name}
-                      type="button"
-                      onClick={() => handleNavClick('/kanban')}
-                      className="flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                    >
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
-                      <span className="flex-1 text-left truncate">{p.name}</span>
-                      <span className="text-[10px] font-mono text-slate-400">{p.progress}%</span>
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => toast.success('Create new project modal')}
-                    className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-xs text-indigo-600 hover:bg-indigo-50 font-semibold transition-colors mt-1"
-                  >
-                    <PlusIcon size={13} />
-                    <span>New Project</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </nav>
-
-        {/* Footer: User Profile & Notification */}
-        <div className="p-3 border-t border-slate-100/80 bg-slate-50/50">
-          <button
-            type="button"
-            onClick={() => handleNavClick('/profile')}
-            className={`
-              flex items-center gap-2.5 w-full rounded-xl p-1.5 hover:bg-white hover:shadow-xs transition-all
-              ${collapsed && !mobileOpen ? 'justify-center' : 'justify-start'}
-            `}
-            title={collapsed && !mobileOpen ? 'Alex Johnson (Engineering Lead)' : undefined}
-          >
-            <div className="relative shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
-                AJ
-              </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white" />
-            </div>
-
-            {(!collapsed || mobileOpen) && (
-              <div className="flex-1 min-w-0 text-left">
-                <div className="text-xs font-bold text-slate-900 truncate">Alex Johnson</div>
-                <div className="text-[10px] text-slate-400 truncate">Product Lead</div>
-              </div>
-            )}
-          </button>
-        </div>
+      {/* ── Desktop Fixed Sidebar ── */}
+      <aside className={`hidden lg:block shrink-0 ${sidebarWidth} transition-all duration-300 h-screen sticky top-0 z-30`}>
+        {sidebarContent}
       </aside>
 
-      {/* Global Interactive Command Palette */}
+      {/* ── Command Palette (Cmd+K) ── */}
       <CommandPalette open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   )

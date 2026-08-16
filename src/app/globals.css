@@ -1,13 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=GFS+Didot&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* For Tailwind v4 */
 @import 'tailwindcss';
 
-/* If you are using Tailwind v3, replace @import 'tailwindcss' with:
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-*/
+:root {
+  --bg-canvas: #f8f6f0;
+  --bg-canvas-subtle: #f2efe7;
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.05);
+  --text-primary: #121316;
+  --text-secondary: #57534e;
+  --text-muted: #8c827a;
+  
+  /* ── World-Class Typography Hierarchy ── */
+  --font-serif: 'Instrument Serif', 'Bodoni Moda', 'Playfair Display', serif;
+  --font-didot: 'Instrument Serif', 'Bodoni Moda', 'Playfair Display', serif;
+  --font-sans-display: 'Inter Tight', 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-num: 'Inter Tight', 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Signature Pastels */
+  --pastel-lavender: #ede9fe;
+  --pastel-lavender-text: #6d28d9;
+  --pastel-peach: #ffedd5;
+  --pastel-peach-text: #c2410c;
+  --pastel-lime: #ecfccb;
+  --pastel-lime-text: #3f6212;
+  --pastel-sky: #e0f2fe;
+  --pastel-sky-text: #0369a1;
+  --pastel-rose: #ffe4e6;
+  --pastel-rose-text: #be123c;
+  --pastel-yellow: #fef9c3;
+  --pastel-yellow-text: #a16207;
+  --dark-dock: #111318;
+}
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -17,42 +44,159 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #eef2ff;
+  background-color: var(--bg-canvas);
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  color: #0f172a;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background-color: #f8f6f0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom Scrollbar */
+/* ── Specific Editorial Display Headings ── */
+.font-serif, .display-serif, .editorial-heading {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+/* ── Crisp, High-Contrast Modern Sans Metrics (Cards, Charts, KPI Dials) ── */
+.stat-number, .kpi-number, .kpi-val, .luxury-num {
+  font-family: var(--font-num) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 1;
+}
+
+.chart-axis-label {
+  font-family: var(--font-body) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  color: #78716c !important;
+}
+
+.chart-percentage-badge {
+  font-family: var(--font-num) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.mono-tag {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+button, input, select, textarea, .font-body {
+  font-family: var(--font-body);
+}
+
+/* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.2);
+  background: rgba(18, 19, 22, 0.15);
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.4);
+  background: rgba(18, 19, 22, 0.3);
 }
 
-/* Glassmorphism Cards */
-.glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+/* Bento Surfaces */
+.bento-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px -2px rgba(18, 19, 22, 0.03), 0 2px 6px -1px rgba(18, 19, 22, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Keyframe Animations */
+.bento-card:hover {
+  box-shadow: 0 12px 30px -4px rgba(18, 19, 22, 0.06), 0 4px 10px -2px rgba(18, 19, 22, 0.03);
+}
+
+.bento-card-interactive {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.bento-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px -4px rgba(18, 19, 22, 0.08), 0 4px 12px -2px rgba(18, 19, 22, 0.04);
+}
+
+/* Drag and Drop Visual States */
+.drag-over-column {
+  background-color: rgba(17, 19, 24, 0.04);
+  border: 2px dashed rgba(17, 19, 24, 0.25) !important;
+  border-radius: 28px;
+}
+
+.card-dragging {
+  opacity: 0.45;
+  transform: scale(0.97) rotate(1deg);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark Obsidian Command Dock */
+.dark-dock {
+  background: #111318;
+  color: #ffffff;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+}
+
+/* Dynamic Island Floating Bar */
+.dynamic-island {
+  background: #111318;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #ffffff;
+}
+
+/* Striped Animated Bar */
+.striped-bar-green {
+  background: repeating-linear-gradient(
+    -45deg,
+    #a3e635,
+    #a3e635 6px,
+    #84cc16 6px,
+    #84cc16 12px
+  );
+}
+
+.striped-bar-orange {
+  background: repeating-linear-gradient(
+    -45deg,
+    #fb923c,
+    #fb923c 6px,
+    #f97316 6px,
+    #f97316 12px
+  );
+}
+
+.striped-bar-purple {
+  background: repeating-linear-gradient(
+    -45deg,
+    #c084fc,
+    #c084fc 6px,
+    #a855f7 6px,
+    #a855f7 12px
+  );
+}
+
+/* Animations */
 @keyframes barGrow {
   from { transform: scaleY(0); }
   to { transform: scaleY(1); }
@@ -60,5 +204,5 @@ body {
 
 .bar-animate {
   transform-origin: bottom;
-  animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: barGrow 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

@@ -10,32 +10,26 @@ import {
 
 const searchItems = [
   // Navigation
-  { id: 'nav-dashboard', category: 'Navigation', title: 'Dashboard', sub: 'Overview, velocity, active sprint metrics', href: '/dashboard', icon: <HomeIcon size={16} /> },
-  { id: 'nav-kanban', category: 'Navigation', title: 'Kanban Board', sub: 'Backlog, In Progress, In Review, Done', href: '/kanban', icon: <GridIcon size={16} /> },
-  { id: 'nav-calendar', category: 'Navigation', title: 'Calendar', sub: 'Month, week, day views & deadlines', href: '/calendar', icon: <CalendarIcon size={16} /> },
-  { id: 'nav-analytics', category: 'Navigation', title: 'Analytics & Insights', sub: 'Sprint throughput & member productivity', href: '/analytics', icon: <BarChartIcon size={16} /> },
-  { id: 'nav-team', category: 'Navigation', title: 'Team Members', sub: 'Manage team, roles & invitations', href: '/team', icon: <UsersIcon size={16} /> },
-  { id: 'nav-messages', category: 'Navigation', title: 'Messages & Channels', sub: '#general, #engineering, #design', href: '/messages', icon: <MessageIcon size={16} /> },
-  { id: 'nav-billing', category: 'Navigation', title: 'Billing & Plans', sub: 'Subscription tier, usage & invoices', href: '/billing', icon: <CreditCardIcon size={16} /> },
-  { id: 'nav-settings', category: 'Navigation', title: 'Workspace Settings', sub: 'Profile, security & notifications', href: '/settings', icon: <SettingsIcon size={16} /> },
-  { id: 'nav-profile', category: 'Navigation', title: 'My Profile', sub: 'View and edit your personal profile', href: '/profile', icon: <UsersIcon size={16} /> },
+  { id: 'nav-dashboard', category: 'Navigation', title: 'Overview', sub: 'Velocity, sprint progress, metrics & lineup', href: '/dashboard', icon: <HomeIcon size={16} /> },
+  { id: 'nav-kanban', category: 'Navigation', title: 'Tasks Board', sub: 'To do, In Progress, Under Review, Ready', href: '/kanban', icon: <GridIcon size={16} /> },
+  { id: 'nav-calendar', category: 'Navigation', title: 'Schedule & Calendar', sub: 'Week, month, deadlines & live meet rooms', href: '/calendar', icon: <CalendarIcon size={16} /> },
+  { id: 'nav-analytics', category: 'Navigation', title: 'Analytics & Activity', sub: 'Throughput burn-up, speedometer & distribution', href: '/Analytics', icon: <BarChartIcon size={16} /> },
+  { id: 'nav-team', category: 'Navigation', title: 'Members Directory', sub: 'Live presence, tracked time & roles', href: '/team', icon: <UsersIcon size={16} /> },
+  { id: 'nav-messages', category: 'Navigation', title: 'Chat & Channels', sub: '#general, #engineering, #design, #product', href: '/messages', icon: <MessageIcon size={16} /> },
+  { id: 'nav-billing', category: 'Navigation', title: 'Billing & Plans', sub: 'Pro Tier, usage meters & invoices', href: '/billing', icon: <CreditCardIcon size={16} /> },
+  { id: 'nav-settings', category: 'Navigation', title: 'Workspace Settings', sub: 'Profile, security 2FA & notifications', href: '/settings', icon: <SettingsIcon size={16} /> },
+  { id: 'nav-profile', category: 'Navigation', title: 'My Profile', sub: 'Bio, skills, assigned projects & stats', href: '/profile', icon: <UsersIcon size={16} /> },
 
   // Projects
-  { id: 'proj-1', category: 'Projects', title: 'Authentication Service', sub: 'OAuth2, JWT session tokens & Redis', href: '/kanban', icon: <ZapIcon size={16} color="#6366f1" /> },
-  { id: 'proj-2', category: 'Projects', title: 'Payment Gateway', sub: 'Stripe webhooks & subscription billing', href: '/kanban', icon: <ZapIcon size={16} color="#10b981" /> },
-  { id: 'proj-3', category: 'Projects', title: 'Customer Portal', sub: 'Client dashboard & activity feeds', href: '/kanban', icon: <ZapIcon size={16} color="#f59e0b" /> },
-  { id: 'proj-4', category: 'Projects', title: 'Mobile App v2', sub: 'Push notifications & offline sync', href: '/kanban', icon: <ZapIcon size={16} color="#ef4444" /> },
+  { id: 'proj-1', category: 'Projects', title: 'Publications & Shots', sub: 'Dribbble, Behance case studies & articles', href: '/kanban', icon: <ZapIcon size={16} color="#f43f5e" /> },
+  { id: 'proj-2', category: 'Projects', title: 'Commercial Work', sub: 'Client portals, pitch decks & enterprise apps', href: '/kanban', icon: <ZapIcon size={16} color="#8b5cf6" /> },
+  { id: 'proj-3', category: 'Projects', title: 'Design Internal', sub: 'Design system 2.0 & token architecture', href: '/kanban', icon: <ZapIcon size={16} color="#10b981" /> },
 
   // Tasks
-  { id: 'task-1', category: 'Tasks', title: 'MRD-032: OAuth2 Social Login Integration', sub: 'In Progress · Assigned to Alex Johnson', href: '/kanban', icon: <CheckIcon size={16} /> },
-  { id: 'task-2', category: 'Tasks', title: 'MRD-033: Stripe Webhook Event Handling', sub: 'In Progress · Assigned to Sarah Chen', href: '/kanban', icon: <CheckIcon size={16} /> },
-  { id: 'task-3', category: 'Tasks', title: 'MRD-041: Redis Cache Layer for Sessions', sub: 'Backlog · Priority High', href: '/kanban', icon: <CheckIcon size={16} /> },
-  { id: 'task-4', category: 'Tasks', title: 'MRD-028: Homepage Redesign & Layout', sub: 'In Review · Assigned to Jordan Lee', href: '/kanban', icon: <CheckIcon size={16} /> },
-
-  // Team
-  { id: 'team-1', category: 'Team Members', title: 'Alex Johnson', sub: 'Engineering Lead · alex@meridian.io', href: '/team', icon: <UsersIcon size={16} /> },
-  { id: 'team-2', category: 'Team Members', title: 'Sarah Chen', sub: 'Senior Full-Stack · sarah@meridian.io', href: '/team', icon: <UsersIcon size={16} /> },
-  { id: 'team-3', category: 'Team Members', title: 'Marcus Webb', sub: 'Backend Engineer · marcus@meridian.io', href: '/team', icon: <UsersIcon size={16} /> },
+  { id: 'task-1', category: 'Tasks', title: 'MRD-032: Fitness App UI Concept', sub: 'To do · Assigned to Kacie Velasquez', href: '/kanban', icon: <CheckIcon size={16} /> },
+  { id: 'task-2', category: 'Tasks', title: 'MRD-033: Analytics Dashboard Design', sub: 'In Progress · Assigned to Alex Johnson', href: '/kanban', icon: <CheckIcon size={16} /> },
+  { id: 'task-3', category: 'Tasks', title: 'MRD-041: Meditation App Concept', sub: 'Under Review · Priority High', href: '/kanban', icon: <CheckIcon size={16} /> },
+  { id: 'task-4', category: 'Tasks', title: 'MRD-028: CI/CD Setup with GitHub Actions', sub: 'Ready · Assigned to Kai Okafor', href: '/kanban', icon: <CheckIcon size={16} /> },
 ]
 
 export default function CommandPalette({ open, onClose }) {
@@ -81,25 +75,24 @@ export default function CommandPalette({ open, onClose }) {
     }
   }
 
-  // Group by category
   const categories = Array.from(new Set(filteredItems.map(i => i.category)))
 
   return (
     <div
-      className="fixed inset-0 z-[999] flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-[999] flex items-start justify-center pt-16 sm:pt-24 px-4 bg-stone-950/40 backdrop-blur-md animate-in fade-in duration-150"
       onClick={() => {
         setQuery('')
         onClose()
       }}
     >
       <div
-        className="w-full max-w-xl rounded-2xl bg-white shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-150"
+        className="w-full max-w-xl rounded-3xl bg-[#FAF8F5] shadow-2xl border border-stone-200 overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-150"
         onClick={e => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
         {/* Search Header Input */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-100 bg-slate-50/50">
-          <SearchIcon size={18} className="text-slate-400 shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-stone-200/80 bg-white">
+          <SearchIcon size={18} className="text-stone-400 shrink-0" />
           <input
             ref={inputRef}
             autoFocus
@@ -110,7 +103,7 @@ export default function CommandPalette({ open, onClose }) {
               setSelectedIndex(0)
             }}
             placeholder="Search pages, tasks, projects, or team members..."
-            className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
+            className="w-full bg-transparent text-sm font-semibold text-stone-900 outline-none placeholder:text-stone-400 font-sans"
           />
           {query && (
             <button
@@ -118,12 +111,12 @@ export default function CommandPalette({ open, onClose }) {
                 setQuery('')
                 setSelectedIndex(0)
               }}
-              className="text-xs text-slate-400 hover:text-slate-600 px-1.5 py-0.5 rounded-md hover:bg-slate-200"
+              className="text-xs text-stone-400 hover:text-stone-600 px-1.5 py-0.5 rounded-md hover:bg-stone-200"
             >
               Clear
             </button>
           )}
-          <span className="text-[10px] font-mono text-slate-400 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">
+          <span className="text-[10px] font-mono text-stone-400 bg-stone-100 border border-stone-200 px-1.5 py-0.5 rounded-md shrink-0">
             ESC
           </span>
         </div>
@@ -131,7 +124,7 @@ export default function CommandPalette({ open, onClose }) {
         {/* Results List */}
         <div className="flex-1 overflow-y-auto p-2 space-y-3">
           {filteredItems.length === 0 ? (
-            <div className="py-12 text-center text-slate-400">
+            <div className="py-12 text-center text-stone-400">
               <div className="text-2xl mb-1">🔍</div>
               <p className="text-xs font-medium">No results found for &ldquo;{query}&rdquo;</p>
             </div>
@@ -140,7 +133,7 @@ export default function CommandPalette({ open, onClose }) {
               const catItems = filteredItems.filter(i => i.category === cat)
               return (
                 <div key={cat} className="space-y-1">
-                  <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">
                     {cat}
                   </div>
                   {catItems.map(item => {
@@ -151,29 +144,29 @@ export default function CommandPalette({ open, onClose }) {
                         key={item.id}
                         onClick={() => handleSelect(item)}
                         onMouseEnter={() => setSelectedIndex(globalIdx)}
-                        className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
+                        className={`flex items-center justify-between px-3 py-2.5 rounded-2xl cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-indigo-50 text-indigo-900 shadow-xs'
-                            : 'text-slate-700 hover:bg-slate-50'
+                            ? 'bg-[#111318] text-white shadow-sm'
+                            : 'text-stone-700 hover:bg-white'
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                            isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                            isSelected ? 'bg-white/20 text-white' : 'bg-white border border-stone-200 text-stone-600 shadow-2xs'
                           }`}>
                             {item.icon}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-xs font-semibold truncate leading-tight">
+                            <div className="text-xs font-bold truncate leading-tight">
                               {item.title}
                             </div>
-                            <div className="text-[11px] text-slate-400 truncate mt-0.5">
+                            <div className={`text-[11px] truncate mt-0.5 ${isSelected ? 'text-stone-300' : 'text-stone-400'}`}>
                               {item.sub}
                             </div>
                           </div>
                         </div>
-                        <span className="text-[11px] font-medium text-slate-400 shrink-0 ml-2">
-                          Jump →
+                        <span className={`text-[11px] font-mono shrink-0 ml-2 ${isSelected ? 'text-lime-400 font-bold' : 'text-stone-400'}`}>
+                          ↵ Jump
                         </span>
                       </div>
                     )
@@ -185,12 +178,12 @@ export default function CommandPalette({ open, onClose }) {
         </div>
 
         {/* Footer shortcuts */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-slate-100 bg-slate-50/80 text-[11px] text-slate-400">
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-stone-200/80 bg-white/80 text-[11px] text-stone-400 font-mono">
           <div className="flex items-center gap-2">
-            <span>Navigate: <kbd className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">↑</kbd> <kbd className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">↓</kbd></span>
-            <span>Select: <kbd className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">↵</kbd></span>
+            <span>Navigate: <kbd className="bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200">↑</kbd> <kbd className="bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200">↓</kbd></span>
+            <span>Select: <kbd className="bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200">↵</kbd></span>
           </div>
-          <span>Meridian Quick Finder</span>
+          <span>Meridian Quick Command</span>
         </div>
       </div>
     </div>

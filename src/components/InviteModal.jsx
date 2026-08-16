@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { PlusIcon, UsersIcon, CheckIcon } from './Icons'
+import { toast } from 'react-hot-toast'
 
 const ROLES = [
   'Engineering Lead',
@@ -15,8 +17,7 @@ const ROLES = [
 ]
 
 const AVATAR_COLORS = [
-  '#6366f1', '#10b981', '#f59e0b', '#ef4444',
-  '#8b5cf6', '#0ea5e9', '#ec4899', '#f97316',
+  '#f43f5e', '#8b5cf6', '#6366f1', '#10b981', '#f59e0b', '#0ea5e9', '#ec4899', '#f97316',
 ]
 
 function getInitials(name) {
@@ -53,21 +54,26 @@ export default function InviteModal({ open, onClose, onInvite }) {
     setLoading(true)
     setTimeout(() => {
       const colorIdx = Math.floor(Math.random() * AVATAR_COLORS.length)
-      onInvite({
-        name: name.trim(),
-        email: email.trim(),
-        role,
-        initials: getInitials(name.trim()),
-        color: AVATAR_COLORS[colorIdx],
-        status: 'offline',
-        joined: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-      })
+      if (onInvite) {
+        onInvite({
+          name: name.trim(),
+          email: email.trim(),
+          role,
+          initials: getInitials(name.trim()),
+          color: AVATAR_COLORS[colorIdx],
+          status: 'online',
+          projects: 1,
+          tasks: 0,
+          timeLogged: '00:00:00',
+        })
+      }
+      setLoading(false)
+      toast.success(`Invitation sent to ${email.trim()}!`)
       setName('')
       setEmail('')
       setRole(ROLES[0])
-      setLoading(false)
       onClose()
-    }, 800)
+    }, 400)
   }
 
   return (
@@ -75,70 +81,72 @@ export default function InviteModal({ open, onClose, onInvite }) {
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-stone-950/40 backdrop-blur-xs transition-opacity animate-in fade-in"
       />
 
-      {/* Modal Card */}
-      <div className="relative z-[901] w-full max-w-md rounded-3xl bg-white p-6 sm:p-7 shadow-2xl border border-indigo-100">
+      {/* Modal */}
+      <div className="relative w-full max-w-md rounded-3xl bg-[#FAF8F5] p-6 shadow-2xl border border-stone-200 animate-in zoom-in-95 duration-200">
+        
         {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Invite Team Member
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">Send an invitation to join your workspace</p>
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-200/80">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#111318] text-white flex items-center justify-center shadow-xs">
+              <UsersIcon size={16} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-stone-900 leading-none" style={{ fontFamily: 'var(--font-didot)' }}>
+                Invite Teammate
+              </h3>
+              <p className="text-[11px] text-stone-500 mt-0.5">Send email invite with workspace permissions</p>
+            </div>
           </div>
+
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 text-lg hover:bg-slate-100 hover:text-slate-700 transition-colors"
+            className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-200/60 transition-colors"
           >
-            ×
+            ✕
           </button>
         </div>
 
-        {/* Form */}
-        <div className="flex flex-col gap-4">
-          {/* Full Name */}
+        <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Name</label>
+            <label className="block text-xs font-bold text-stone-700 mb-1">Full Name *</label>
             <input
+              type="text"
               autoFocus
+              placeholder="e.g. Mya Guzman"
               value={name}
-              onChange={e => { setName(e.target.value); setNameErr('') }}
-              placeholder="e.g. Jordan Lee"
-              className={`w-full rounded-xl border px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-all ${
-                nameErr
-                  ? 'border-rose-500 bg-rose-50/50'
-                  : 'border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10'
-              }`}
+              onChange={e => {
+                setName(e.target.value)
+                if (nameErr) setNameErr('')
+              }}
+              className="w-full px-3.5 py-2 text-xs font-medium rounded-2xl bg-white border border-stone-200 focus:border-stone-400 outline-none"
             />
-            {nameErr && <p className="mt-1 text-xs text-rose-500 font-medium">⚠ {nameErr}</p>}
+            {nameErr && <span className="text-[10px] text-rose-500 font-semibold mt-1 block">{nameErr}</span>}
           </div>
 
-          {/* Email */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Work Email</label>
+            <label className="block text-xs font-bold text-stone-700 mb-1">Email Address *</label>
             <input
               type="email"
+              placeholder="e.g. mya@meridian.io"
               value={email}
-              onChange={e => { setEmail(e.target.value); setEmailErr('') }}
-              placeholder="colleague@company.com"
-              className={`w-full rounded-xl border px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-all ${
-                emailErr
-                  ? 'border-rose-500 bg-rose-50/50'
-                  : 'border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10'
-              }`}
+              onChange={e => {
+                setEmail(e.target.value)
+                if (emailErr) setEmailErr('')
+              }}
+              className="w-full px-3.5 py-2 text-xs font-medium rounded-2xl bg-white border border-stone-200 focus:border-stone-400 outline-none"
             />
-            {emailErr && <p className="mt-1 text-xs text-rose-500 font-medium">⚠ {emailErr}</p>}
+            {emailErr && <span className="text-[10px] text-rose-500 font-semibold mt-1 block">{emailErr}</span>}
           </div>
 
-          {/* Role */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Role</label>
+            <label className="block text-xs font-bold text-stone-700 mb-1">Role / Department</label>
             <select
               value={role}
               onChange={e => setRole(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+              className="w-full px-3.5 py-2 text-xs font-semibold rounded-2xl bg-white border border-stone-200 focus:border-stone-400 outline-none cursor-pointer"
             >
               {ROLES.map(r => (
                 <option key={r} value={r}>{r}</option>
@@ -146,36 +154,39 @@ export default function InviteModal({ open, onClose, onInvite }) {
             </select>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2.5 pt-2 border-t border-slate-100 mt-1">
+          {/* Quick link */}
+          <div className="p-3 rounded-2xl bg-white border border-stone-200/60 flex items-center justify-between text-xs">
+            <span className="text-stone-400 font-mono text-[11px] truncate">https://meridian.io/join/ws_pro</span>
             <button
               type="button"
-              onClick={onClose}
-              className="flex-1 rounded-xl border border-slate-200 bg-white py-2.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+              onClick={() => toast.success('Invite link copied!')}
+              className="font-bold text-violet-700 hover:text-violet-900 shrink-0 ml-2"
             >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading}
-              className={`flex-[2] rounded-xl py-2.5 text-sm font-semibold text-white shadow-md transition-all ${
-                loading
-                  ? 'bg-indigo-400 cursor-wait'
-                  : 'bg-indigo-500 shadow-indigo-500/20 hover:bg-indigo-600 active:scale-95'
-              }`}
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Sending...
-                </span>
-              ) : (
-                'Send Invitation'
-              )}
+              Copy Link
             </button>
           </div>
         </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-stone-200/80">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-2xl text-xs font-bold text-stone-600 hover:bg-stone-200/60 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-5 py-2 rounded-2xl bg-[#111318] hover:bg-black text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <PlusIcon size={14} strokeWidth={2.5} />
+            <span>{loading ? 'Sending...' : 'Send Invitation'}</span>
+          </button>
+        </div>
+
       </div>
     </div>
   )

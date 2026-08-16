@@ -1,344 +1,338 @@
 "use client"
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import Sidebar from '@/components/sidebar'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import DynamicHeader from '@/components/DynamicHeader'
 import {
-  TrendingUpIcon, CheckIcon, ZapIcon,
-  DownloadIcon, MoreHorizontalIcon,
+  BarChartIcon, TrendingUpIcon, UsersIcon, ClockIcon,
+  ChevronDownIcon, ArrowUpRightIcon, DownloadIcon, FilterIcon,
+  ShareIcon, CheckCircleIcon, ZapIcon, ClipboardIcon, TargetIcon
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
 
-// --- Sample Analytics Data ---
 const weeklyData = [
-  { week: 'W28', completed: 67, added: 48 },
-  { week: 'W29', completed: 74, added: 61 },
-  { week: 'W30', completed: 89, added: 55 },
-  { week: 'W31', completed: 71, added: 72 },
-  { week: 'W32', completed: 94, added: 49 },
-  { week: 'W33', completed: 82, added: 58 },
-  { week: 'W34', completed: 78, added: 63 },
-  { week: 'W35', completed: 103, added: 44 },
+  { week: 'W28', completed: 48, added: 32 },
+  { week: 'W29', completed: 54, added: 42 },
+  { week: 'W30', completed: 68, added: 38 },
+  { week: 'W31', completed: 52, added: 54 },
+  { week: 'W32', completed: 74, added: 35 },
+  { week: 'W33', completed: 62, added: 44 },
+  { week: 'W34', completed: 59, added: 48 },
+  { week: 'W35', completed: 86, added: 34 },
 ]
 
-const maxVal = 120
-
-const projectDist = [
-  { name: 'Auth Service', value: 34, color: '#6366f1' },
-  { name: 'Payment Gateway', value: 22, color: '#10b981' },
-  { name: 'Customer Portal', value: 18, color: '#f59e0b' },
-  { name: 'Mobile App v2', value: 15, color: '#ef4444' },
-  { name: 'Analytics Dashboard', value: 11, color: '#8b5cf6' },
+const projectDistribution = [
+  { name: 'Publications & Shots', share: 34, color: '#f43f5e', tasks: 28 },
+  { name: 'Commercial Portals', share: 22, color: '#8b5cf6', tasks: 18 },
+  { name: 'Design Internal', share: 18, color: '#10b981', tasks: 14 },
+  { name: 'Mobile App v2', share: 15, color: '#f59e0b', tasks: 12 },
+  { name: 'Analytics Core', share: 11, color: '#0ea5e9', tasks: 9 },
 ]
 
-const members = [
-  { name: 'Alex Johnson', initials: 'AJ', color: '#8b5cf6', tasks: 32, completed: 28, rate: 87 },
-  { name: 'Sarah Chen', initials: 'SC', color: '#6366f1', tasks: 29, completed: 24, rate: 82 },
-  { name: 'Marcus Webb', initials: 'MW', color: '#10b981', tasks: 24, completed: 21, rate: 87 },
-  { name: 'Priya Nair', initials: 'PN', color: '#f59e0b', tasks: 22, completed: 17, rate: 77 },
-  { name: 'Kai Okafor', initials: 'KO', color: '#ef4444', tasks: 19, completed: 14, rate: 73 },
+const memberVelocity = [
+  { name: 'Alex Johnson', role: 'Design Lead', pts: 42, target: 35, speed: '120%', avatar: 'AJ', color: '#8b5cf6' },
+  { name: 'Sarah Chen', role: 'Full Stack Engineer', pts: 38, target: 35, speed: '108%', avatar: 'SC', color: '#6366f1' },
+  { name: 'Marcus Webb', role: 'Security Architect', pts: 31, target: 30, speed: '103%', avatar: 'MW', color: '#10b981' },
+  { name: 'Kacie Velasquez', role: 'UI Engineer', pts: 29, target: 28, speed: '104%', avatar: 'KV', color: '#f43f5e' },
+  { name: 'Priya Nair', role: 'Backend Lead', pts: 26, target: 25, speed: '104%', avatar: 'PN', color: '#f59e0b' },
 ]
 
-// Matching glassmorphic card style from your Dashboard
-const Card = ({ children, className = '' }) => (
-  <div className={`rounded-[20px] bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_24px_rgba(99,102,241,0.06)] transition-transform hover:-translate-y-0.5 ${className}`}>
-    {children}
-  </div>
-)
-
-// --- Helper SVG Charts ---
-function DonutChart({ data }) {
-  const total = data.reduce((s, d) => s + d.value, 0)
-  const r = 60
-  const cx = 80
-  const cy = 80
-  const circumference = 2 * Math.PI * r
-
-  const slices = data.map((d, i) => {
-    const prevTotal = data.slice(0, i).reduce((sum, item) => sum + item.value, 0)
-    const runningOffset = total > 0 ? (prevTotal / total) * circumference : 0
-    const dasharray = total > 0 ? (d.value / total) * circumference : 0
-    const dashoffset = circumference - runningOffset
-    return { ...d, dasharray, dashoffset }
-  })
-
-  return (
-    <svg viewBox="0 0 160 160" className="w-40 h-40">
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e2e8f0" strokeOpacity={0.5} strokeWidth={22} />
-      {slices.map((d, i) => (
-        <circle
-          key={i}
-          cx={cx}
-          cy={cy}
-          r={r}
-          fill="none"
-          stroke={d.color}
-          strokeWidth={22}
-          strokeDasharray={`${d.dasharray} ${circumference - d.dasharray}`}
-          strokeDashoffset={d.dashoffset}
-          strokeLinecap="round"
-          className="transition-all duration-700 ease-out origin-center -rotate-90"
-        />
-      ))}
-      <text x={cx} y={cy - 4} textAnchor="middle" className="text-xl font-bold fill-slate-900 font-sans">
-        {total}
-      </text>
-      <text x={cx} y={cy + 14} textAnchor="middle" className="text-[10px] fill-slate-400 font-medium font-sans">
-        tasks total
-      </text>
-    </svg>
-  )
-}
-
-function AreaChart() {
-  const w = 560
-  const h = 140
-  const pad = { top: 10, right: 10, bottom: 28, left: 32 }
-  const chartW = w - pad.left - pad.right
-  const chartH = h - pad.top - pad.bottom
-  const xStep = chartW / (weeklyData.length - 1)
-
-  const toX = (i) => pad.left + i * xStep
-  const toY = (v) => pad.top + chartH - (v / maxVal) * chartH
-
-  const completedPath = weeklyData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${toX(i)} ${toY(d.completed)}`).join(' ')
-  const addedPath = weeklyData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${toX(i)} ${toY(d.added)}`).join(' ')
-
-  const completedArea = completedPath + ` L ${toX(weeklyData.length - 1)} ${pad.top + chartH} L ${pad.left} ${pad.top + chartH} Z`
-  const addedArea = addedPath + ` L ${toX(weeklyData.length - 1)} ${pad.top + chartH} L ${pad.left} ${pad.top + chartH} Z`
-
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto overflow-visible">
-      <defs>
-        <linearGradient id="gradCompleted" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="#6366f1" stopOpacity="0.01" />
-        </linearGradient>
-        <linearGradient id="gradAdded" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#10b981" stopOpacity="0.16" />
-          <stop offset="100%" stopColor="#10b981" stopOpacity="0.01" />
-        </linearGradient>
-      </defs>
-
-      {[0, 0.25, 0.5, 0.75, 1].map((frac) => {
-        const y = pad.top + chartH * frac
-        return (
-          <g key={frac}>
-            <line x1={pad.left} x2={w - pad.right} y1={y} y2={y} stroke="#e2e8f0" strokeOpacity={0.6} strokeWidth="1" />
-            <text x={pad.left - 6} y={y + 4} textAnchor="end" className="text-[9px] fill-slate-400 font-mono">
-              {Math.round(maxVal * (1 - frac))}
-            </text>
-          </g>
-        )
-      })}
-
-      <path d={addedArea} fill="url(#gradAdded)" />
-      <path d={completedArea} fill="url(#gradCompleted)" />
-      <path d={addedPath} fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d={completedPath} fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-
-      {weeklyData.map((d, i) => (
-        <g key={i}>
-          <circle cx={toX(i)} cy={toY(d.completed)} r="3.5" fill="#6366f1" />
-          <circle cx={toX(i)} cy={toY(d.added)} r="3" fill="#10b981" />
-          <text x={toX(i)} y={h - 4} textAnchor="middle" className="text-[9px] fill-slate-400 font-mono">
-            {d.week}
-          </text>
-        </g>
-      ))}
-    </svg>
-  )
-}
-
-// --- Main Analytics Component ---
-export default function Analytics() {
-  const [range, setRange] = useState('8 Weeks')
+export default function AnalyticsPage() {
+  const [timeRange, setTimeRange] = useState('Sprint 14')
+  const [hoveredWeek, setHoveredWeek] = useState(null)
+  const maxVal = 95
 
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen w-full">
-        {/* 1. Sidebar Component */}
+      <div className="flex min-h-screen w-full bg-[#FAF8F5]">
+        {/* Sidebar */}
         <Sidebar />
 
-        {/* 2. Main Analytics Content */}
+        {/* Main Content */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-        {/* Header */}
-        <div className="flex flex-col items-stretch justify-between gap-3 mb-7 sm:flex-row sm:items-start sm:gap-3">
-          <div>
-            <div className="text-[21px] sm:text-[26px] font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Analytics & Insights
-            </div>
-            <div className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
-              Team throughput, performance metrics, and task velocity
-            </div>
-          </div>
+          
+          <DynamicHeader
+            onOpenNewTask={() => toast.success('Analytics report downloaded')}
+            onOpenSearch={() => {
+              const evt = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
+              window.dispatchEvent(evt)
+            }}
+          />
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            {/* Range Selector */}
-            <div className="flex p-1 bg-white/80 border border-slate-200/80 rounded-xl shadow-xs">
-              {['4 Weeks', '8 Weeks', '3 Months'].map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRange(r)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                    range === r
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'text-slate-500 hover:text-slate-900'
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-
-            {/* Export Button */}
-            <button
-              onClick={() => toast.success('Analytics report exported!')}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200/80 bg-white/80 backdrop-blur-sm text-[13.5px] font-medium text-slate-600 hover:bg-white transition-colors cursor-pointer"
-            >
-              <DownloadIcon size={15} />
-              Export
-            </button>
-          </div>
-        </div>
-
-        {/* KPI Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
-          {[
-            { label: 'Completion Rate', value: '78.4%', delta: '↑ 6.2% vs last period', color: '#6366f1', bg: '#eef2ff', icon: <CheckIcon size={20} /> },
-            { label: 'Avg Sprint Velocity', value: '88 pts', delta: '↑ 12 pts vs baseline', color: '#10b981', bg: '#d1fae5', icon: <TrendingUpIcon size={20} /> },
-            { label: 'Tasks / Day (avg)', value: '11.4', delta: 'Best: 14.7 on Wed', color: '#f59e0b', bg: '#fef3c7', icon: <ZapIcon size={20} /> },
-          ].map((s) => (
-            <Card key={s.label} className="p-5">
-              <div className="flex items-start justify-between mb-3.5">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: s.bg, color: s.color }}>
-                  {s.icon}
-                </div>
-                <MoreHorizontalIcon size={16} />
-              </div>
-              <div className="text-[28px] font-bold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                {s.value}
-              </div>
-              <div className="text-[12.5px] text-slate-500 mt-1">{s.label}</div>
-              <div className="text-[11.5px] mt-1.5 font-medium" style={{ color: s.color }}>{s.delta}</div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 mb-5">
-          {/* Main Area Chart Card */}
-          <Card className="p-6">
-            <div className="flex items-center justify-between flex-wrap gap-2.5 mb-6">
-              <div>
-                <div className="text-[15px] font-semibold text-slate-900">Task Throughput</div>
-                <div className="text-[12.5px] text-slate-400 mt-0.5">Completed vs added tasks per week</div>
-              </div>
-              <div className="flex items-center gap-4 text-xs text-slate-500">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-xs bg-indigo-600" />
-                  <span>Completed</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-xs bg-emerald-500" />
-                  <span>Added</span>
-                </div>
-              </div>
-            </div>
-            <AreaChart />
-          </Card>
-
-          {/* Distribution Donut Card */}
-          <Card className="p-5 flex flex-col justify-between">
+          {/* Page Title & Range Selector */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <div className="text-[15px] font-semibold text-slate-900 mb-2">Task Distribution</div>
-              <div className="flex justify-center my-2">
-                <DonutChart data={projectDist} />
-              </div>
+              <h1 className="text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                Executive <em className="italic font-serif font-normal">Analytics</em>
+              </h1>
+              <p className="text-xs text-stone-500 font-medium mt-1">
+                Real-time throughput velocity, burndown accuracy, and resource allocation across spaces
+              </p>
             </div>
-            <div className="space-y-2 mt-2">
-              {projectDist.map((d) => (
-                <div key={d.name} className="flex items-center gap-2 text-xs">
-                  <span className="w-2 h-2 rounded-xs shrink-0" style={{ backgroundColor: d.color }} />
-                  <span className="text-slate-600 flex-1 truncate">{d.name}</span>
-                  <span className="text-slate-400 font-mono font-medium">{d.value}%</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
 
-        {/* Team Performance Section */}
-        <Card className="p-0! overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200/60">
-            <div className="text-[15px] font-semibold text-slate-900">Team Performance</div>
-            <div className="text-[12.5px] text-slate-400 mt-0.5">Individual completion rates & task volume</div>
-          </div>
-
-          <div className="divide-y divide-slate-100">
-            {members.map((m) => (
-              <div
-                key={m.name}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:px-6 gap-4 hover:bg-indigo-50/20 transition-colors"
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => toast.success('Exporting CSV & PDF...')}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-white border border-stone-200 text-xs font-bold text-stone-700 hover:bg-stone-50 shadow-2xs transition-all cursor-pointer"
               >
-                {/* Member Info */}
-                <div className="flex items-center gap-3.5 min-w-[200px]">
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold text-white shrink-0"
-                    style={{ backgroundColor: m.color }}
-                  >
-                    {m.initials}
-                  </div>
+                <DownloadIcon size={13} />
+                <span>Export Report</span>
+              </button>
+
+              <button
+                onClick={() => toast.success('Filtered range applied')}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-[#111318] text-white text-xs font-bold shadow-xs hover:bg-black transition-all cursor-pointer"
+              >
+                <span>{timeRange}</span>
+                <ChevronDownIcon size={12} />
+              </button>
+            </div>
+          </div>
+
+          {/* Bento KPI Summary Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
+            <div className="p-5 rounded-3xl bg-[#EDE9FE] border border-[#DDD6FE] shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-[#6D28D9]">Weekly Velocity</span>
+                <span className="p-1 rounded-lg bg-white/80 text-[#6D28D9] shadow-2xs">
+                  <ZapIcon size={14} />
+                </span>
+              </div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-stone-950 stat-number">103 pts</div>
+              <div className="text-xs font-bold text-[#6D28D9] mt-1.5">+14% vs 4-week avg</div>
+            </div>
+
+            <div className="p-5 rounded-3xl bg-[#FFEDD5] border border-[#FDBA74] shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-[#C2410C]">Cycle Time</span>
+                <span className="p-1 rounded-lg bg-white/80 text-[#C2410C] shadow-2xs">
+                  <ClockIcon size={14} />
+                </span>
+              </div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-stone-950 stat-number">2.4 days</div>
+              <div className="text-xs font-bold text-[#C2410C] mt-1.5">-0.8d reduction</div>
+            </div>
+
+            <div className="p-5 rounded-3xl bg-[#E0F2FE] border border-[#BAE6FD] shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-[#0369A1]">PR Merge Rate</span>
+                <span className="p-1 rounded-lg bg-white/80 text-[#0369A1] shadow-2xs">
+                  <CheckCircleIcon size={14} />
+                </span>
+              </div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-stone-950 stat-number">98.2%</div>
+              <div className="text-xs font-bold text-[#0369A1] mt-1.5">42 PRs merged</div>
+            </div>
+
+            <div className="p-5 rounded-3xl bg-[#ECFCCB] border border-[#D9F99D] shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-[#3F6212]">Member Efficiency</span>
+                <span className="p-1 rounded-lg bg-white/80 text-[#3F6212] shadow-2xs">
+                  <TargetIcon size={14} />
+                </span>
+              </div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-stone-950 stat-number">87.4%</div>
+              <div className="text-xs font-bold text-[#3F6212] mt-1.5">High team morale</div>
+            </div>
+          </div>
+
+          {/* Main Chart Grid: Velocity Burn-up + Project Allocation (Ref Image 1) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-7">
+            
+            {/* Left 2 Cols: Sprint Burn-Up Bar Chart (Image 1 Left) */}
+            <div className="lg:col-span-2 bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/80 shadow-2xs flex flex-col justify-between">
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-900 leading-snug">{m.name}</h3>
-                    <p className="text-xs text-slate-400">{m.completed} of {m.tasks} tasks completed</p>
+                    <h2 className="text-base font-bold text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                      Sprint Throughput & Scope
+                    </h2>
+                    <p className="text-xs text-stone-400 mt-0.5 font-normal">Story points completed vs scope additions per week</p>
+                  </div>
+
+                  {/* Legend */}
+                  <div className="flex items-center gap-4 text-xs font-bold">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#111318]" />
+                      <span className="text-stone-700">Completed</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#a3e635]" />
+                      <span className="text-stone-700">Added</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="flex items-center gap-4 flex-1 max-w-xs">
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center text-xs mb-1.5">
-                      <span className="text-slate-400">Completion</span>
-                      <span
-                        className={`font-mono font-semibold ${
-                          m.rate >= 85 ? 'text-emerald-600' : m.rate >= 75 ? 'text-amber-600' : 'text-rose-600'
-                        }`}
-                      >
-                        {m.rate}%
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                {/* Bar Columns Container with Gridlines */}
+                <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 pt-8 pb-3 border-b border-stone-100 relative">
+                  
+                  {/* Subtle Gridlines */}
+                  <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-30">
+                    <div className="border-b border-dashed border-stone-200 w-full" />
+                    <div className="border-b border-dashed border-stone-200 w-full" />
+                    <div className="border-b border-dashed border-stone-200 w-full" />
+                    <div className="border-b border-dashed border-stone-200 w-full" />
+                  </div>
+
+                  {weeklyData.map((d) => {
+                    const isHovered = hoveredWeek === d.week
+                    return (
                       <div
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          m.rate >= 85 ? 'bg-emerald-500' : m.rate >= 75 ? 'bg-amber-500' : 'bg-rose-500'
-                        }`}
-                        style={{ width: `${m.rate}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
+                        key={d.week}
+                        onMouseEnter={() => setHoveredWeek(d.week)}
+                        onMouseLeave={() => setHoveredWeek(null)}
+                        className="flex-1 flex flex-col items-center gap-2 h-full justify-end relative cursor-pointer group z-10"
+                      >
+                        {/* Hover Tooltip */}
+                        {isHovered && (
+                          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#111318] text-white text-[11px] font-sans font-bold px-3 py-1.5 rounded-xl shadow-xl whitespace-nowrap z-30 flex items-center gap-2 border border-white/10">
+                            <span className="text-white">{d.completed} pts done</span>
+                            <span className="text-stone-400">·</span>
+                            <span className="text-lime-400">{d.added} added</span>
+                          </div>
+                        )}
 
-                {/* Performance Badge */}
-                <div className="sm:text-right shrink-0">
-                  <span
-                    className={`inline-block text-[11px] font-semibold px-2.5 py-1 rounded-full text-center ${
-                      m.rate >= 85
-                        ? 'bg-emerald-50 text-emerald-600'
-                        : m.rate >= 75
-                        ? 'bg-amber-50 text-amber-600'
-                        : 'bg-rose-50 text-rose-600'
-                    }`}
-                  >
-                    {m.rate >= 85 ? 'Excellent' : m.rate >= 75 ? 'Good' : 'Below avg'}
-                  </span>
+                        <div className="w-full flex items-end justify-center gap-1.5 h-full">
+                          {/* Completed Bar (Dark Charcoal) */}
+                          <div
+                            className="w-full max-w-[18px] bg-[#111318] rounded-t-md transition-all duration-300 group-hover:bg-black group-hover:scale-y-105 origin-bottom shadow-xs"
+                            style={{ height: `${(d.completed / maxVal) * 100}%` }}
+                          />
+                          {/* Added Bar (Lime Green) */}
+                          <div
+                            className="w-full max-w-[18px] bg-[#a3e635] rounded-t-md transition-all duration-300 group-hover:bg-[#84cc16] group-hover:scale-y-105 origin-bottom shadow-xs"
+                            style={{ height: `${(d.added / maxVal) * 100}%` }}
+                          />
+                        </div>
+
+                        {/* Week Label (Clean, Sharp, No Fuzzy Serif!) */}
+                        <span className="chart-axis-label font-sans font-semibold text-[11px] text-stone-500 group-hover:text-stone-900 group-hover:font-bold transition-colors">
+                          {d.week}
+                        </span>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
-            ))}
+
+              {/* Bottom Insight Footer */}
+              <div className="mt-4 flex items-center justify-between text-xs text-stone-500 font-medium">
+                <span>Peak throughput: <strong>W35 (86 pts)</strong></span>
+                <span className="text-lime-700 font-bold">+28% Sprint Velocity Surge</span>
+              </div>
+            </div>
+
+            {/* Right 1 Col: Project Distribution (Image 1 Right) */}
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/80 shadow-2xs flex flex-col justify-between">
+              <div>
+                <h2 className="text-base font-bold text-stone-950 font-serif mb-0.5" style={{ fontFamily: 'var(--font-serif)' }}>
+                  Project Distribution
+                </h2>
+                <p className="text-xs text-stone-400 font-normal mb-6">Resource effort by space category</p>
+
+                {/* Progress Breakdown Rows */}
+                <div className="space-y-4">
+                  {projectDistribution.map(p => (
+                    <div key={p.name} className="group cursor-pointer">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs"
+                            style={{ backgroundColor: p.color }}
+                          />
+                          <span className="font-semibold text-stone-800 group-hover:text-stone-950 transition-colors">
+                            {p.name}
+                          </span>
+                        </div>
+                        <span className="chart-percentage-badge text-stone-950 font-bold text-xs">
+                          {p.share}%
+                        </span>
+                      </div>
+
+                      <div className="w-full bg-stone-100 h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ width: `${p.share}%`, backgroundColor: p.color }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Active Tracked Spaces Footer (as shown in image) */}
+              <div className="pt-6 mt-6 border-t border-stone-100 flex items-center justify-between text-xs">
+                <span className="text-stone-500 font-medium">Active Tracked Spaces:</span>
+                <span className="font-bold text-stone-950 font-sans">5 spaces</span>
+              </div>
+            </div>
+
           </div>
-        </Card>
-      </main>
-    </div>
+
+          {/* Member Velocity Leaderboard */}
+          <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-base font-bold text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                  Team Member Velocity & Output
+                </h2>
+                <p className="text-xs text-stone-400 mt-0.5">Individual points delivered against target capacity</p>
+              </div>
+
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-stone-100 text-stone-800">
+                Sprint 14 Target: 160 pts
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead>
+                  <tr className="border-b border-stone-200 text-stone-400 font-bold uppercase text-[10px] tracking-wider">
+                    <th className="pb-3 pl-3">Member</th>
+                    <th className="pb-3">Role</th>
+                    <th className="pb-3">Points Delivered</th>
+                    <th className="pb-3">Target</th>
+                    <th className="pb-3">Efficiency</th>
+                    <th className="pb-3 pr-3 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {memberVelocity.map(m => (
+                    <tr key={m.name} className="hover:bg-stone-50/80 transition-colors">
+                      <td className="py-3.5 pl-3">
+                        <div className="flex items-center gap-2.5">
+                          <div
+                            className="w-7 h-7 rounded-full text-white text-[10px] font-bold flex items-center justify-center shadow-2xs"
+                            style={{ backgroundColor: m.color }}
+                          >
+                            {m.avatar}
+                          </div>
+                          <span className="font-bold text-stone-900">{m.name}</span>
+                        </div>
+                      </td>
+                      <td className="py-3.5 text-stone-500">{m.role}</td>
+                      <td className="py-3.5 font-bold text-stone-900 stat-number text-sm">{m.pts} pts</td>
+                      <td className="py-3.5 text-stone-400 stat-number">{m.target} pts</td>
+                      <td className="py-3.5">
+                        <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 text-[11px] stat-number">
+                          {m.speed}
+                        </span>
+                      </td>
+                      <td className="py-3.5 pr-3 text-right">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-lime-100 text-lime-800">
+                          ● On Track
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </main>
+      </div>
     </ProtectedRoute>
   )
 }

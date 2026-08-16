@@ -1,44 +1,44 @@
-"use client;"
+"use client"
 
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { PlusIcon, ClockIcon, CheckIcon, TagIcon, UsersIcon } from './Icons'
 
 const ASSIGNEES = [
   { initials: 'AJ', name: 'Alex Johnson', color: '#8b5cf6' },
+  { initials: 'KV', name: 'Kacie Velasquez', color: '#f43f5e' },
   { initials: 'SC', name: 'Sarah Chen', color: '#6366f1' },
   { initials: 'MW', name: 'Marcus Webb', color: '#10b981' },
   { initials: 'PN', name: 'Priya Nair', color: '#f59e0b' },
   { initials: 'KO', name: 'Kai Okafor', color: '#ef4444' },
   { initials: 'JL', name: 'Jordan Lee', color: '#0ea5e9' },
-  { initials: 'NK', name: 'Nadia Kowalski', color: '#ec4899' },
-  { initials: 'TR', name: 'Tomás Rivera', color: '#f97316' },
 ]
 
-const ALL_TAGS = ['Auth', 'Backend', 'Frontend', 'Design', 'Payments', 'Security', 'Mobile', 'Infra', 'DevOps', 'Testing', 'API', 'Management']
+const ALL_TAGS = ['Design', 'Internal Tasks', 'Commercial', 'Dev', 'Auth', 'Backend', 'Payments', 'Mobile', 'Testing']
 
 const COLUMNS = [
-  { id: 'backlog', title: 'Backlog' },
-  { id: 'inprogress', title: 'In Progress' },
-  { id: 'review', title: 'In Review' },
-  { id: 'done', title: 'Done' },
+  { id: 'todo', title: 'To do' },
+  { id: 'inprogress', title: 'In progress' },
+  { id: 'review', title: 'Under review' },
+  { id: 'ready', title: 'Ready' },
 ]
 
 const PRIORITIES = ['Critical', 'High', 'Medium', 'Low']
 
 const PRIORITY_STYLES = {
-  Critical: { border: 'border-rose-500', bg: 'bg-rose-50', text: 'text-rose-600' },
-  High:     { border: 'border-amber-500', bg: 'bg-amber-50', text: 'text-amber-600' },
-  Medium:   { border: 'border-indigo-500', bg: 'bg-indigo-50', text: 'text-indigo-600' },
-  Low:      { border: 'border-slate-400', bg: 'bg-slate-100', text: 'text-slate-600' },
+  Critical: { bg: 'bg-rose-50 border-rose-200 text-rose-700', active: 'bg-rose-500 text-white' },
+  High:     { bg: 'bg-amber-50 border-amber-200 text-amber-800', active: 'bg-amber-500 text-white' },
+  Medium:   { bg: 'bg-indigo-50 border-indigo-200 text-indigo-700', active: 'bg-indigo-600 text-white' },
+  Low:      { bg: 'bg-stone-100 border-stone-200 text-stone-700', active: 'bg-stone-700 text-white' },
 }
 
-export default function CreateTaskModal({ open, defaultColumnId, onClose, onAdd }) {
+export default function CreateTaskModal({ open, defaultColumnId = 'todo', onClose, onAdd }) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState('Medium')
   const [columnId, setColumnId] = useState(defaultColumnId)
   const [assigneeIdx, setAssigneeIdx] = useState(0)
-  const [due, setDue] = useState('')
-  const [tags, setTags] = useState([])
+  const [due, setDue] = useState('25 Sep')
+  const [tags, setTags] = useState(['Design', 'Internal Tasks'])
   const [titleErr, setTitleErr] = useState(false)
 
   if (!open) return null
@@ -50,43 +50,39 @@ export default function CreateTaskModal({ open, defaultColumnId, onClose, onAdd 
     }
 
     const a = ASSIGNEES[assigneeIdx]
-    const colMap = {
-      backlog: 'Backlog',
-      inprogress: 'In Progress',
-      review: 'In Review',
-      done: 'Done',
-    }
 
     const task = {
       id: `task-${Date.now()}`,
-      taskId: `MRD-${Math.floor(Math.random() * 900) + 100}`,
+      taskId: `MRD-0${Math.floor(Math.random() * 80) + 20}`,
       title: title.trim(),
-      description,
+      description: description.trim() || 'Prepare and review deliverables for sprint milestones.',
       priority,
-      status: colMap[columnId] || 'Backlog',
+      status: columnId,
       tags,
       assignee: a.initials,
       assigneeName: a.name,
       assigneeColor: a.color,
-      due: due || undefined,
+      due: due || '25 Sep',
+      subtasks: [
+        { text: 'Initial design review', done: false },
+        { text: 'Figma prototype sync', done: false }
+      ]
     }
 
     onAdd?.(task, columnId)
 
-    // Reset Form
+    // Reset
     setTitle('')
     setDescription('')
     setPriority('Medium')
-    setColumnId(defaultColumnId)
     setAssigneeIdx(0)
-    setDue('')
-    setTags([])
+    setTags(['Design', 'Internal Tasks'])
     setTitleErr(false)
     onClose?.()
   }
 
   const toggleTag = (t) => {
-    setTags((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]))
+    setTags(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
   }
 
   return (
@@ -94,164 +90,153 @@ export default function CreateTaskModal({ open, defaultColumnId, onClose, onAdd 
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-stone-950/40 backdrop-blur-xs transition-opacity animate-in fade-in"
       />
 
       {/* Modal Card */}
-      <div className="relative z-[901] w-full max-w-lg rounded-3xl bg-white p-6 sm:p-7 shadow-2xl border border-indigo-100 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-lg rounded-3xl bg-[#FAF8F5] p-6 shadow-2xl border border-stone-200 animate-in zoom-in-95 duration-200">
+        
         {/* Header */}
-        <div className="flex items-center justify-between pb-3">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Create Task
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Add a new task to your project board
-            </p>
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-200/80">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#111318] text-white flex items-center justify-center shadow-xs">
+              <PlusIcon size={16} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-stone-900 leading-none" style={{ fontFamily: 'var(--font-didot)' }}>
+                Create New Task
+              </h3>
+              <p className="text-[11px] text-stone-500 mt-0.5">Add deliverables to your workspace kanban</p>
+            </div>
           </div>
+
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 text-lg hover:bg-slate-100 hover:text-slate-700 transition-colors"
+            className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-200/60 transition-colors"
           >
-            ×
+            ✕
           </button>
         </div>
 
-        {/* Form Body */}
-        <div className="mt-4 flex flex-col gap-4">
+        <div className="space-y-4">
           {/* Title */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">
-              Task Title <span className="text-rose-500">*</span>
-            </label>
+            <label className="block text-xs font-bold text-stone-700 mb-1">Task Title *</label>
             <input
+              type="text"
               autoFocus
+              placeholder="e.g. Fitness App UI Concept"
               value={title}
-              onChange={(e) => {
+              onChange={e => {
                 setTitle(e.target.value)
-                setTitleErr(false)
+                if (titleErr) setTitleErr(false)
               }}
-              placeholder="e.g. Implement user authentication flow"
-              className={`w-full rounded-xl border px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 outline-none transition-all ${
+              className={`w-full px-3.5 py-2.5 text-xs font-medium rounded-2xl bg-white border outline-none font-sans transition-all ${
                 titleErr
-                  ? 'border-rose-500 bg-rose-50/50'
-                  : 'border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10'
+                  ? 'border-rose-400 ring-2 ring-rose-200'
+                  : 'border-stone-200 focus:border-stone-400 focus:ring-2 focus:ring-stone-200'
               }`}
             />
-            {titleErr && (
-              <p className="mt-1 text-xs text-rose-500 font-medium">⚠ Title is required</p>
-            )}
+            {titleErr && <span className="text-[10px] text-rose-500 font-semibold mt-1 block">Title is required</span>}
           </div>
 
           {/* Description */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">
-              Description
-            </label>
+            <label className="block text-xs font-bold text-stone-700 mb-1">Description</label>
             <textarea
+              rows={2}
+              placeholder="Describe requirements, acceptance criteria..."
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add more details about this task..."
-              rows={3}
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 resize-y"
+              onChange={e => setDescription(e.target.value)}
+              className="w-full px-3.5 py-2 text-xs font-medium rounded-2xl bg-white border border-stone-200 focus:border-stone-400 focus:ring-2 focus:ring-stone-200 outline-none font-sans resize-none"
             />
           </div>
 
           {/* Priority & Column */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-slate-700">
-                Priority
-              </label>
+              <label className="block text-xs font-bold text-stone-700 mb-1.5">Priority</label>
               <div className="flex flex-wrap gap-1.5">
-                {PRIORITIES.map((p) => {
-                  const active = priority === p
-                  const style = PRIORITY_STYLES[p]
-                  return (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setPriority(p)}
-                      className={`rounded-lg border px-2.5 py-1 text-xs transition-all ${
-                        active
-                          ? `${style.border} ${style.bg} ${style.text} font-bold`
-                          : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  )
-                })}
+                {PRIORITIES.map(p => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPriority(p)}
+                    className={`px-2.5 py-1 text-[11px] font-bold rounded-xl border transition-all cursor-pointer ${
+                      priority === p
+                        ? PRIORITY_STYLES[p].active
+                        : PRIORITY_STYLES[p].bg
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-slate-700">
-                Column
-              </label>
+              <label className="block text-xs font-bold text-stone-700 mb-1.5">Status Column</label>
               <select
                 value={columnId}
-                onChange={(e) => setColumnId(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                onChange={e => setColumnId(e.target.value)}
+                className="w-full px-3 py-2 text-xs font-semibold rounded-2xl bg-white border border-stone-200 focus:border-stone-400 outline-none cursor-pointer"
               >
-                {COLUMNS.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.title}
-                  </option>
+                {COLUMNS.map(c => (
+                  <option key={c.id} value={c.id}>{c.title}</option>
                 ))}
               </select>
             </div>
           </div>
 
           {/* Assignee & Due Date */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-slate-700">
-                Assignee
-              </label>
-              <select
-                value={assigneeIdx}
-                onChange={(e) => setAssigneeIdx(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
-              >
+              <label className="block text-xs font-bold text-stone-700 mb-1.5">Assignee</label>
+              <div className="flex items-center gap-2 overflow-x-auto py-1">
                 {ASSIGNEES.map((a, i) => (
-                  <option key={a.initials} value={i}>
-                    {a.name}
-                  </option>
+                  <button
+                    key={a.initials}
+                    type="button"
+                    onClick={() => setAssigneeIdx(i)}
+                    className={`w-7 h-7 rounded-full text-[10px] font-bold flex items-center justify-center text-white transition-transform cursor-pointer ${
+                      assigneeIdx === i ? 'ring-2 ring-stone-900 ring-offset-2 scale-110' : 'opacity-70 hover:opacity-100'
+                    }`}
+                    style={{ backgroundColor: a.color }}
+                    title={a.name}
+                  >
+                    {a.initials}
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-slate-700">
-                Due Date
-              </label>
+              <label className="block text-xs font-bold text-stone-700 mb-1.5">Due Date</label>
               <input
-                type="date"
+                type="text"
                 value={due}
-                onChange={(e) => setDue(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                onChange={e => setDue(e.target.value)}
+                placeholder="e.g. 25 Sep"
+                className="w-full px-3 py-2 text-xs font-medium rounded-2xl bg-white border border-stone-200 focus:border-stone-400 outline-none"
               />
             </div>
           </div>
 
           {/* Tags */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">
-              Tags
-            </label>
+            <label className="block text-xs font-bold text-stone-700 mb-1.5">Tags</label>
             <div className="flex flex-wrap gap-1.5">
-              {ALL_TAGS.map((t) => {
-                const active = tags.includes(t)
+              {ALL_TAGS.map(t => {
+                const selected = tags.includes(t)
                 return (
                   <button
                     key={t}
                     type="button"
                     onClick={() => toggleTag(t)}
-                    className={`rounded-full border px-2.5 py-1 text-xs transition-all ${
-                      active
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600 font-semibold'
-                        : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                    className={`px-2.5 py-0.5 text-[11px] font-semibold rounded-full border transition-all cursor-pointer ${
+                      selected
+                        ? 'bg-[#111318] text-white border-stone-900'
+                        : 'bg-white text-stone-600 border-stone-200 hover:border-stone-300'
                     }`}
                   >
                     {t}
@@ -260,25 +245,27 @@ export default function CreateTaskModal({ open, defaultColumnId, onClose, onAdd 
               })}
             </div>
           </div>
-
-          {/* Actions Footer */}
-          <div className="mt-2 flex items-center gap-2.5 pt-4 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 rounded-xl border border-slate-200 bg-white py-2.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleAdd}
-              className="flex-[2] rounded-xl bg-indigo-500 py-2.5 text-xs font-semibold text-white shadow-md shadow-indigo-500/20 transition-all hover:bg-indigo-600 active:scale-95"
-            >
-              Create Task
-            </button>
-          </div>
         </div>
+
+        {/* Footer Actions */}
+        <div className="flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-stone-200/80">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-2xl text-xs font-bold text-stone-600 hover:bg-stone-200/60 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="px-5 py-2 rounded-2xl bg-[#111318] hover:bg-black text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <PlusIcon size={14} strokeWidth={2.5} />
+            <span>Create Task</span>
+          </button>
+        </div>
+
       </div>
     </div>
   )
