@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { login as loginApi, googleLogin } from '../Service/authService';
+import { login as loginApi, googleLogin, githubLogin } from '../Service/authService';
 import { toast } from 'react-hot-toast';
 import { ZapIcon, ArrowRightIcon, CheckIcon, ShieldIcon, SparklesIcon } from '@/components/Icons';
 
@@ -208,18 +208,15 @@ export default function LoginPage() {
             <button
               onClick={googleLogin}
               type="button"
-              className="py-2.5 px-3 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 text-xs font-bold text-stone-700 flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
+              className="py-2.5 px-3 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 text-xs font-bold text-stone-700 flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer active:scale-98"
             >
               <GoogleIcon />
               <span>Google</span>
             </button>
             <button
-              onClick={() => {
-                demoLogin();
-                toast.success('Signed in with GitHub');
-              }}
+              onClick={githubLogin}
               type="button"
-              className="py-2.5 px-3 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 text-xs font-bold text-stone-700 flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
+              className="py-2.5 px-3 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 text-xs font-bold text-stone-700 flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer active:scale-98"
             >
               <GitHubIcon />
               <span>GitHub</span>

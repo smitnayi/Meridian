@@ -11,7 +11,7 @@ if (typeof window !== 'undefined') {
 
   if (token) {
     localStorage.setItem("meridian_token", token);
-    window.history.replaceState({}, "", "/dashboard");
+    window.history.replaceState({}, "", window.location.pathname);
   }
 }
 
@@ -24,7 +24,17 @@ export default function ProtectedRoute({ children }) {
   const isHydrated = useSyncExternalStore(emptySubscribe, () => true, () => false)
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const tokenFromUrl = params.get('token')
+      if (tokenFromUrl) {
+        localStorage.setItem('meridian_token', tokenFromUrl)
+        window.history.replaceState({}, '', pathname || '/dashboard')
+      }
+    }
     if (!loading && isHydrated && !isAuthenticated) {
+
+    
       if (typeof window !== 'undefined') {
         try {
           sessionStorage.setItem('meridian_redirect_after_login', pathname)
