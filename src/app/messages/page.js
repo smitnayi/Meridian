@@ -116,7 +116,7 @@ export default function MessagesPage() {
 
         {/* Main Chat Canvas */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          
+
           <DynamicHeader
             onOpenNewTask={() => toast.success('Creating new channel discussion')}
             onOpenSearch={() => {
@@ -127,17 +127,17 @@ export default function MessagesPage() {
 
           {/* Main Dual-Pane Chat Hub */}
           <div className="bg-white rounded-3xl border border-stone-200/80 shadow-2xs overflow-hidden flex flex-col md:flex-row h-[calc(100vh-160px)] mb-6">
-            
+
             {/* Channels Sidebar (Left 280px) */}
             <div className="w-full md:w-72 bg-[#FAF8F5] border-r border-stone-200/80 p-4 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                    Channels & <em className="italic font-serif font-normal">Discussions</em>
+                  <h2 className="text-xl sm:text-2xl font-normal text-stone-950 font-serif">
+                    Channels & <em className="italic font-serif font-normal text-stone-900">Discussions</em>
                   </h2>
                   <button
                     onClick={() => toast.success('New channel modal')}
-                    className="p-1 rounded-xl hover:bg-stone-200 text-stone-500 hover:text-stone-900"
+                    className="p-1 rounded-xl hover:bg-stone-200 text-stone-500 hover:text-stone-900 cursor-pointer"
                   >
                     <PlusIcon size={14} />
                   </button>
@@ -165,11 +165,10 @@ export default function MessagesPage() {
                         <button
                           key={c.id}
                           onClick={() => setActiveChannel(c.id)}
-                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                            isActive
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${isActive
                               ? 'bg-[#111318] text-white shadow-xs'
                               : 'text-stone-600 hover:bg-stone-200/50 hover:text-stone-900'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center gap-2">
                             <span className={isActive ? 'text-lime-400' : 'text-stone-400'}>#</span>
@@ -210,12 +209,12 @@ export default function MessagesPage() {
 
             {/* Chat Messages Feed & Floating Composer (Right) */}
             <div className="flex-1 flex flex-col bg-white">
-              
+
               {/* Channel Header Bar */}
               <div className="px-6 py-4 border-b border-stone-100 flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-extrabold text-stone-900" style={{ fontFamily: 'var(--font-didot)' }}>
+                    <span className="text-base font-bold text-stone-900 font-mono">
                       #{activeChanObj.name}
                     </span>
                     <span className="text-xs text-stone-400 hidden sm:inline">— {activeChanObj.desc}</span>

@@ -2,11 +2,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
-import {sendOtp,verifyOtp,signup} from "@/Service/authService";
+import { sendOtp, verifyOtp, signup } from "@/Service/authService";
+import { ZapIcon, ShieldIcon } from '@/components/Icons';
+import { toast } from 'react-hot-toast';
 
 const GoogleIcon = () => (
-  <svg width={20} height={20} viewBox="0 0 24 24">
+  <svg width={18} height={18} viewBox="0 0 24 24">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -15,7 +16,7 @@ const GoogleIcon = () => (
 );
 
 const GitHubIcon = () => (
-  <svg width={20} height={20} viewBox="0 0 24 24" fill="#1a1a2e">
+  <svg width={18} height={18} viewBox="0 0 24 24" fill="#111318">
     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
   </svg>
 );
@@ -48,19 +49,6 @@ const EyeIcon = ({ open }) => (
   </svg>
 );
 
-const ArrowRightIcon = () => (
-  <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
-  </svg>
-);
-
-const ZapIconSVG = () => (
-  <svg width={20} height={20} viewBox="0 0 24 24" fill="white">
-    <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
-  </svg>
-);
-
-/* ── Password Strength Bar ── */
 function PasswordStrength({ password }) {
   const checks = [
     { ok: password.length >= 8, label: '8+ characters' },
@@ -69,19 +57,19 @@ function PasswordStrength({ password }) {
     { ok: /[^a-zA-Z0-9]/.test(password), label: 'Symbol' },
   ];
   const score = checks.filter(c => c.ok).length;
-  const colorClass = score <= 1 ? 'bg-red-500' : score === 2 || score === 3 ? 'bg-amber-500' : 'bg-emerald-500';
-  const textColorClass = score <= 1 ? 'text-red-500' : score === 2 || score === 3 ? 'text-amber-500' : 'text-emerald-500';
+  const colorClass = score <= 1 ? 'bg-rose-500' : score === 2 || score === 3 ? 'bg-amber-500' : 'bg-emerald-500';
+  const textColorClass = score <= 1 ? 'text-rose-500' : score === 2 || score === 3 ? 'text-amber-500' : 'text-emerald-600';
   const label = ['', 'Weak', 'Fair', 'Good', 'Strong'][score];
 
   if (!password) return null;
 
   return (
-    <div className="mt-1.5">
+    <div className="mt-1.5 mb-3">
       <div className="flex gap-1 mb-1.5">
         {[0, 1, 2, 3].map(i => (
           <div
             key={i}
-            className={`h-[3px] flex-1 rounded-full transition-colors duration-300 ${i < score ? colorClass : 'bg-slate-200'}`}
+            className={`h-[3px] flex-1 rounded-full transition-colors duration-300 ${i < score ? colorClass : 'bg-stone-200'}`}
           />
         ))}
       </div>
@@ -89,14 +77,14 @@ function PasswordStrength({ password }) {
         {checks.map(c => (
           <span
             key={c.label}
-            className={`text-[11px] flex items-center gap-0.5 ${c.ok ? 'text-emerald-500' : 'text-slate-400'}`}
+            className={`text-[11px] flex items-center gap-0.5 ${c.ok ? 'text-emerald-600 font-semibold' : 'text-stone-400'}`}
           >
             <span>{c.ok ? '✓' : '○'}</span>
             {c.label}
           </span>
         ))}
         {score > 0 && (
-          <span className={`text-[11px] font-semibold ml-auto ${textColorClass}`}>
+          <span className={`text-[11px] font-bold ml-auto ${textColorClass}`}>
             {label}
           </span>
         )}
@@ -105,17 +93,16 @@ function PasswordStrength({ password }) {
   );
 }
 
-/* ── Reusable Input Field ── */
 function Field({ label, type = 'text', value, onChange, placeholder, error, icon, autoFocus }) {
   const [showPw, setShowPw] = useState(false);
   const isPw = type === 'password';
 
   return (
-    <div className="mb-4">
-      <label className="block text-xs font-semibold text-slate-700 mb-1.5">{label}</label>
+    <div className="mb-3.5">
+      <label className="block text-xs font-bold text-stone-700 mb-1.5">{label}</label>
       <div className="relative">
         {icon && (
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400">
             {icon}
           </div>
         )}
@@ -125,154 +112,99 @@ function Field({ label, type = 'text', value, onChange, placeholder, error, icon
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
-          className={`w-full py-2.5 text-sm text-slate-900 bg-white rounded-xl border outline-none font-sans transition-all duration-150 ${
+          className={`w-full py-2.5 text-xs font-medium text-stone-900 bg-white rounded-2xl border outline-none font-sans transition-all ${
             isPw ? 'pr-10' : 'pr-3.5'
           } ${icon ? 'pl-10' : 'pl-3.5'} ${
             error
-              ? 'border-red-500 bg-red-50/30 focus:ring-4 focus:ring-red-500/10'
-              : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10'
+              ? 'border-rose-400 ring-2 ring-rose-200'
+              : 'border-stone-200 focus:border-stone-400 focus:ring-2 focus:ring-stone-200'
           }`}
         />
         {isPw && (
           <button
             type="button"
             onClick={() => setShowPw(p => !p)}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-slate-600 bg-transparent border-none cursor-pointer"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-0.5 text-stone-400 hover:text-stone-600 bg-transparent border-none cursor-pointer"
           >
             <EyeIcon open={showPw} />
           </button>
         )}
       </div>
-      {error && <div className="text-xs text-red-500 mt-1 font-medium">⚠ {error}</div>}
+      {error && <div className="text-[11px] text-rose-500 mt-1 font-semibold">⚠ {error}</div>}
     </div>
   );
 }
 
-/* ── Social Button ── */
-function SocialBtn({ children, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      type="button"
-      className="w-full py-3 px-3 rounded-xl border border-slate-200 bg-white hover:border-indigo-500 hover:bg-indigo-50/50 text-sm font-medium text-slate-700 flex items-center justify-center gap-2.5 transition-all duration-150 cursor-pointer font-sans"
-    >
-      {children}
-    </button>
-  );
-}
-
-/* ── Primary CTA Button ── */
-function PrimaryBtn({ children, onClick, loading }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={loading}
-      type="button"
-      className={`w-full py-3.5 px-4 rounded-full border-none text-white font-semibold text-sm flex items-center justify-center gap-2.5 shadow-lg font-sans transition-all duration-200 ${
-        loading
-          ? 'bg-indigo-400 cursor-wait'
-          : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-indigo-500/45 hover:-translate-y-0.5 cursor-pointer shadow-indigo-500/35'
-      }`}
-    >
-      {loading && (
-        <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin shrink-0" />
-      )}
-      {children}
-      {!loading && <ArrowRightIcon />}
-    </button>
-  );
-}
-
-function Divider() {
-  return (
-    <div className="flex items-center gap-3 my-4">
-      <div className="flex-1 h-px bg-slate-100" />
-      <span className="text-xs font-medium text-slate-400 tracking-wider">OR</span>
-      <div className="flex-1 h-px bg-slate-100" />
-    </div>
-  );
-}
-
-/* ── Left Marketing Panel ── */
 function LeftPanel() {
   const features = [
-    { icon: '⊞', title: 'Kanban boards with real-time collaboration', sub: 'Move faster with clarity and alignment', bg: 'bg-purple-100' },
-    { icon: '◎', title: 'Sprint planning & velocity tracking', sub: 'Plan smarter. Deliver consistently.', bg: 'bg-indigo-100' },
-    { icon: '▦', title: 'Analytics dashboards that actually make sense', sub: 'Get insights that help you make better decisions', bg: 'bg-blue-100' },
-    { icon: '◫', title: 'Built-in team chat & notifications', sub: 'Stay in sync without leaving your workspace', bg: 'bg-purple-100' },
+    { icon: '⊞', title: 'Interactive Kanban Boards', sub: 'Pastel swimlanes & subtask progress', bg: 'bg-[#EDE9FE] text-[#6D28D9]' },
+    { icon: '◎', title: 'Sprint Velocity Tracking', sub: 'Burn-up metrics & capacity planning', bg: 'bg-[#ECFCCB] text-[#3F6212]' },
+    { icon: '▦', title: 'High-Impact Analytics', sub: 'Live speedometers & member velocity', bg: 'bg-[#FFEDD5] text-[#C2410C]' },
+    { icon: '◫', title: 'Team Directory & Presence', sub: 'Real-time channels & hours tracking', bg: 'bg-[#E0F2FE] text-[#0369A1]' },
   ];
 
   return (
-    <div className="hidden lg:flex flex-1 min-h-screen bg-gradient-to-br from-[#f8f7ff] via-[#f0edff] to-[#eef2ff] relative p-12 lg:p-14 flex-col overflow-hidden">
-      {/* Radial Blobs */}
-      <div className="absolute -top-20 -right-16 w-96 h-96 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -left-10 w-88 h-88 rounded-full bg-fuchsia-500/15 blur-3xl pointer-events-none" />
-      
-      {/* Dot grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:22px_22px] opacity-20 pointer-events-none" />
-
-      {/* Logo */}
-      <div className="flex items-center gap-2.5 mb-12 relative z-10">
-        <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/40">
-          <ZapIconSVG />
-        </div>
-        <span className="text-2xl font-bold text-slate-900 tracking-tight">Meridian</span>
-      </div>
-
-      {/* Badge */}
-      <div className="inline-flex items-center gap-1.5 bg-white border border-indigo-500/20 rounded-full px-3.5 py-1.5 w-fit mb-6 relative z-10 shadow-sm shadow-indigo-500/10">
-        <span className="text-indigo-600 text-xs">⚡</span>
-        <span className="text-xs font-semibold text-indigo-600">All-in-one workspace</span>
-      </div>
-
-      {/* Headline */}
-      <h1 className="font-extrabold text-4xl lg:text-5xl text-slate-900 leading-tight tracking-tight mb-4 relative z-10">
-        Where great teams<br />build <span className="text-indigo-600">great products</span>.
-      </h1>
-      <p className="text-base text-slate-500 leading-relaxed mb-10 max-w-md relative z-10">
-        Meridian brings your teams work into one place — tasks, sprints, analytics, and communication.
-      </p>
-
-      {/* Features List */}
-      <div className="flex flex-col gap-5 relative z-10 mb-auto">
-        {features.map((f, i) => (
-          <div key={i} className="flex items-start gap-3.5">
-            <div className={`w-11 h-11 rounded-xl ${f.bg} flex items-center justify-center text-xl shrink-0 shadow-sm shadow-indigo-500/10`}>
-              {f.icon}
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-slate-900 leading-snug">{f.title}</div>
-              <div className="text-xs text-slate-500 mt-0.5">{f.sub}</div>
-            </div>
+    <div className="hidden lg:flex flex-1 min-h-screen bg-gradient-to-br from-[#FAF8F5] via-[#F4F0E6] to-[#EBE5D8] relative p-12 lg:p-14 flex-col overflow-hidden justify-between border-r border-stone-200/80">
+      <div>
+        <div className="flex items-center gap-3 mb-10">
+          <div className="w-10 h-10 rounded-2xl bg-[#111318] flex items-center justify-center text-white shadow-md">
+            <ZapIcon size={20} strokeWidth={2.5} className="text-lime-400" />
           </div>
-        ))}
-      </div>
+          <div>
+            <span className="text-2xl font-extrabold text-stone-900 tracking-tight">
+              Meridian <em className="font-serif italic font-normal text-stone-700">Clarity</em> <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-lime-200 text-lime-900 ml-1">PRO</span>
+            </span>
+            <div className="text-xs text-stone-500 font-medium">Enterprise Workspace System</div>
+          </div>
+        </div>
 
-      {/* Social Proof */}
-      <div className="mt-10 bg-white/75 backdrop-blur-md rounded-2xl p-5 border border-white/90 shadow-lg shadow-indigo-500/10 relative z-10">
-        <div className="flex items-center mb-2">
-          {['👩🏻', '👨🏽', '👦🏻', '👩🏾', '👨🏼'].map((em, i) => (
-            <div
-              key={i}
-              className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-sm -ml-2 first:ml-0"
-              style={{ backgroundColor: `hsl(${i * 50 + 200}, 65%, 60%)`, zIndex: 5 - i }}
-            >
-              {em}
+        <h1 className="font-serif text-5xl lg:text-6xl text-stone-950 font-normal leading-[1.08] tracking-tight mb-5">
+          Start your <em className="italic font-normal font-serif text-stone-900 underline decoration-lime-400 decoration-wavy decoration-2">creative journey</em><br />
+          with <em className="italic font-normal font-serif text-stone-900">Meridian Workspace</em>.
+        </h1>
+        <p className="text-sm text-stone-600 leading-relaxed mb-10 max-w-md font-medium">
+          Create high-velocity workflows for deliverables, sprint tracking, and team channels.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-xl">
+          {features.map((f, i) => (
+            <div key={i} className="p-4 rounded-3xl bg-white/85 backdrop-blur-sm border border-stone-200/80 shadow-2xs hover:shadow-xs transition-shadow">
+              <div className={`w-8 h-8 rounded-xl ${f.bg} flex items-center justify-center text-sm font-bold mb-2 shadow-2xs`}>
+                {f.icon}
+              </div>
+              <div className="text-xs font-bold text-stone-900 leading-snug">{f.title}</div>
+              <div className="text-[11px] text-stone-500 mt-1">{f.sub}</div>
             </div>
           ))}
-          <div className="w-8 h-8 rounded-full bg-indigo-600 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white -ml-2 z-0">
-            +8K
+        </div>
+      </div>
+
+      <div className="mt-8 bg-white/90 backdrop-blur-md rounded-3xl p-5 border border-stone-200 shadow-sm flex items-center justify-between max-w-xl">
+        <div className="flex items-center gap-3">
+          <div className="flex -space-x-2">
+            {['SC', 'AJ', 'MW', 'KV'].map((init, i) => (
+              <div
+                key={i}
+                className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-white shadow-2xs"
+                style={{ backgroundColor: ['#6366f1', '#8b5cf6', '#10b981', '#f43f5e'][i] }}
+              >
+                {init}
+              </div>
+            ))}
+          </div>
+          <div className="text-xs text-stone-600">
+            Trusted by <strong className="text-stone-900 font-bold">12,000+</strong> product teams worldwide
           </div>
         </div>
-        <div className="text-sm text-slate-600">
-          Trusted by <strong className="text-slate-900">12,000+</strong> teams worldwide
-        </div>
+
+        <span className="text-xs font-mono font-bold text-lime-800 bg-lime-100 px-2.5 py-1 rounded-full">
+          Free 14-Day Trial
+        </span>
       </div>
     </div>
   );
 }
 
-/* ── OTP Modal Component ── */
 function OtpModal({ email, onClose, onSuccess }) {
   const [vals, setVals] = useState(['', '', '', '', '', '']);
   const [verifying, setVerifying] = useState(false);
@@ -313,49 +245,48 @@ function OtpModal({ email, onClose, onSuccess }) {
   };
 
   const handleVerify = async (code) => {
-  if (code.length !== 6) {
-    setOtpErr("Please enter the complete OTP");
-    return;
-  }
+    if (code.length !== 6) {
+      setOtpErr("Please enter the complete OTP");
+      return;
+    }
 
-  try {
-    setVerifying(true);
-    setOtpErr("");
+    try {
+      setVerifying(true);
+      setOtpErr("");
 
-    await verifyOtp({
-      email,
-      otp: code,
-    });
+      await verifyOtp({
+        email,
+        otp: code,
+      });
 
-    onSuccess();
-
-  } catch (error) {
-    setOtpErr(error.message);
-  } finally {
-    setVerifying(false);
-  }
-};
+      onSuccess();
+    } catch (error) {
+      setOtpErr(error.message || "Invalid verification code");
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all duration-200">
-      <div className="w-full max-w-[420px] bg-white rounded-3xl p-8 shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/40 backdrop-blur-sm p-4 transition-all duration-200">
+      <div className="w-full max-w-[420px] bg-white rounded-3xl p-8 shadow-2xl border border-stone-200 relative animate-in fade-in zoom-in-95 duration-200">
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 bg-transparent border-none text-lg cursor-pointer"
+          className="absolute top-6 right-6 text-stone-400 hover:text-stone-700 bg-transparent border-none text-lg cursor-pointer"
         >
           ✕
         </button>
 
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-4 text-indigo-600">
+          <div className="w-12 h-12 rounded-2xl bg-violet-50 text-violet-700 flex items-center justify-center mx-auto mb-4 text-xl font-bold shadow-2xs">
             ✉️
           </div>
-          <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight mb-1.5">
-            Verify your email
+          <h3 className="text-2xl font-normal font-serif text-stone-950 tracking-tight mb-1.5">
+            Verify your <em className="italic font-serif font-normal">work email</em>
           </h3>
-          <p className="text-sm text-slate-500 m-0">
-            We&apos;ve sent a 6-digit verification code to <strong className="text-slate-900">{email}</strong>.
+          <p className="text-xs text-stone-500 m-0">
+            We&apos;ve sent a 6-digit verification code to <strong className="text-stone-900 font-mono">{email}</strong>.
           </p>
         </div>
 
@@ -370,38 +301,43 @@ function OtpModal({ email, onClose, onSuccess }) {
               onPaste={handlePaste}
               maxLength={1}
               autoFocus={i === 0}
-              className={`w-[48px] h-[56px] rounded-xl text-center text-xl font-bold font-mono text-slate-900 outline-none transition-all duration-150 ${
+              className={`w-[46px] h-[54px] rounded-2xl text-center text-xl font-bold font-mono text-stone-900 outline-none transition-all ${
                 otpErr
-                  ? 'border-2 border-red-500 bg-red-50/20'
+                  ? 'border-2 border-rose-400 bg-rose-50/20'
                   : v
-                  ? 'border-2 border-indigo-600 bg-indigo-50/10 shadow-[0_0_0_3px_rgba(99,102,241,0.12)]'
-                  : 'border-2 border-slate-200 bg-white focus:border-indigo-600'
+                  ? 'border-2 border-stone-900 bg-stone-50'
+                  : 'border border-stone-200 bg-white focus:border-stone-400 focus:ring-2 focus:ring-stone-200'
               }`}
             />
           ))}
         </div>
 
         {otpErr && (
-          <p className="text-center text-xs text-red-500 font-medium mb-4">
+          <p className="text-center text-[11px] text-rose-500 font-semibold mb-4">
             ⚠ {otpErr}
           </p>
         )}
 
         <div className="mb-6">
-          <PrimaryBtn loading={verifying} onClick={() => handleVerify(vals.join(''))}>
-            Verify OTP
-          </PrimaryBtn>
+          <button
+            type="button"
+            disabled={verifying}
+            onClick={() => handleVerify(vals.join(''))}
+            className="w-full py-3 rounded-2xl bg-[#111318] hover:bg-black text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+          >
+            {verifying ? 'Verifying...' : 'Verify OTP Code'}
+          </button>
         </div>
 
-        <div className="text-center text-xs text-slate-500">
-          Didnt receive the code?{' '}
+        <div className="text-center text-xs text-stone-500">
+          Didn&apos;t receive the code?{' '}
           {countdown > 0 ? (
-            <span className="text-slate-400 font-medium">Resend in {countdown}s</span>
+            <span className="text-stone-400 font-mono">Resend in {countdown}s</span>
           ) : (
             <button
               type="button"
               onClick={() => setCountdown(60)}
-              className="bg-transparent border-none text-indigo-600 font-semibold cursor-pointer hover:underline p-0 text-xs"
+              className="bg-transparent border-none text-stone-900 font-bold cursor-pointer hover:underline p-0 text-xs"
             >
               Resend OTP
             </button>
@@ -412,9 +348,9 @@ function OtpModal({ email, onClose, onSuccess }) {
   );
 }
 
-export default function SignupPage({ onAuth }) {
+export default function SignupPage() {
   const router = useRouter();
-  const [step, setStep] = useState(1); // 1: Account Info, 2: OTP Modal (handled via showOtpModal), 3: Create Password
+  const [step, setStep] = useState(1);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [loading, setLoading] = useState(false);
   
@@ -430,129 +366,126 @@ export default function SignupPage({ onAuth }) {
   const [pwErr, setPwErr] = useState('');
   const [cPwErr, setCPwErr] = useState('');
 
-  const load = (fn) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (fn) fn();
-    }, 1000);
-  };
-
   const validateEmail = (v) => {
     if (!v) return 'Email is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Please enter a valid email address';
-    if (v === 'registered@company.com') return 'Already registered email';
     return '';
   };
 
   const handleSendOtp = async () => {
-  let hasError = false;
+    let hasError = false;
 
-  if (!firstName.trim()) {
-    setFirstNameErr("First name is required");
-    hasError = true;
-  }
+    if (!firstName.trim()) {
+      setFirstNameErr("First name is required");
+      hasError = true;
+    }
 
-  if (!lastName.trim()) {
-    setLastNameErr("Last name is required");
-    hasError = true;
-  }
+    if (!lastName.trim()) {
+      setLastNameErr("Last name is required");
+      hasError = true;
+    }
 
-  const eErr = validateEmail(email);
+    const eErr = validateEmail(email);
+    if (eErr) {
+      setEmailErr(eErr);
+      hasError = true;
+    }
 
-  if (eErr) {
-    setEmailErr(eErr);
-    hasError = true;
-  }
+    if (hasError) return;
 
-  if (hasError) return;
-
-  try {
-    setLoading(true);
-
-    await sendOtp({
-      firstName,
-      lastName,
-      email,
-    });
-
-    setShowOtpModal(true);
-
-  } catch (error) {
-    setEmailErr(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      await sendOtp({
+        firstName,
+        lastName,
+        email,
+      });
+      setShowOtpModal(true);
+    } catch (error) {
+      setEmailErr(error.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFinalSubmit = async () => {
-  let hasError = false;
+    let hasError = false;
 
-  if (password.length < 8) {
-    setPwErr("At least 8 characters");
-    hasError = true;
-  }
+    if (password.length < 8) {
+      setPwErr("At least 8 characters required");
+      hasError = true;
+    }
 
-  if (password !== confirmPw) {
-    setCPwErr("Passwords don't match");
-    hasError = true;
-  }
+    if (password !== confirmPw) {
+      setCPwErr("Passwords don't match");
+      hasError = true;
+    }
 
-  if (hasError) return;
+    if (hasError) return;
 
-  try {
-    setLoading(true);
-
-    await signup({
-      firstName,
-      lastName,
-      email,
-      password,
-    });
-
-    onAuth();
-
-    router.push('/');
-
-  } catch (error) {
-    setPwErr(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      await signup({
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+      toast.success('Account created! Please sign in.');
+      router.push('/');
+    } catch (error) {
+      setPwErr(error.message || "Signup failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="flex min-h-screen bg-[#f8f7ff] relative">
+    <div className="flex min-h-screen bg-[#FAF8F5]">
       <LeftPanel />
 
-      <div className="w-full lg:w-[500px] shrink-0 flex items-start justify-center bg-white px-7 py-8 md:px-14 md:py-10 shadow-2xl lg:shadow-[-4px_0_32px_rgba(99,102,241,0.06)] min-h-screen overflow-y-auto">
-        <div className="w-full max-w-[380px] py-6 md:py-10 transition-all duration-200 ease-out">
+      <div className="w-full lg:w-[480px] shrink-0 flex items-center justify-center bg-white px-7 py-8 md:px-12 md:py-10 shadow-2xl border-l border-stone-200/80 min-h-screen">
+        <div className="w-full max-w-[360px]">
 
           <div className="mb-6">
-            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1.5">
-              {step === 3 ? 'Create your password' : 'Create your account'}
+            <h2 className="text-3xl font-normal font-serif text-stone-950 tracking-tight mb-1">
+              {step === 3 ? (
+                <>Create your <em className="italic font-serif font-normal text-stone-900">password</em></>
+              ) : (
+                <>Create your <em className="italic font-serif font-normal text-stone-900">account</em></>
+              )}
             </h2>
-            <p className="text-sm text-slate-500 m-0">
-              {step === 3 ? 'Secure your workspace account' : 'Free trial — no credit card required'}
+            <p className="text-xs text-stone-500 font-medium">
+              {step === 3 ? 'Secure your workspace account' : 'Free 14-day trial — no credit card required'}
             </p>
           </div>
 
           {step === 1 && (
             <>
-
-              <div className="grid grid-cols-2 gap-2.5 mb-2.5">
-                <SocialBtn onClick={() => load(onAuth)}>
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => router.push('/')}
+                  className="py-2.5 px-3 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 text-xs font-bold text-stone-700 flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
+                >
                   <GoogleIcon />
-                  Google
-                </SocialBtn>
-                <SocialBtn onClick={() => load(onAuth)}>
+                  <span>Google</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/')}
+                  className="py-2.5 px-3 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 text-xs font-bold text-stone-700 flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
+                >
                   <GitHubIcon />
-                  GitHub
-                </SocialBtn>
+                  <span>GitHub</span>
+                </button>
               </div>
 
-              <Divider />
-
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 h-px bg-stone-200" />
+                <span className="text-[10px] font-bold text-stone-400 font-mono">OR DETAILS</span>
+                <div className="flex-1 h-px bg-stone-200" />
+              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <Field
@@ -580,34 +513,38 @@ export default function SignupPage({ onAuth }) {
                   setEmail(v);
                   setEmailErr('');
                 }}
-                placeholder="you@company.com"
+                placeholder="alex@meridian.io"
                 error={emailErr}
                 icon={<MailIcon />}
               />
 
-              {/* Terms & Conditions */}
-              <div className="text-[12.5px] text-slate-400 mb-4 leading-relaxed">
-                By signing up you agree to our{' '}
-                <button type="button" className="bg-transparent border-none text-indigo-600 font-medium hover:underline cursor-pointer p-0 text-[12.5px]">
-                  Terms
+              <div className="text-[11px] text-stone-500 mb-4 leading-relaxed font-medium">
+                By signing up you agree to Meridian&apos;s{' '}
+                <button type="button" className="bg-transparent border-none text-stone-900 font-bold hover:underline cursor-pointer p-0 text-[11px]">
+                  Terms of Service
                 </button>{' '}
                 &{' '}
-                <button type="button" className="bg-transparent border-none text-indigo-600 font-medium hover:underline cursor-pointer p-0 text-[12.5px]">
+                <button type="button" className="bg-transparent border-none text-stone-900 font-bold hover:underline cursor-pointer p-0 text-[11px]">
                   Privacy Policy
                 </button>
                 .
               </div>
 
-              {/* CTA Button */}
-              <PrimaryBtn loading={loading} onClick={handleSendOtp}>
-                Send OTP
-              </PrimaryBtn>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleSendOtp}
+                className="w-full py-3 rounded-2xl bg-[#111318] hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
+              >
+                {loading ? 'Sending OTP code...' : 'Continue with Email'}
+                {!loading && <span>→</span>}
+              </button>
             </>
           )}
 
           {step === 3 && (
             <div>
-              <div className="mb-4 inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-500/20 rounded-full px-3.5 py-1 text-xs font-semibold text-emerald-600">
+              <div className="mb-4 inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-900 rounded-full px-3 py-1 text-xs font-bold font-mono">
                 <span>Email verified ✓</span>
               </div>
 
@@ -627,44 +564,50 @@ export default function SignupPage({ onAuth }) {
 
               {password && <PasswordStrength password={password} />}
 
-              <div className="mt-3">
-                <Field
-                  label="Confirm password"
-                  type="password"
-                  value={confirmPw}
-                  onChange={(v) => {
-                    setConfirmPw(v);
-                    setCPwErr('');
-                  }}
-                  placeholder="Repeat your password"
-                  error={cPwErr}
-                  icon={<LockIcon />}
-                />
-              </div>
+              <Field
+                label="Confirm password"
+                type="password"
+                value={confirmPw}
+                onChange={(v) => {
+                  setConfirmPw(v);
+                  setCPwErr('');
+                }}
+                placeholder="Repeat your password"
+                error={cPwErr}
+                icon={<LockIcon />}
+              />
 
-              <div className="mt-2">
-                <PrimaryBtn loading={loading} onClick={handleFinalSubmit}>
-                  Create Account
-                </PrimaryBtn>
-              </div>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleFinalSubmit}
+                className="w-full py-3 rounded-2xl bg-[#111318] hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer mt-2"
+              >
+                {loading ? 'Creating Account...' : 'Complete Workspace Setup'}
+                {!loading && <span>→</span>}
+              </button>
             </div>
           )}
 
-          {/* Login Switch */}
-          <p className="text-center text-sm text-slate-500 mt-4">
+          <p className="text-center text-xs text-stone-500 font-medium mt-6">
             Already have an account?{' '}
             <button
               type="button"
               onClick={() => router.push('/')}
-              className="bg-transparent border-none text-indigo-600 font-bold hover:underline cursor-pointer p-0 text-sm"
+              className="text-xs font-bold text-stone-900 hover:underline cursor-pointer"
             >
               Sign in
             </button>
           </p>
+
+          <div className="flex items-center justify-center gap-1.5 mt-6 text-[11px] text-stone-400 font-medium">
+            <ShieldIcon size={13} />
+            <span>256-bit SSL encrypted workspace</span>
+          </div>
+
         </div>
       </div>
 
-      {/* OTP Modal */}
       {showOtpModal && (
         <OtpModal
           email={email}

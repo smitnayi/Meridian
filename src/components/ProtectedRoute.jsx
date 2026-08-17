@@ -54,8 +54,8 @@ export default function ProtectedRoute({ children }) {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 border border-amber-200">
             <ShieldLockIcon size={24} className="text-amber-700" strokeWidth={2} />
           </div>
-          <h2 className="text-xl font-bold text-stone-900 mb-2 font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
-            Protected Workspace
+          <h2 className="text-xl font-normal text-stone-900 mb-2 font-serif">
+            Protected <em className="italic font-serif font-normal text-stone-900">Workspace</em>
           </h2>
           <p className="text-xs text-stone-500 mb-6 font-medium">
             You need to be signed in to view and interact with this workspace.

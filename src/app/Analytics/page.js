@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
 
         {/* Main Content */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          
+
           <DynamicHeader
             onOpenNewTask={() => toast.success('Analytics report downloaded')}
             onOpenSearch={() => {
@@ -61,12 +61,12 @@ export default function AnalyticsPage() {
           />
 
           {/* Page Title & Range Selector */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                Executive <em className="italic font-serif font-normal">Analytics</em>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight font-serif">
+                High-throughput <em className="italic font-serif font-normal text-stone-900">Velocity & Insights</em>
               </h1>
-              <p className="text-xs text-stone-500 font-medium mt-1">
+              <p className="text-xs sm:text-sm text-stone-500 font-medium mt-1.5">
                 Real-time throughput velocity, burndown accuracy, and resource allocation across spaces
               </p>
             </div>
@@ -139,16 +139,16 @@ export default function AnalyticsPage() {
 
           {/* Main Chart Grid: Velocity Burn-up + Project Allocation (Ref Image 1) */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-7">
-            
+
             {/* Left 2 Cols: Sprint Burn-Up Bar Chart (Image 1 Left) */}
             <div className="lg:col-span-2 bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/80 shadow-2xs flex flex-col justify-between">
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
                   <div>
-                    <h2 className="text-base font-bold text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                      Sprint Throughput & Scope
+                    <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 font-serif">
+                      Sprint Throughput & <em className="italic font-serif font-normal text-stone-800">Scope</em>
                     </h2>
-                    <p className="text-xs text-stone-400 mt-0.5 font-normal">Story points completed vs scope additions per week</p>
+                    <p className="text-xs sm:text-sm text-stone-500 mt-1 font-medium">Story points completed vs scope additions per week</p>
                   </div>
 
                   {/* Legend */}
@@ -166,7 +166,7 @@ export default function AnalyticsPage() {
 
                 {/* Bar Columns Container with Gridlines */}
                 <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 pt-8 pb-3 border-b border-stone-100 relative">
-                  
+
                   {/* Subtle Gridlines */}
                   <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-30">
                     <div className="border-b border-dashed border-stone-200 w-full" />
@@ -226,10 +226,10 @@ export default function AnalyticsPage() {
             {/* Right 1 Col: Project Distribution (Image 1 Right) */}
             <div className="bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/80 shadow-2xs flex flex-col justify-between">
               <div>
-                <h2 className="text-base font-bold text-stone-950 font-serif mb-0.5" style={{ fontFamily: 'var(--font-serif)' }}>
-                  Project Distribution
+                <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 font-serif mb-1">
+                  Project <em className="italic font-serif font-normal text-stone-800">Distribution</em>
                 </h2>
-                <p className="text-xs text-stone-400 font-normal mb-6">Resource effort by space category</p>
+                <p className="text-xs sm:text-sm text-stone-500 font-medium mb-6">Resource effort by space category</p>
 
                 {/* Progress Breakdown Rows */}
                 <div className="space-y-4">
@@ -274,10 +274,10 @@ export default function AnalyticsPage() {
           <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs mb-12">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-base font-bold text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                  Team Member Velocity & Output
+                <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 font-serif">
+                  Team Member Velocity & <em className="italic font-serif font-normal text-stone-800">Output</em>
                 </h2>
-                <p className="text-xs text-stone-400 mt-0.5">Individual points delivered against target capacity</p>
+                <p className="text-xs sm:text-sm text-stone-500 mt-1 font-medium">Individual points delivered against target capacity</p>
               </div>
 
               <span className="text-xs font-bold px-3 py-1 rounded-full bg-stone-100 text-stone-800">

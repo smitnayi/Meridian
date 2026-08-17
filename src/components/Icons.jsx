@@ -3,15 +3,15 @@
 import React from 'react';
 
 const I = ({ size = 18, className = '', strokeWidth = 1.75, children }) => (
-  <svg 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth={strokeWidth} 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={strokeWidth}
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className={`inline-block shrink-0 transition-transform ${className}`}
   >
     {children}

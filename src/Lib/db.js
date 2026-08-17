@@ -1,13 +1,27 @@
 import mysql2 from 'mysql2/promise';
 
-const db = await mysql2.createConnection({
-    host: process.env.DB_HOST,
-    password: process.env.DB_PASSWORD,
-    user: process.env.DB_USER,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-})
+let pool;
 
-console.log(`Database Connected On ${process.env.DB_HOST}`);
+function getPool() {
+  if (!pool) {
+    pool = mysql2.createPool({
+      host: process.env.DB_HOST || 'localhost',
+      password: process.env.DB_PASSWORD || '',
+      user: process.env.DB_USER || 'root',
+      database: process.env.DB_NAME || 'meridian',
+      port: Number(process.env.DB_PORT) || 3306,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0
+    });
+  }
+  return pool;
+}
 
-export default db;
+const db = {
+  query: (...args) => getPool().query(...args),
+  execute: (...args) => getPool().execute(...args),
+  getConnection: () => getPool().getConnection(),
+};
+
+export default db;

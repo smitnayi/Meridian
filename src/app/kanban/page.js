@@ -388,7 +388,7 @@ export default function KanbanPage() {
 
         {/* Main Kanban Content */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          
+
           {/* Top Dynamic Header */}
           <DynamicHeader
             onOpenNewTask={() => {
@@ -401,44 +401,41 @@ export default function KanbanPage() {
             }}
           />
 
-          {/* ── Header Title & View Pill Controls (Ref 1) ── */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-4">
-              <h1 className="text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                Publications & <em className="italic font-serif font-normal">Deliverables</em>
+          {/* ── Header Title & View Pill Controls ── */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight font-serif">
+                Sprint 14 <em className="italic font-serif font-normal text-stone-900">Task Orchestration</em>
               </h1>
 
               {/* View Switcher Capsule (List | Board | Workflow) */}
               <div className="flex items-center gap-1 bg-stone-200/70 p-1 rounded-2xl">
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    viewMode === 'list'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${viewMode === 'list'
                       ? 'bg-[#111318] text-white shadow-xs'
                       : 'text-stone-600 hover:text-stone-900'
-                  }`}
+                    }`}
                 >
                   <ListIcon size={13} />
                   <span>List</span>
                 </button>
                 <button
                   onClick={() => setViewMode('board')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    viewMode === 'board'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${viewMode === 'board'
                       ? 'bg-[#111318] text-white shadow-xs'
                       : 'text-stone-600 hover:text-stone-900'
-                  }`}
+                    }`}
                 >
                   <KanbanBoardIcon size={13} />
                   <span>00 Board</span>
                 </button>
                 <button
                   onClick={() => setViewMode('workflow')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    viewMode === 'workflow'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${viewMode === 'workflow'
                       ? 'bg-[#111318] text-white shadow-xs'
                       : 'text-stone-600 hover:text-stone-900'
-                  }`}
+                    }`}
                 >
                   <WorkflowIcon size={13} />
                   <span>Workflow</span>
@@ -548,18 +545,17 @@ export default function KanbanPage() {
                     onDragOver={(e) => handleDragOver(e, col.id)}
                     onDragLeave={(e) => handleDragLeave(e, col.id)}
                     onDrop={(e) => handleDrop(e, col.id)}
-                    className={`flex flex-col gap-3.5 p-2 rounded-3xl transition-all duration-200 ${
-                      isDragOver ? 'drag-over-column' : 'bg-transparent'
-                    }`}
+                    className={`flex flex-col gap-3.5 p-2 rounded-3xl transition-all duration-200 ${isDragOver ? 'drag-over-column' : 'bg-transparent'
+                      }`}
                   >
                     {/* Column Header Pill */}
-                    <div className="flex items-center justify-between px-2">
+                    <div className="flex items-center justify-between px-2.5 mb-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-stone-900 font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
+                        <span className="text-base sm:text-lg font-bold text-stone-950">
                           {col.title}
                         </span>
-                        <span className="text-xs font-bold text-stone-400 stat-number">
-                          ({col.count})
+                        <span className="text-xs font-bold text-stone-400 font-mono bg-stone-100 px-2 py-0.5 rounded-md">
+                          {col.count}
                         </span>
                       </div>
 
@@ -586,9 +582,8 @@ export default function KanbanPage() {
                             onDragStart={(e) => handleDragStart(e, task, col.id)}
                             onDragEnd={handleDragEnd}
                             onClick={() => setSelectedTask(task)}
-                            className={`bg-white rounded-3xl p-5 border border-stone-200/80 shadow-xs hover:shadow-md bento-card-interactive cursor-grab active:cursor-grabbing group relative transition-all ${
-                              isBeingDragged ? 'card-dragging' : ''
-                            }`}
+                            className={`bg-white rounded-3xl p-5 border border-stone-200/80 shadow-xs hover:shadow-md bento-card-interactive cursor-grab active:cursor-grabbing group relative transition-all ${isBeingDragged ? 'card-dragging' : ''
+                              }`}
                           >
                             {/* Drag Handle Indicator */}
                             <div className="absolute top-4 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-stone-300 hover:text-stone-600">
@@ -601,9 +596,8 @@ export default function KanbanPage() {
                                 {task.tags.map(tag => (
                                   <span
                                     key={tag}
-                                    className={`text-[10.5px] font-bold px-2.5 py-0.5 rounded-full border ${
-                                      tagPills[tag] || 'bg-stone-100 text-stone-700 border-stone-200'
-                                    }`}
+                                    className={`text-[10.5px] font-bold px-2.5 py-0.5 rounded-full border ${tagPills[tag] || 'bg-stone-100 text-stone-700 border-stone-200'
+                                      }`}
                                   >
                                     {tag}
                                   </span>
@@ -624,7 +618,7 @@ export default function KanbanPage() {
                             </div>
 
                             {/* Title & Description */}
-                            <h3 className="text-sm font-bold text-stone-900 group-hover:text-stone-700 tracking-tight leading-snug mb-2 font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
+                            <h3 className="text-sm font-normal text-stone-900 group-hover:text-stone-700 tracking-tight leading-snug mb-2 font-serif">
                               {task.title}
                             </h3>
 
@@ -714,11 +708,11 @@ export default function KanbanPage() {
           {viewMode === 'list' && (
             <div className="bg-white rounded-3xl border border-stone-200/80 shadow-2xs p-6 mb-12">
               <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-100">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 font-serif">
                     Task <em className="italic font-serif font-normal">Inventory</em> List
                   </h2>
-                  <span className="text-xs font-bold text-stone-400 stat-number">({allTasks.length} total)</span>
+                  <span className="text-xs font-bold text-stone-400 font-mono bg-stone-100 px-2 py-0.5 rounded-md">{allTasks.length} total</span>
                 </div>
 
                 <button
@@ -778,12 +772,11 @@ export default function KanbanPage() {
                           </td>
 
                           <td className="py-3.5">
-                            <span className={`text-[10.5px] font-bold px-2.5 py-0.5 rounded-full ${
-                              t.priority === 'Critical' ? 'bg-rose-100 text-rose-700' :
-                              t.priority === 'High' ? 'bg-amber-100 text-amber-800' :
-                              t.priority === 'Medium' ? 'bg-indigo-100 text-indigo-700' :
-                              'bg-stone-100 text-stone-700'
-                            }`}>
+                            <span className={`text-[10.5px] font-bold px-2.5 py-0.5 rounded-full ${t.priority === 'Critical' ? 'bg-rose-100 text-rose-700' :
+                                t.priority === 'High' ? 'bg-amber-100 text-amber-800' :
+                                  t.priority === 'Medium' ? 'bg-indigo-100 text-indigo-700' :
+                                    'bg-stone-100 text-stone-700'
+                              }`}>
                               {t.priority}
                             </span>
                           </td>
@@ -844,10 +837,10 @@ export default function KanbanPage() {
               <div className="bg-white rounded-3xl border border-stone-200/80 shadow-2xs p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-stone-100">
                   <div>
-                    <h2 className="text-xl font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
+                    <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 font-serif">
                       Sprint 14 <em className="italic font-serif font-normal">Pipeline</em> & Milestones
                     </h2>
-                    <p className="text-xs text-stone-500 mt-0.5">End-to-end design & engineering workflow stages with live completion rates</p>
+                    <p className="text-xs sm:text-sm text-stone-500 mt-1 font-medium">End-to-end design & engineering workflow stages with live completion rates</p>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -876,7 +869,7 @@ export default function KanbanPage() {
                         </div>
 
                         {/* Stage Title */}
-                        <h3 className="text-sm font-bold text-stone-900 mb-1 font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
+                        <h3 className="text-base sm:text-lg font-bold text-stone-900 mb-1">
                           {stage.name}
                         </h3>
                         <p className="text-[11px] text-stone-500 leading-relaxed mb-4">

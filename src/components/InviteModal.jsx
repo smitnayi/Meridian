@@ -94,10 +94,10 @@ export default function InviteModal({ open, onClose, onInvite }) {
               <UsersIcon size={16} strokeWidth={2.5} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-stone-900 leading-none" style={{ fontFamily: 'var(--font-didot)' }}>
-                Invite Teammate
+              <h3 className="text-xl sm:text-2xl font-normal font-serif text-stone-900 leading-none">
+                Invite <em className="italic font-serif font-normal text-stone-800">Teammate</em>
               </h3>
-              <p className="text-[11px] text-stone-500 mt-0.5">Send email invite with workspace permissions</p>
+              <p className="text-xs text-stone-500 mt-1 font-medium">Send email invite with workspace permissions</p>
             </div>
           </div>
 

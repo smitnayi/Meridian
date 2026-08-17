@@ -44,7 +44,7 @@ export default function TeamPage() {
 
         {/* Main Canvas */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          
+
           <DynamicHeader
             onOpenNewTask={() => setInviteModalOpen(true)}
             onOpenSearch={() => {
@@ -54,12 +54,12 @@ export default function TeamPage() {
           />
 
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                Team <em className="italic font-serif font-normal">Members</em> & Presence
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight font-serif">
+                Team <em className="italic font-serif font-normal text-stone-900">Members & Presence</em>
               </h1>
-              <p className="text-xs sm:text-sm text-stone-500 font-medium mt-1">
+              <p className="text-xs sm:text-sm text-stone-500 font-medium mt-1.5">
                 Manage team directory, live availability, tracked hours, and workspace invitations
               </p>
             </div>
@@ -163,9 +163,8 @@ export default function TeamPage() {
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`px-3 py-1 text-xs font-bold rounded-xl capitalize transition-all cursor-pointer ${
-                    statusFilter === s ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
-                  }`}
+                  className={`px-3 py-1 text-xs font-bold rounded-xl capitalize transition-all cursor-pointer ${statusFilter === s ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
+                    }`}
                 >
                   {s}
                 </button>
@@ -191,13 +190,12 @@ export default function TeamPage() {
                         {member.initials}
                       </div>
                       <span
-                        className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full ring-2 ring-white ${
-                          member.status === 'online'
+                        className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full ring-2 ring-white ${member.status === 'online'
                             ? 'bg-emerald-500'
                             : member.status === 'away'
-                            ? 'bg-amber-500'
-                            : 'bg-stone-400'
-                        }`}
+                              ? 'bg-amber-500'
+                              : 'bg-stone-400'
+                          }`}
                       />
                     </div>
 
@@ -207,7 +205,7 @@ export default function TeamPage() {
                   </div>
 
                   {/* Name & Role */}
-                  <h3 className="text-sm font-bold text-stone-900 leading-snug" style={{ fontFamily: 'var(--font-didot)' }}>
+                  <h3 className="text-sm font-bold text-stone-900 leading-snug">
                     {member.name}
                   </h3>
                   <div className="text-xs text-stone-500 font-medium mt-0.5">{member.role}</div>

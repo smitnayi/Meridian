@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { login as loginApi, googleLogin } from '../Service/authService';
 import { toast } from 'react-hot-toast';
-import { ZapIcon, ArrowRightIcon, CheckIcon, ShieldIcon } from '@/components/Icons';
+import { ZapIcon, ArrowRightIcon, CheckIcon, ShieldIcon, SparklesIcon } from '@/components/Icons';
 
 /* ── Tiny Icons ── */
 const GoogleIcon = () => (
@@ -76,20 +76,20 @@ function LeftPanel() {
       <div>
         <div className="flex items-center gap-3 mb-10">
           <div className="w-10 h-10 rounded-2xl bg-[#111318] flex items-center justify-center text-white shadow-md">
-            <ZapIcon size={20} strokeWidth={2.5} />
+            <ZapIcon size={20} strokeWidth={2.5} className="text-lime-400" />
           </div>
           <div>
-            <span className="text-2xl font-extrabold text-stone-900 tracking-tight" style={{ fontFamily: 'var(--font-didot)' }}>
-              Clarity <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-lime-200 text-lime-900 ml-1">PRO</span>
+            <span className="text-2xl font-extrabold text-stone-900 tracking-tight">
+              Meridian <em className="font-serif italic font-normal text-stone-700">Clarity</em> <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-lime-200 text-lime-900 ml-1">PRO</span>
             </span>
-            <div className="text-xs text-stone-500 font-medium">Meridian Workspace System</div>
+            <div className="text-xs text-stone-500 font-medium">Enterprise Workspace System</div>
           </div>
         </div>
 
-        {/* Headline */}
-        <h1 className="font-serif text-5xl lg:text-6xl text-stone-950 font-normal leading-[1.08] tracking-tight mb-5" style={{ fontFamily: 'var(--font-serif)' }}>
-          Where <em className="italic font-normal font-serif">exceptional</em> teams<br />
-          build <span className="italic font-serif underline decoration-lime-400 decoration-wavy decoration-2">iconic products</span>.
+        {/* Headline with Instrument Serif Italic Highlights */}
+        <h1 className="font-serif text-5xl lg:text-6xl text-stone-950 font-normal leading-[1.08] tracking-tight mb-5">
+          Where <em className="italic font-normal font-serif text-stone-900 underline decoration-lime-400 decoration-wavy decoration-2">exceptional</em> teams<br />
+          build <em className="italic font-normal font-serif text-stone-900">iconic products</em>.
         </h1>
         <p className="text-sm text-stone-600 leading-relaxed mb-10 max-w-md font-medium">
           Meridian brings your deliverables, sprint velocity, calendar schedules, and team channels into one unified, ultra-premium interface.
@@ -98,8 +98,8 @@ function LeftPanel() {
         {/* Features Bento */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-xl">
           {features.map((f, i) => (
-            <div key={i} className="p-4 rounded-3xl bg-white/80 backdrop-blur-sm border border-stone-200/80 shadow-2xs">
-              <div className={`w-8 h-8 rounded-xl ${f.bg} flex items-center justify-center text-sm font-bold mb-2`}>
+            <div key={i} className="p-4 rounded-3xl bg-white/85 backdrop-blur-sm border border-stone-200/80 shadow-2xs hover:shadow-xs transition-shadow">
+              <div className={`w-8 h-8 rounded-xl ${f.bg} flex items-center justify-center text-sm font-bold mb-2 shadow-2xs`}>
                 {f.icon}
               </div>
               <div className="text-xs font-bold text-stone-900 leading-snug">{f.title}</div>
@@ -180,10 +180,10 @@ export default function LoginPage() {
       <div className="w-full lg:w-[480px] shrink-0 flex items-center justify-center bg-white px-7 py-8 md:px-12 md:py-10 shadow-2xl border-l border-stone-200/80 min-h-screen">
         <div className="w-full max-w-[360px]">
 
-          {/* Header */}
+          {/* Header with Instrument Serif Italic */}
           <div className="mb-6">
-            <h2 className="text-3xl font-normal font-serif text-stone-950 tracking-tight mb-1" style={{ fontFamily: 'var(--font-serif)' }}>
-              Sign in to <em className="italic font-serif font-normal">Meridian</em>
+            <h2 className="text-3xl font-normal font-serif text-stone-950 tracking-tight mb-1">
+              Sign in to <em className="italic font-serif font-normal text-stone-900">Meridian</em>
             </h2>
             <p className="text-xs text-stone-500 font-medium">
               Access your team workspace and sprint deliverables
@@ -195,12 +195,12 @@ export default function LoginPage() {
             type="button"
             onClick={() => {
               demoLogin();
-              toast.success('Logged in as Demo Alex Johnson!');
+              toast.success('Logged in as Demo Alex Johnson (Engineering Lead)!');
             }}
-            className="w-full py-3 px-4 rounded-2xl bg-lime-400 hover:bg-lime-300 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all mb-4 cursor-pointer"
+            className="w-full py-3 px-4 rounded-2xl bg-lime-400 hover:bg-lime-300 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all mb-4 cursor-pointer active:scale-98"
           >
             <span>⚡ Instant 1-Click Demo Sign-in</span>
-            <span className="font-mono text-[11px] bg-stone-950/10 px-2 py-0.5 rounded-full">Alex Johnson</span>
+            <span className="font-mono text-[11px] bg-stone-950/10 px-2 py-0.5 rounded-full font-bold">Alex Johnson</span>
           </button>
 
           {/* Social Logins */}
@@ -275,7 +275,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-2xl bg-[#111318] hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
+              className="w-full py-3 rounded-2xl bg-[#111318] hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-98"
             >
               {loading ? 'Authenticating...' : 'Sign in to Workspace'}
               {!loading && <span>→</span>}

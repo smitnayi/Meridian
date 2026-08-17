@@ -15,7 +15,7 @@ import {
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
 
-// Pastel Bento KPIs (from Reference 1 "Clarity")
+// Pastel Bento KPIs
 const bentoKPIs = [
   {
     id: 'tasks',
@@ -25,7 +25,7 @@ const bentoKPIs = [
     bg: 'bg-[#EDE9FE]',
     text: 'text-[#6D28D9]',
     border: 'border-[#DDD6FE]',
-    icon: <ClipboardIcon size={18} />,
+    icon: <ClipboardIcon size={18} className="text-[#6D28D9]" />,
     sparkline: [30, 45, 60, 55, 80, 95, 137]
   },
   {
@@ -36,7 +36,7 @@ const bentoKPIs = [
     bg: 'bg-[#FFEDD5]',
     text: 'text-[#C2410C]',
     border: 'border-[#FDBA74]',
-    icon: <ZapIcon size={18} />,
+    icon: <ZapIcon size={18} className="text-[#C2410C]" />,
     sparkline: [6.8, 7.2, 7.5, 7.9, 8.1, 8.4, 8.6]
   },
   {
@@ -47,7 +47,7 @@ const bentoKPIs = [
     bg: 'bg-[#E0F2FE]',
     text: 'text-[#0369A1]',
     border: 'border-[#BAE6FD]',
-    icon: <TargetIcon size={18} />,
+    icon: <TargetIcon size={18} className="text-[#0369A1]" />,
     sparkline: [40, 52, 58, 62, 68, 70, 74]
   },
   {
@@ -58,7 +58,7 @@ const bentoKPIs = [
     bg: 'bg-[#ECFCCB]',
     text: 'text-[#3F6212]',
     border: 'border-[#D9F99D]',
-    icon: <RocketIcon size={18} />,
+    icon: <RocketIcon size={18} className="text-[#3F6212]" />,
     sparkline: [50, 60, 75, 80, 88, 91, 94]
   },
 ]
@@ -102,7 +102,7 @@ const myWorkInitial = [
     path: 'Publications / Shots',
     title: 'Design 3 variations for iOS widget card mockup',
     subtasksCompleted: 3,
-    subtasksTotal: 10,
+    subtasksTotal: 5,
     due: 'Today 5pm',
     tab: 'todo',
     priority: 'High',
@@ -122,7 +122,7 @@ const myWorkInitial = [
     path: 'Commercial / Portals',
     title: 'Implement OAuth2 token refresh & user session handler',
     subtasksCompleted: 4,
-    subtasksTotal: 6,
+    subtasksTotal: 5,
     due: 'Tomorrow',
     tab: 'todo',
     priority: 'Critical',
@@ -139,10 +139,10 @@ const myWorkInitial = [
   {
     id: 'mw-3',
     taskId: 'MRD-038',
-    path: 'Design internal / Exploration',
+    path: 'Design Internal / Exploration',
     title: 'Explore responsive tablet layouts for task board view',
     subtasksCompleted: 1,
-    subtasksTotal: 4,
+    subtasksTotal: 2,
     due: 'July 30',
     tab: 'todo',
     priority: 'Medium',
@@ -158,8 +158,8 @@ const myWorkInitial = [
     taskId: 'MRD-044',
     path: 'Commercial / Portals',
     title: 'Client Review & Feedback on v2 redesign',
-    subtasksCompleted: 5,
-    subtasksTotal: 5,
+    subtasksCompleted: 1,
+    subtasksTotal: 1,
     due: 'July 28',
     tab: 'done',
     priority: 'Low',
@@ -204,12 +204,12 @@ export default function Dashboard() {
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen w-full bg-[#FAF8F5]">
-        {/* 1. Global Left Sidebar */}
+        {/* Sidebar */}
         <Sidebar />
 
-        {/* 2. Main Executive Canvas */}
+        {/* Main Executive Canvas */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          
+
           {/* Dynamic Top Header & Schedule Island */}
           <DynamicHeader
             onOpenNewTask={() => setModalOpen(true)}
@@ -219,61 +219,61 @@ export default function Dashboard() {
             }}
           />
 
-          {/* ── Greeting & Top Headline ── */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          {/* ── Greeting & Top Headline with Instrument Serif Italic ── */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                  Good morning, <em className="italic font-serif font-normal">Alex</em>
+              <div className="flex items-center gap-3">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight font-serif leading-tight">
+                  Good morning, <em className="italic font-serif font-normal text-stone-900">Alex</em>
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-lime-200 text-lime-900 font-mono">
-                  Sprint 14
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-lime-200 text-lime-900 font-mono shadow-2xs">
+                  Sprint 14 Active
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-stone-500 font-medium mt-1">
-                Let&apos;s make this day productive · 3 active high-priority deliverables queued
+              <p className="text-sm sm:text-base text-stone-600 font-medium mt-1.5">
+                Command center for <em className="font-serif italic font-normal text-stone-800 text-base sm:text-lg">high-velocity</em> sprint execution · 3 priorities queued
               </p>
             </div>
 
             {/* Quick Summary Pill Badge */}
-            <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl border border-stone-200/80 shadow-2xs">
+            <div className="flex items-center gap-3.5 bg-white px-5 py-2.5 rounded-2xl border border-stone-200/80 shadow-2xs">
               <div className="text-right">
-                <span className="text-[10px] uppercase tracking-wider font-bold text-stone-400 block">Tasks done</span>
-                <span className="text-base font-extrabold text-stone-950 stat-number">2,543</span>
+                <span className="text-[10px] uppercase tracking-wider font-bold text-stone-400 block font-mono">Tasks done</span>
+                <span className="text-lg font-extrabold text-stone-950 stat-number">2,543</span>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-lime-100 text-lime-800 flex items-center justify-center font-bold text-xs">
-                <ArrowUpRightIcon size={14} />
+              <div className="w-9 h-9 rounded-xl bg-lime-100 text-lime-800 flex items-center justify-center font-bold text-xs shadow-2xs">
+                <ArrowUpRightIcon size={16} />
               </div>
             </div>
           </div>
 
-          {/* ── 1. Bento KPI Metric Cards (Ref 1 "Clarity") ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
+          {/* ── 1. Bento KPI Metric Cards ── */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {bentoKPIs.map(kpi => (
               <div
                 key={kpi.id}
                 onClick={() => router.push(kpi.id === 'tasks' ? '/kanban' : '/Analytics')}
-                className={`rounded-3xl p-5 border ${kpi.border} ${kpi.bg} bento-card-interactive cursor-pointer relative overflow-hidden group`}
+                className={`rounded-3xl p-6 border ${kpi.border} ${kpi.bg} bento-card-interactive cursor-pointer relative overflow-hidden group shadow-2xs`}
               >
                 <div className="flex items-start justify-between mb-3">
-                  <span className="p-2 rounded-2xl bg-white/80 backdrop-blur-xs shadow-2xs text-stone-800">
+                  <span className="p-2.5 rounded-2xl bg-white/85 backdrop-blur-xs shadow-2xs">
                     {kpi.icon}
                   </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/90 text-stone-700 shadow-2xs">
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/95 text-stone-700 shadow-2xs font-mono">
                     {kpi.delta}
                   </span>
                 </div>
 
-                <div className="text-4xl font-extrabold text-stone-950 tracking-tight mb-1 stat-number">
+                <div className="text-4xl sm:text-5xl font-extrabold text-stone-950 tracking-tight mb-1 stat-number">
                   {kpi.value}
                 </div>
 
-                <div className="text-xs font-semibold text-stone-700">
+                <div className="text-xs sm:text-sm font-semibold text-stone-700">
                   {kpi.label}
                 </div>
 
                 {/* Micro sparkline visualizer */}
-                <div className="mt-3 flex items-end gap-1 h-5 pt-1">
+                <div className="mt-3.5 flex items-end gap-1 h-6 pt-1">
                   {kpi.sparkline.map((val, idx) => (
                     <div
                       key={idx}
@@ -286,32 +286,32 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* ── 2. Middle Grid: LineUp (Ref 3) + Working Activity Schedule ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-7">
-            
+          {/* ── 2. Middle Grid: LineUp + Working Activity Schedule ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
             {/* Left 2 Cols: LineUp & Trending Section */}
             <div className="lg:col-span-2 space-y-6">
-              
+
               {/* LineUp Cards */}
-              <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                      LineUp & <em className="italic font-serif font-normal">Focal Points</em>
+              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/80 shadow-2xs">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 font-serif tracking-tight">
+                      LineUp & <em className="italic font-serif font-normal text-stone-800">Focal Points</em>
                     </h2>
-                    <span className="text-xs font-bold text-stone-400 stat-number">(2 active)</span>
+                    <span className="text-xs font-bold text-stone-400 font-mono bg-stone-100 px-2 py-0.5 rounded-md">2 active</span>
                   </div>
 
                   <button
                     onClick={() => router.push('/kanban')}
-                    className="text-xs font-semibold text-stone-500 hover:text-stone-900 flex items-center gap-1 transition-colors"
+                    className="text-xs sm:text-sm font-bold text-stone-600 hover:text-stone-950 flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <span>View all</span>
-                    <ArrowUpRightIcon size={13} />
+                    <span>View all board</span>
+                    <ArrowUpRightIcon size={14} />
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {initialLineUp.map(item => (
                     <div
                       key={item.id}
@@ -328,32 +328,32 @@ export default function Dashboard() {
                           description: 'Active sprint focal point deliverable with live timer sync.'
                         })
                       }}
-                      className={`p-4 rounded-2xl border ${item.border} ${item.bg} hover:shadow-xs transition-all cursor-pointer group`}
+                      className={`p-5 rounded-2xl border ${item.border} ${item.bg} hover:shadow-xs transition-all cursor-pointer group`}
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 font-mono">
+                      <div className="flex items-start justify-between mb-2.5">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 font-mono">
                           {item.category}
                         </span>
-                        <span className="text-xl font-bold text-stone-900 stat-number">
+                        <span className="text-2xl font-extrabold text-stone-900 stat-number">
                           {item.pct}%
                         </span>
                       </div>
 
-                      <div className="text-xs font-bold text-stone-900 group-hover:text-stone-700 leading-snug mb-3">
+                      <div className="text-sm font-bold text-stone-900 group-hover:text-stone-700 leading-snug mb-3.5">
                         {item.title}
                       </div>
 
-                      <div className="flex items-center justify-between text-xs text-stone-500 pt-2 border-t border-stone-900/5">
-                        <div className="flex items-center gap-1 text-[11px]">
-                          <ClockIcon size={12} />
-                          <span className="stat-number">{item.timeSpent}</span>
+                      <div className="flex items-center justify-between text-xs text-stone-500 pt-2.5 border-t border-stone-900/5">
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <ClockIcon size={13} className="text-stone-400" />
+                          <span className="stat-number font-mono">{item.timeSpent}</span>
                         </div>
 
                         <div className="flex -space-x-1.5 overflow-hidden">
                           {item.assignees.map((a, i) => (
                             <div
                               key={i}
-                              className="w-5 h-5 rounded-full ring-1 ring-white text-[9px] font-bold text-white flex items-center justify-center"
+                              className="w-6 h-6 rounded-full ring-1 ring-white text-[10px] font-bold text-white flex items-center justify-center"
                               style={{ backgroundColor: a.color }}
                             >
                               {a.name[0]}
@@ -367,82 +367,78 @@ export default function Dashboard() {
               </div>
 
               {/* Trending Projects Strip */}
-              <div className="bg-white rounded-3xl p-5 border border-stone-200/80 shadow-2xs">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                      Trending <em className="italic font-serif font-normal">Initiatives</em>
+              <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-xl sm:text-2xl font-normal text-stone-950 font-serif tracking-tight">
+                      Trending <em className="italic font-serif font-normal text-stone-800">Initiatives</em>
                     </h3>
-                    <span className="text-xs font-bold text-stone-400 stat-number">(3)</span>
+                    <span className="text-xs font-bold text-stone-400 font-mono bg-stone-100 px-2 py-0.5 rounded-md">3 total</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200/60">
-                    <div className="text-[10px] text-stone-400 font-bold uppercase">Dribbble</div>
-                    <div className="font-bold text-stone-800 truncate">Banking App Animation</div>
-                    <div className="text-lg font-bold text-stone-900 stat-number mt-1">12%</div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs">
+                  <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/60">
+                    <div className="text-[10px] text-stone-400 font-bold uppercase font-mono">Dribbble</div>
+                    <div className="text-xs sm:text-sm font-bold text-stone-800 truncate mt-1">Banking App Animation</div>
+                    <div className="text-xl font-extrabold text-stone-900 stat-number mt-1.5">12%</div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200/60">
-                    <div className="text-[10px] text-stone-400 font-bold uppercase">Behance</div>
-                    <div className="font-bold text-stone-800 truncate">AI chat app case</div>
-                    <div className="text-lg font-bold text-stone-900 stat-number mt-1">36%</div>
+                  <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/60">
+                    <div className="text-[10px] text-stone-400 font-bold uppercase font-mono">Behance</div>
+                    <div className="text-xs sm:text-sm font-bold text-stone-800 truncate mt-1">AI chat app case study</div>
+                    <div className="text-xl font-extrabold text-stone-900 stat-number mt-1.5">36%</div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200/60">
-                    <div className="text-[10px] text-stone-400 font-bold uppercase">Meridian Internal</div>
-                    <div className="font-bold text-stone-800 truncate">Logotype & Token Design</div>
-                    <div className="text-lg font-bold text-stone-900 stat-number mt-1">98%</div>
+                  <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/60">
+                    <div className="text-[10px] text-stone-400 font-bold uppercase font-mono">Design Internal</div>
+                    <div className="text-xs sm:text-sm font-bold text-stone-800 truncate mt-1">Logotype & Token Specs</div>
+                    <div className="text-xl font-extrabold text-stone-900 stat-number mt-1.5">98%</div>
                   </div>
                 </div>
               </div>
 
             </div>
 
-            {/* Right Col: Working Activity Timeline Schedule (Ref 3 & Ref 5) */}
-            <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs flex flex-col justify-between">
+            {/* Right Col: Working Activity Timeline Schedule */}
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/80 shadow-2xs flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-base font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                    Working <em className="italic font-serif font-normal">Activity</em>
+                  <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 font-serif tracking-tight">
+                    Working <em className="italic font-serif font-normal text-stone-800">Activity</em>
                   </h2>
-                  <span className="text-[11px] font-semibold text-stone-500 font-mono bg-stone-100 px-2 py-0.5 rounded-md">
+                  <span className="text-[11px] font-bold text-stone-500 font-mono bg-stone-100 px-2.5 py-0.5 rounded-md">
                     July 24 – 28
                   </span>
                 </div>
-                <p className="text-xs text-stone-400 mb-5">Sprint hours logged across active days</p>
+                <p className="text-xs sm:text-sm text-stone-500 mb-6 font-medium">Sprint hours logged across active days</p>
 
                 {/* Day Labels */}
                 <div className="grid grid-cols-5 text-center text-xs font-bold text-stone-600 mb-3">
-                  <div>Wed<span className="block text-stone-400 stat-number text-[10px]">24</span></div>
-                  <div>Thu<span className="block text-stone-400 stat-number text-[10px]">25</span></div>
-                  <div className="text-stone-900">Fri<span className="block text-rose-500 stat-number text-[10px]">26</span></div>
-                  <div>Sat<span className="block text-stone-400 stat-number text-[10px]">27</span></div>
-                  <div>Sun<span className="block text-stone-400 stat-number text-[10px]">28</span></div>
+                  <div>Wed<span className="block text-stone-400 stat-number text-[11px] mt-0.5">24</span></div>
+                  <div>Thu<span className="block text-stone-400 stat-number text-[11px] mt-0.5">25</span></div>
+                  <div className="text-stone-900">Fri<span className="block text-rose-600 font-bold stat-number text-[11px] mt-0.5">26</span></div>
+                  <div>Sat<span className="block text-stone-400 stat-number text-[11px] mt-0.5">27</span></div>
+                  <div>Sun<span className="block text-stone-400 stat-number text-[11px] mt-0.5">28</span></div>
                 </div>
 
                 {/* Multi-Colored Vertical Time Blocks */}
-                <div className="grid grid-cols-5 gap-2 h-44 items-end relative py-2 border-b border-stone-100">
-                  
-                  {/* Wed 24 */}
+                <div className="grid grid-cols-5 gap-2.5 h-44 items-end relative py-2 border-b border-stone-100">
                   <div className="flex flex-col gap-1.5 h-full justify-end">
                     <div className="w-full h-8 bg-rose-200 rounded-lg" />
                     <div className="w-full h-14 bg-orange-400 rounded-lg" />
                   </div>
 
-                  {/* Thu 25 */}
                   <div className="flex flex-col gap-1.5 h-full justify-end">
                     <div className="w-full h-12 bg-lime-400 rounded-lg" />
                     <div className="w-full h-16 bg-orange-500 rounded-lg" />
                   </div>
 
-                  {/* Fri 26 (Active Focus Day) */}
                   <div
                     className="flex flex-col gap-1.5 h-full justify-end relative cursor-pointer group"
                     onMouseEnter={() => setHoveredBar('fri')}
                     onMouseLeave={() => setHoveredBar(null)}
                   >
                     {hoveredBar === 'fri' && (
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#111318] text-white text-[10px] font-mono px-2.5 py-1 rounded-xl shadow-lg whitespace-nowrap z-20">
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#111318] text-white text-xs font-mono px-3 py-1 rounded-xl shadow-lg whitespace-nowrap z-20">
                         10:59:16 Banking App
                       </div>
                     )}
@@ -451,61 +447,57 @@ export default function Dashboard() {
                     <div className="w-full h-8 bg-lime-300 rounded-lg" />
                   </div>
 
-                  {/* Sat 27 */}
                   <div className="flex flex-col gap-1.5 h-full justify-end">
                     <div className="w-full h-10 bg-lime-400 rounded-lg" />
                     <div className="w-full h-6 bg-violet-300 rounded-lg" />
                   </div>
 
-                  {/* Sun 28 */}
                   <div className="flex flex-col gap-1.5 h-full justify-end">
                     <div className="w-full h-8 bg-pink-300 rounded-lg" />
                     <div className="w-full h-14 bg-orange-400 rounded-lg" />
                     <div className="w-full h-6 bg-lime-400 rounded-lg" />
                   </div>
-
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-4 text-xs font-semibold text-stone-600">
-                <span>Total logged:</span>
-                <span className="text-stone-900 font-bold stat-number text-sm">24.5 hours</span>
+              <div className="flex items-center justify-between pt-4 text-xs sm:text-sm font-semibold text-stone-600">
+                <span>Total sprint logged:</span>
+                <span className="text-stone-950 font-bold stat-number text-base sm:text-lg">24.5 hours</span>
               </div>
             </div>
 
           </div>
 
-          {/* ── 3. "My Work" Interactive Filter Table (Ref 3 & Ref 1) ── */}
-          <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs mb-10">
-            
+          {/* ── 3. "My Work" Interactive Filter Table ── */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/80 shadow-2xs mb-10">
+
             {/* Header & Filter Pills */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-stone-100">
               <div className="flex items-center gap-3">
-                <h2 className="text-base font-normal text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                  My <em className="italic font-serif font-normal">Work</em> & Deliverables
+                <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 font-serif tracking-tight">
+                  My <em className="italic font-serif font-normal text-stone-800">Work</em> & Deliverables
                 </h2>
-                <span className="text-xs font-bold text-stone-400 stat-number">({filteredWork.length})</span>
+                <span className="text-xs font-bold text-stone-400 font-mono bg-stone-100 px-2 py-0.5 rounded-md">({filteredWork.length})</span>
               </div>
+
 
               {/* Segmented Control Pills */}
               <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-2xl">
                 <button
                   onClick={() => setWorkTab('todo')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    workTab === 'todo'
-                      ? 'bg-[#111318] text-white shadow-xs'
-                      : 'text-stone-500 hover:text-stone-800'
-                  }`}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${workTab === 'todo'
+                    ? 'bg-[#111318] text-white shadow-xs'
+                    : 'text-stone-500 hover:text-stone-800'
+                    }`}
                 >
                   To do ({myWork.filter(w => w.tab === 'todo').length})
                 </button>
                 <button
                   onClick={() => setWorkTab('done')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    workTab === 'done'
-                      ? 'bg-[#111318] text-white shadow-xs'
-                      : 'text-stone-500 hover:text-stone-800'
-                  }`}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${workTab === 'done'
+                    ? 'bg-[#111318] text-white shadow-xs'
+                    : 'text-stone-500 hover:text-stone-800'
+                    }`}
                 >
                   Done ({myWork.filter(w => w.tab === 'done').length})
                 </button>
@@ -525,11 +517,10 @@ export default function Dashboard() {
                     <button
                       type="button"
                       onClick={(e) => toggleTaskDone(e, task.id)}
-                      className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-colors shrink-0 ${
-                        task.tab === 'done'
-                          ? 'bg-lime-500 border-lime-600 text-white'
-                          : 'border-stone-300 bg-white hover:border-stone-400'
-                      }`}
+                      className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-colors shrink-0 ${task.tab === 'done'
+                        ? 'bg-lime-500 border-lime-600 text-white'
+                        : 'border-stone-300 bg-white hover:border-stone-400'
+                        }`}
                     >
                       {task.tab === 'done' && <CheckIcon size={12} strokeWidth={3} />}
                     </button>
@@ -538,9 +529,8 @@ export default function Dashboard() {
                       <div className="text-[10px] text-stone-400 font-mono tracking-tight">
                         {task.path}
                       </div>
-                      <div className={`text-xs font-bold text-stone-900 group-hover:text-stone-700 truncate ${
-                        task.tab === 'done' ? 'line-through text-stone-400' : ''
-                      }`}>
+                      <div className={`text-xs font-bold text-stone-900 group-hover:text-stone-700 truncate ${task.tab === 'done' ? 'line-through text-stone-400' : ''
+                        }`}>
                         {task.title}
                       </div>
                     </div>
@@ -571,7 +561,7 @@ export default function Dashboard() {
                       {task.due}
                     </span>
 
-                    <button className="text-stone-400 hover:text-stone-700 p-1">
+                    <button className="text-stone-400 hover:text-stone-700 p-1 cursor-pointer">
                       <MoreHorizontalIcon size={16} />
                     </button>
                   </div>

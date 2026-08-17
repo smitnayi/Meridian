@@ -73,7 +73,7 @@ export default function TaskDetailDrawer({ task, open, onClose, onUpdateTask, on
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
         <div className="w-screen max-w-md bg-[#FAF8F5] shadow-2xl border-l border-stone-200/80 flex flex-col animate-in slide-in-from-right duration-300">
-          
+
           {/* Header */}
           <div className="px-6 py-4 border-b border-stone-200/70 bg-white flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -110,10 +110,10 @@ export default function TaskDetailDrawer({ task, open, onClose, onUpdateTask, on
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Title & Description */}
             <div>
-              <h2 className="text-xl font-bold text-stone-900 tracking-tight" style={{ fontFamily: 'var(--font-didot)' }}>
+              <h2 className="text-2xl sm:text-3xl font-normal text-stone-900 tracking-tight font-serif leading-tight">
                 {task.title}
               </h2>
-              <p className="text-xs text-stone-500 mt-2 leading-relaxed">
+              <p className="text-xs sm:text-sm text-stone-500 mt-2.5 leading-relaxed font-medium">
                 {task.description || 'No detailed description provided for this task.'}
               </p>
             </div>
@@ -182,15 +182,13 @@ export default function TaskDetailDrawer({ task, open, onClose, onUpdateTask, on
                   <div
                     key={i}
                     onClick={() => toggleSubtask(i)}
-                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer ${
-                      st.done
+                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer ${st.done
                         ? 'bg-lime-50/60 border-lime-200 text-stone-400 line-through'
                         : 'bg-white border-stone-200/70 text-stone-800 hover:border-stone-300'
-                    }`}
+                      }`}
                   >
-                    <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
-                      st.done ? 'bg-lime-500 border-lime-600 text-white' : 'border-stone-300 bg-white'
-                    }`}>
+                    <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${st.done ? 'bg-lime-500 border-lime-600 text-white' : 'border-stone-300 bg-white'
+                      }`}>
                       {st.done && <CheckIcon size={11} strokeWidth={3} />}
                     </div>
                     <span className="text-xs font-medium select-none">{st.text}</span>

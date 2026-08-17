@@ -46,7 +46,7 @@ export default function SettingsPage() {
 
         {/* Main Canvas */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          
+
           <DynamicHeader
             onOpenNewTask={() => toast.success('Workspace action triggered')}
             onOpenSearch={() => {
@@ -56,11 +56,11 @@ export default function SettingsPage() {
           />
 
           {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-3xl sm:text-4xl font-normal tracking-tight text-stone-950 font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-              Workspace & <em className="italic font-serif font-normal">Account</em> Settings
+          <div className="mb-7">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-stone-950 font-serif">
+              Account <em className="italic font-serif font-normal text-stone-900">Preferences & Security</em>
             </h1>
-            <p className="text-xs sm:text-sm text-stone-500 font-medium mt-1">
+            <p className="text-xs sm:text-sm text-stone-500 font-medium mt-1.5">
               Manage your personal credentials, security keys, notification preferences, and team defaults
             </p>
           </div>
@@ -73,9 +73,8 @@ export default function SettingsPage() {
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                    active ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
-                  }`}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${active ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
+                    }`}
                 >
                   {t.icon}
                   <span>{t.label}</span>
@@ -88,7 +87,7 @@ export default function SettingsPage() {
           {activeTab === 'profile' && (
             <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs max-w-2xl">
               <form onSubmit={handleSaveProfile} className="space-y-5">
-                
+
                 {/* Avatar Banner */}
                 <div className="flex items-center gap-4 pb-5 border-b border-stone-100">
                   <div className="w-16 h-16 rounded-2xl bg-[#8B5CF6] text-white text-xl font-bold flex items-center justify-center shadow-xs">
@@ -218,9 +217,8 @@ export default function SettingsPage() {
                     setTwoFactor(!twoFactor)
                     toast.success(twoFactor ? '2FA disabled' : '2FA activated with Google Authenticator!')
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    twoFactor ? 'bg-lime-400 text-stone-950' : 'bg-stone-200 text-stone-700'
-                  }`}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${twoFactor ? 'bg-lime-400 text-stone-950' : 'bg-stone-200 text-stone-700'
+                    }`}
                 >
                   {twoFactor ? 'Enabled' : 'Enable 2FA'}
                 </button>

@@ -45,7 +45,7 @@ export default function ProfilePage() {
 
         {/* Main Canvas */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          
+
           <DynamicHeader
             onOpenNewTask={() => router.push('/settings')}
             onOpenSearch={() => {
@@ -57,14 +57,14 @@ export default function ProfilePage() {
           {/* Header Banner Bento */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-2xs mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-3xl bg-[#8B5CF6] text-white text-2xl font-extrabold flex items-center justify-center shadow-md shrink-0 font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
+              <div className="w-20 h-20 rounded-3xl bg-[#8B5CF6] text-white text-2xl font-extrabold flex items-center justify-center shadow-md shrink-0 font-serif">
                 AJ
               </div>
 
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl sm:text-3xl font-normal text-stone-950 tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                    Alex <em className="italic font-serif font-normal">Johnson</em>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-stone-950 tracking-tight font-serif">
+                    Alex <em className="italic font-serif font-normal text-stone-900">Johnson</em>
                   </h1>
                   <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-lime-100 text-lime-800 font-mono">
                     ● Active Now
@@ -104,19 +104,19 @@ export default function ProfilePage() {
 
           {/* Grid: Bio & Skills + Projects + Activity */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-            
+
             {/* Left 1 Col: Bio & Skills */}
             <div className="space-y-6">
               <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs">
-                <h2 className="text-sm font-bold text-stone-900 mb-2 font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
-                  About
+                <h2 className="text-xl sm:text-2xl font-normal text-stone-900 mb-2 font-serif">
+                  About <em className="italic font-serif font-normal text-stone-800">Me</em>
                 </h2>
-                <p className="text-xs text-stone-600 leading-relaxed font-medium">
+                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-medium">
                   {bio}
                 </p>
 
-                <h3 className="text-xs font-bold text-stone-900 mt-5 mb-2 font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
-                  Core Skills
+                <h3 className="text-lg sm:text-xl font-normal text-stone-900 mt-5 mb-2 font-serif">
+                  Core <em className="italic font-serif font-normal text-stone-800">Skills</em>
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
                   {skills.map(s => (
@@ -130,12 +130,12 @@ export default function ProfilePage() {
 
             {/* Right 2 Cols: Assigned Projects & Activity */}
             <div className="lg:col-span-2 space-y-6">
-              
+
               {/* Assigned Projects */}
               <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-bold text-stone-900 font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
-                    Assigned Project Spaces
+                  <h2 className="text-xl sm:text-2xl font-normal text-stone-900 font-serif">
+                    Assigned <em className="italic font-serif font-normal text-stone-800">Project Spaces</em>
                   </h2>
                   <span className="text-xs font-mono text-stone-400 stat-number">3 active</span>
                 </div>
@@ -165,8 +165,8 @@ export default function ProfilePage() {
 
               {/* Recent Activity Log */}
               <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs">
-                <h2 className="text-base font-bold text-stone-900 mb-4 font-serif" style={{ fontFamily: 'var(--font-didot)' }}>
-                  Recent Contributions
+                <h2 className="text-xl sm:text-2xl font-normal text-stone-900 mb-4 font-serif">
+                  Recent <em className="italic font-serif font-normal text-stone-800">Contributions</em>
                 </h2>
 
                 <div className="space-y-3">

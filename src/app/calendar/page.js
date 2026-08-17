@@ -130,7 +130,7 @@ export default function CalendarPage() {
 
         {/* Main Content (Dual-Pane) */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          
+
           {/* Dynamic Top Header */}
           <DynamicHeader
             onOpenNewTask={() => toast.success('Open New Event Modal')}
@@ -142,42 +142,38 @@ export default function CalendarPage() {
 
           {/* ── Main Dual-Pane Grid (Ref 5 "Flentesy") ── */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-12">
-            
+
             {/* ── LEFT / CENTER: Light Warm Calendar Canvas (8 cols) ── */}
             <div className="xl:col-span-8 flex flex-col gap-6">
-              
+
               {/* Header Bar */}
               <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-2xl sm:text-3xl font-normal text-stone-950 tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                      May, <em className="italic font-serif font-normal">2026</em>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-stone-950 tracking-tight font-serif">
+                      Schedule & <em className="italic font-serif font-normal text-stone-900">Sprint Timelines</em>
                     </h1>
-                    <span className="text-stone-400">▾</span>
 
                     {/* View Switcher Capsule (Card | Block | Table) */}
                     <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl ml-2">
                       <button
                         onClick={() => setViewMode('card')}
-                        className={`px-3 py-1 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                          viewMode === 'card' ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
-                        }`}
+                        className={`px-3 py-1 text-xs font-bold rounded-xl transition-all cursor-pointer ${viewMode === 'card' ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
+                          }`}
                       >
                         Card
                       </button>
                       <button
                         onClick={() => setViewMode('block')}
-                        className={`px-3 py-1 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                          viewMode === 'block' ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
-                        }`}
+                        className={`px-3 py-1 text-xs font-bold rounded-xl transition-all cursor-pointer ${viewMode === 'block' ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
+                          }`}
                       >
                         Block
                       </button>
                       <button
                         onClick={() => setViewMode('table')}
-                        className={`px-3 py-1 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                          viewMode === 'table' ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
-                        }`}
+                        className={`px-3 py-1 text-xs font-bold rounded-xl transition-all cursor-pointer ${viewMode === 'table' ? 'bg-[#111318] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
+                          }`}
                       >
                         Table
                       </button>
@@ -222,7 +218,7 @@ export default function CalendarPage() {
               {/* ══════════════════════════════════════════════════════════ */}
               {viewMode === 'card' && (
                 <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs relative overflow-x-auto">
-                  
+
                   {/* Days Header */}
                   <div className="grid grid-cols-5 gap-3 mb-6 min-w-[600px]">
                     {[
@@ -235,11 +231,10 @@ export default function CalendarPage() {
                       <div
                         key={d.day}
                         onClick={() => setSelectedDay(d.day)}
-                        className={`text-center py-2 rounded-2xl cursor-pointer transition-all ${
-                          selectedDay === d.day
+                        className={`text-center py-2 rounded-2xl cursor-pointer transition-all ${selectedDay === d.day
                             ? 'bg-[#111318] text-white shadow-md'
                             : 'hover:bg-stone-100 text-stone-700'
-                        }`}
+                          }`}
                       >
                         <span className="text-2xl font-extrabold stat-number block leading-none">{d.day}</span>
                         <span className={`text-[11px] font-bold ${selectedDay === d.day ? 'text-stone-300' : 'text-stone-400'}`}>/{d.label}</span>
@@ -249,7 +244,7 @@ export default function CalendarPage() {
 
                   {/* Event Schedule Columns */}
                   <div className="grid grid-cols-5 gap-3 relative min-w-[600px] min-h-[460px]">
-                    
+
                     {/* Column 1 (Mon 17) */}
                     <div className="space-y-3">
                       <div className="p-4 rounded-2xl bg-[#FEF9C3] border border-[#FEF08A] shadow-2xs hover:shadow-xs transition-all">
@@ -480,11 +475,10 @@ export default function CalendarPage() {
                             </td>
 
                             <td className="py-3.5">
-                              <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded-full ${
-                                evt.status === 'In Progress' ? 'bg-violet-100 text-violet-800' :
-                                evt.status === 'Completed' ? 'bg-lime-100 text-lime-800' :
-                                'bg-stone-100 text-stone-600'
-                              }`}>
+                              <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded-full ${evt.status === 'In Progress' ? 'bg-violet-100 text-violet-800' :
+                                  evt.status === 'Completed' ? 'bg-lime-100 text-lime-800' :
+                                    'bg-stone-100 text-stone-600'
+                                }`}>
                                 {evt.status}
                               </span>
                             </td>
@@ -509,7 +503,7 @@ export default function CalendarPage() {
 
             {/* ── RIGHT: Deep Obsidian Dark Command Dock (4 cols - Ref Image 3) ── */}
             <div className="xl:col-span-4 dark-dock p-6 flex flex-col justify-between space-y-6">
-              
+
               {/* Header */}
               <div>
                 <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
@@ -527,15 +521,15 @@ export default function CalendarPage() {
                 </div>
 
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-bold text-white tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                    Urgent Tasks (5)
+                  <h2 className="text-xl sm:text-2xl font-normal text-white tracking-tight font-serif">
+                    Urgent <em className="italic font-serif font-normal text-lime-400">Tasks</em> (5)
                   </h2>
                   <span className="text-xs font-mono text-lime-400">Active</span>
                 </div>
 
                 {/* Dark Urgent Task Cards (Image 3 Top) */}
                 <div className="space-y-3 mb-6">
-                  
+
                   {/* Card 1: Design System (Peach/Coral Accent) */}
                   <div className="p-4 rounded-2xl bg-[#1E2028] border border-white/10 hover:border-white/20 transition-all">
                     <div className="flex items-center justify-between text-xs text-rose-400 font-mono mb-1">
@@ -590,7 +584,7 @@ export default function CalendarPage() {
 
               {/* ── Dark Data Viz Widgets (Ref Image 3 Bottom) ── */}
               <div className="space-y-4 pt-4 border-t border-white/10">
-                
+
                 {/* Radial Speedometer Widget: Task Statistics */}
                 <div className="p-4 rounded-2xl bg-[#181A22] border border-white/10">
                   <div className="flex items-center justify-between mb-3">

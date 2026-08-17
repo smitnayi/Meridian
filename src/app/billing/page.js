@@ -61,7 +61,7 @@ export default function BillingPage() {
 
         {/* Main Canvas */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto pt-16 lg:pt-6">
-          
+
           <DynamicHeader
             onOpenNewTask={() => toast.success('Add card modal')}
             onOpenSearch={() => {
@@ -71,12 +71,12 @@ export default function BillingPage() {
           />
 
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight font-serif" style={{ fontFamily: 'var(--font-serif)' }}>
-                Workspace <em className="italic font-serif font-normal">Billing</em> & Plans
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight font-serif">
+                Workspace <em className="italic font-serif font-normal text-stone-900">Billing & Subscriptions</em>
               </h1>
-              <p className="text-xs sm:text-sm text-stone-500 font-medium mt-1">
+              <p className="text-xs sm:text-sm text-stone-500 font-medium mt-1.5">
                 Manage your workspace subscription plan, resource utilization, and invoices
               </p>
             </div>
@@ -116,8 +116,8 @@ export default function BillingPage() {
 
           {/* Pricing Tier Matrix */}
           <div className="mb-10">
-            <h2 className="text-base font-bold text-stone-900 mb-4" style={{ fontFamily: 'var(--font-didot)' }}>
-              Subscription Tiers
+            <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 mb-5 font-serif">
+              Subscription <em className="italic font-serif font-normal text-stone-800">Tiers & Workspace Capacity</em>
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -130,11 +130,10 @@ export default function BillingPage() {
                       setSelectedPlan(plan.id)
                       toast.success(`Switched to ${plan.name}`)
                     }}
-                    className={`rounded-3xl p-6 flex flex-col justify-between transition-all cursor-pointer relative ${
-                      isSelected
-                        ? 'bg-[#111318] text-white shadow-xl scale-102 border border-white/20'
-                        : 'bg-white text-stone-900 border border-stone-200/80 shadow-2xs hover:shadow-md'
-                    }`}
+                    className={`rounded-3xl p-6 flex flex-col justify-between transition-all cursor-pointer relative ${isSelected
+                      ? 'bg-[#111318] text-white shadow-xl scale-102 border border-white/20'
+                      : 'bg-white text-stone-900 border border-stone-200/80 shadow-2xs hover:shadow-md'
+                      }`}
                   >
                     {plan.popular && (
                       <span className="absolute -top-3 right-6 text-[10px] font-bold px-3 py-0.5 rounded-full bg-lime-400 text-stone-950 font-mono shadow-xs">
@@ -143,7 +142,7 @@ export default function BillingPage() {
                     )}
 
                     <div>
-                      <div className="text-sm font-bold tracking-tight mb-1" style={{ fontFamily: 'var(--font-didot)' }}>
+                      <div className="text-sm font-bold tracking-tight mb-1">
                         {plan.name}
                       </div>
 
@@ -164,11 +163,10 @@ export default function BillingPage() {
 
                     <button
                       type="button"
-                      className={`w-full py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-lime-400 text-stone-950 hover:bg-lime-300'
-                          : 'bg-[#111318] text-white hover:bg-black'
-                      }`}
+                      className={`w-full py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${isSelected
+                        ? 'bg-lime-400 text-stone-950 hover:bg-lime-300'
+                        : 'bg-[#111318] text-white hover:bg-black'
+                        }`}
                     >
                       {isSelected ? 'Active Plan' : 'Upgrade'}
                     </button>
@@ -180,8 +178,8 @@ export default function BillingPage() {
 
           {/* Invoices Table */}
           <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs mb-10">
-            <h2 className="text-base font-bold text-stone-900 mb-4" style={{ fontFamily: 'var(--font-didot)' }}>
-              Billing History & Invoices
+            <h2 className="text-2xl sm:text-3xl font-normal text-stone-950 mb-5 font-serif">
+              Billing History & <em className="italic font-serif font-normal text-stone-800">Invoices</em>
             </h2>
 
             <div className="overflow-x-auto">
