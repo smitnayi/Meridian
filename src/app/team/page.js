@@ -11,6 +11,7 @@ import {
   MessageIcon, CheckIcon, SettingsIcon, ClockIcon, ZapIcon, BarChartIcon
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 const initialMembers = [
   { id: 'mem_1', name: 'Alex Johnson', role: 'Engineering Lead', email: 'alex@meridian.io', initials: 'AJ', color: '#8b5cf6', status: 'online', projects: 8, tasks: 32, timeLogged: '18:24:12' },
@@ -25,10 +26,25 @@ const initialMembers = [
 
 export default function TeamPage() {
   const router = useRouter()
-  const [members, setMembers] = useState(initialMembers)
+  const { fullName, initials, email } = useCurrentUser()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
+
+  const [customMembers] = useState(initialMembers)
+
+  const members = React.useMemo(() => {
+    return customMembers.map((m, i) =>
+      i === 0
+        ? {
+            ...m,
+            name: fullName ? `${fullName} (You)` : m.name,
+            email: email || m.email,
+            initials: initials || m.initials,
+          }
+        : m
+    )
+  }, [customMembers, fullName, initials, email])
 
   const filtered = members.filter(m => {
     const matchSearch = m.name.toLowerCase().includes(search.toLowerCase()) || m.role.toLowerCase().includes(search.toLowerCase()) || m.email.toLowerCase().includes(search.toLowerCase())

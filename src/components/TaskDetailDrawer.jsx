@@ -6,8 +6,10 @@ import {
   SmileIcon, AttachIcon, SendIcon, TrashIcon, AlertIcon
 } from './Icons'
 import { toast } from 'react-hot-toast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 export default function TaskDetailDrawer({ task, open, onClose, onUpdateTask, onDeleteTask }) {
+  const { fullName, initials } = useCurrentUser()
   const [subtasks, setSubtasks] = useState(task?.subtasks || [])
   const [newSubtask, setNewSubtask] = useState('')
   const [comments, setComments] = useState([
@@ -45,8 +47,8 @@ export default function TaskDetailDrawer({ task, open, onClose, onUpdateTask, on
       ...prev,
       {
         id: `c_${Date.now()}`,
-        author: 'Alex Johnson (You)',
-        initials: 'AJ',
+        author: fullName ? `${fullName} (You)` : 'You',
+        initials: initials || 'ME',
         color: '#111318',
         time: 'Just now',
         text: commentInput.trim()

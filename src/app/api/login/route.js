@@ -36,7 +36,7 @@ export async function POST(request){
 
         const token = jwt.sign({userId:user[0].id,email:user[0].email},process.env.JWT_SECRET,{expiresIn:"7d"});
 
-        return NextResponse.json({
+        const response = NextResponse.json({
             success:true,
             message:"Login successful",
             user:{
@@ -45,7 +45,19 @@ export async function POST(request){
                 email:user[0].email,
             },
             token
-        },{status:200})
+        },{status:200});
+
+        response.cookies.set({
+            name: 'token',
+            value: token,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60, // 7 days
+            path: '/',
+        });
+
+        return response;
 
     }catch(error){
         console.log(error);

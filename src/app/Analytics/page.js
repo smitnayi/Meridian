@@ -10,6 +10,7 @@ import {
   ShareIcon, CheckCircleIcon, ZapIcon, ClipboardIcon, TargetIcon
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 const weeklyData = [
   { week: 'W28', completed: 48, added: 32 },
@@ -39,9 +40,15 @@ const memberVelocity = [
 ]
 
 export default function AnalyticsPage() {
+  const { fullName, initials } = useCurrentUser()
   const [timeRange, setTimeRange] = useState('Sprint 14')
   const [hoveredWeek, setHoveredWeek] = useState(null)
   const maxVal = 95
+
+  // Replace first velocity row with real logged-in user
+  const velocityData = memberVelocity.map((m, i) =>
+    i === 0 ? { ...m, name: fullName || m.name, avatar: initials || m.avatar } : m
+  )
 
   return (
     <ProtectedRoute>
@@ -298,7 +305,7 @@ export default function AnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {memberVelocity.map(m => (
+                  {velocityData.map(m => (
                     <tr key={m.name} className="hover:bg-stone-50/80 transition-colors">
                       <td className="py-3.5 pl-3">
                         <div className="flex items-center gap-2.5">

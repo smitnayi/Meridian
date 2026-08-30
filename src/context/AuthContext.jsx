@@ -1,7 +1,8 @@
 "use client"
 
-import React, { createContext, useContext, useState, useSyncExternalStore } from 'react'
+import React, { createContext, useContext, useState, useSyncExternalStore, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
+import {getCurrentUser} from "../Service/authService";
 
 const AuthContext = createContext(null)
 
@@ -29,10 +30,29 @@ function getInitialUser() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(getInitialUser)
   const [token, setToken] = useState(getInitialToken)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   // React 19 hydrated check
   const isHydrated = useSyncExternalStore(emptySubscribe, () => true, () => false)
+  
+  useEffect(()=>{
+    if (!isHydrated) return 
+    const checkUser = async()=>{
+      try{
+        const result = await getCurrentUser()
+        setUser(result.user)
+        setToken("authenticated")
+
+      }catch(error){
+        setUser(null)
+        setToken(null)
+      }finally{
+        setLoading(false)
+      }
+    }
+    checkUser()
+  },[isHydrated])
 
   const login = (userData, jwtToken) => {
     setUser(userData)
@@ -79,7 +99,7 @@ export function AuthProvider({ children }) {
       value={{
         user,
         token,
-        loading: !isHydrated,
+        loading,
         isAuthenticated,
         login,
         demoLogin,

@@ -14,6 +14,7 @@ import {
   ListIcon, KanbanBoardIcon, WorkflowIcon, LayersIcon, CheckCircleIcon
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 // Initial task data
 const initialColumns = [
@@ -259,6 +260,7 @@ const workflowStages = [
 ]
 
 export default function KanbanPage() {
+  const { fullName, initials } = useCurrentUser()
   const [columns, setColumns] = useState(initialColumns)
   const [viewMode, setViewMode] = useState('board') // 'list' | 'board' | 'workflow'
   const [searchQuery, setSearchQuery] = useState('')
@@ -268,6 +270,11 @@ export default function KanbanPage() {
   const [draggedTask, setDraggedTask] = useState(null)
   const [dragSourceColId, setDragSourceColId] = useState(null)
   const [dragOverColId, setDragOverColId] = useState(null)
+
+  // Inject real user name into workflow stage 1
+  const workflowStagesWithUser = workflowStages.map((s, i) =>
+    i === 0 ? { ...s, owner: fullName || s.owner } : s
+  )
 
   // ── Drag & Drop Event Handlers ──
   const handleDragStart = (e, task, fromColId) => {
@@ -852,7 +859,7 @@ export default function KanbanPage() {
 
                 {/* Workflow Stage Steps */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                  {workflowStages.map((stage, idx) => (
+                  {workflowStagesWithUser.map((stage, idx) => (
                     <div
                       key={stage.step}
                       className="p-5 rounded-3xl bg-[#FAF8F5] border border-stone-200/80 shadow-2xs flex flex-col justify-between relative group hover:border-stone-400 transition-all"

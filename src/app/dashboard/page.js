@@ -7,6 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import DynamicHeader from '@/components/DynamicHeader'
 import CreateTaskModal from '@/components/CreateTaskModal'
 import TaskDetailDrawer from '@/components/TaskDetailDrawer'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 import {
   CheckIcon, ClockIcon, UsersIcon, BarChartIcon,
   ChevronRightIcon, PlusIcon, MoreHorizontalIcon, FilterIcon,
@@ -14,6 +15,7 @@ import {
   ClipboardIcon, TargetIcon, RocketIcon
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
+
 
 // Pastel Bento KPIs
 const bentoKPIs = [
@@ -179,6 +181,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [myWork, setMyWork] = useState(myWorkInitial)
   const [hoveredBar, setHoveredBar] = useState(null)
+  const {fullName, initials} = useCurrentUser();
 
   const filteredWork = myWork.filter(w => {
     if (workTab === 'todo') return w.tab === 'todo'
@@ -224,7 +227,7 @@ export default function Dashboard() {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight font-serif leading-tight">
-                  Good morning, <em className="italic font-serif font-normal text-stone-900">Alex</em>
+                  Good morning, <em className="italic font-serif font-normal text-stone-900">{fullName || 'there'}</em>
                 </h1>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-lime-200 text-lime-900 font-mono shadow-2xs">
                   Sprint 14 Active
@@ -322,7 +325,7 @@ export default function Dashboard() {
                           title: item.title,
                           priority: 'High',
                           due: 'Today 5pm',
-                          assigneeName: 'Alex Johnson',
+                          assigneeName: fullName || 'Team Lead',
                           assigneeColor: item.color,
                           tags: ['Design', item.category],
                           description: 'Active sprint focal point deliverable with live timer sync.'

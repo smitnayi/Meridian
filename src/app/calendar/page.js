@@ -10,6 +10,7 @@ import {
   PaletteIcon, UsersIcon, CalendarIcon, MoreHorizontalIcon, FilterIcon
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 const scheduleEvents = [
   {
@@ -111,11 +112,18 @@ const blockHours = [
 ]
 
 export default function CalendarPage() {
+  const { fullName, initials } = useCurrentUser()
   const [selectedDay, setSelectedDay] = useState(18)
   const [viewMode, setViewMode] = useState('card') // 'card' | 'block' | 'table'
   const [searchQuery, setSearchQuery] = useState('')
 
-  const filteredEvents = scheduleEvents.filter(e => {
+  const dynamicScheduleEvents = scheduleEvents.map(e =>
+    e.id === 'evt-4'
+      ? { ...e, lead: fullName || e.lead, leadInitials: initials || e.leadInitials }
+      : e
+  )
+
+  const filteredEvents = dynamicScheduleEvents.filter(e => {
     if (!searchQuery.trim()) return true
     return e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       e.lead.toLowerCase().includes(searchQuery.toLowerCase()) ||

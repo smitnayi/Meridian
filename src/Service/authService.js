@@ -1,3 +1,4 @@
+
 export async function sendOtp(data){
     const response = await fetch("/api/signup/send-otp", {
         method: "POST",
@@ -79,4 +80,20 @@ export async function googleLogin(){
 
 export async function githubLogin(){
     window.location.href = '/api/auth/github';
+}
+
+
+export async function getCurrentUser(){
+    const response = await fetch(`/api/auth/me`, {
+        method: "GET",
+        credentials: "include"
+    });
+
+    const result = await response.json();
+
+    if(!response.ok){
+        throw new Error(result.message || "Unauthorized"); 
+    }
+
+    return result
 }

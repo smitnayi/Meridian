@@ -56,20 +56,18 @@ export async function GET(request){
 
         const token = jwt.sign({email:email},process.env.JWT_SECRET ,{expiresIn:"7d"});
 
-        const response = NextResponse.redirect(new URL("/dashboard",request.url));
+        const response = NextResponse.redirect(new URL(`/dashboard?token=${token}`, request.url));
 
         //storing JWT in http-cookies
         response.cookies.set("token",token,{
             httpOnly:true,
-            secure:"production",
+            secure: process.env.NODE_ENV === 'production',
             sameSite:"lax",
             maxAge: 7 * 24 * 60 * 60,
             path: "/"
-        })
+        });
 
-        return NextResponse.redirect(
-        new URL(`/dashboard?token=${token}`, request.url)
-        );  
+        return response;
 
 
     }catch(error){

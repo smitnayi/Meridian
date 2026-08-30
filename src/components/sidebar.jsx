@@ -11,6 +11,7 @@ import {
 import toast from 'react-hot-toast'
 import CommandPalette from './CommandPalette'
 import { useAuth } from '@/context/AuthContext'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 const CollapseIcon = ({ collapsed }) => (
   <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ transform: collapsed ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s ease' }}>
@@ -34,7 +35,7 @@ const navItems = [
   { id: 'dashboard', label: 'Overview', href: '/dashboard', icon: <HomeIcon size={17} /> },
   { id: 'kanban', label: 'Tasks Board', href: '/kanban', icon: <GridIcon size={17} />, badge: '12' },
   { id: 'calendar', label: 'Schedule', href: '/calendar', icon: <CalendarIcon size={17} /> },
-  { id: 'analytics', label: 'Activity', href: '/Analytics', icon: <BarChartIcon size={17} /> },
+  { id: 'analytics', label: 'Activity', href: '/analytics', icon: <BarChartIcon size={17} /> },
   { id: 'team', label: 'Members', href: '/team', icon: <UsersIcon size={17} /> },
   { id: 'chat', label: 'Chat', href: '/messages', icon: <MessageIcon size={17} />, badge: '3' },
   { id: 'billing', label: 'Billing', href: '/billing', icon: <CreditCardIcon size={17} /> },
@@ -57,12 +58,17 @@ const liveMembers = [
 export default function Sidebar() {
   const router = useRouter()
   const pathname = usePathname()
-  const { logout, user } = useAuth()
+  const { logout } = useAuth()
+  const { fullName, initials, user } = useCurrentUser()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [spaceList, setSpaceList] = useState(spaces)
   const [selectedSpace, setSelectedSpace] = useState('Publications')
+
+  const dynamicLiveMembers = liveMembers.map((m, i) =>
+    i === 0 ? { ...m, name: fullName || m.name, initials: initials || m.initials } : m
+  )
 
   // Global shortcut (Cmd+K / Ctrl+K) listener
   useEffect(() => {
@@ -262,7 +268,7 @@ export default function Sidebar() {
             </div>
 
             <div className="mt-1 space-y-1">
-              {liveMembers.map(m => (
+              {dynamicLiveMembers.map(m => (
                 <div
                   key={m.name}
                   onClick={() => router.push('/team')}
@@ -304,13 +310,13 @@ export default function Sidebar() {
               className="flex items-center gap-2.5 cursor-pointer group"
             >
               <div className="w-8 h-8 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center shadow-xs">
-                {user?.firstName?.[0] || 'A'}{user?.lastName?.[0] || 'J'}
+                {initials || 'AJ'}
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-bold text-stone-800 leading-tight group-hover:text-violet-600 transition-colors truncate">
-                  {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Alex Johnson'}
+                  {fullName || 'My Account'}
                 </div>
-                <div className="text-[10px] text-stone-400 font-mono truncate">{user?.email || 'alex@meridian.io'}</div>
+                <div className="text-[10px] text-stone-400 font-mono truncate">{user?.email || ''}</div>
               </div>
             </div>
 
@@ -332,7 +338,7 @@ export default function Sidebar() {
             onClick={() => router.push('/profile')}
             className="w-8 h-8 mx-auto rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center shadow-xs cursor-pointer hover:scale-105 transition-transform"
           >
-            {user?.firstName?.[0] || 'A'}
+            {initials?.[0] || 'A'}
           </div>
         )}
       </div>

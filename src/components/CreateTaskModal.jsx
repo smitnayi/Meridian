@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { PlusIcon, ClockIcon, CheckIcon, TagIcon, UsersIcon } from './Icons'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 const ASSIGNEES = [
   { initials: 'AJ', name: 'Alex Johnson', color: '#8b5cf6' },
@@ -31,7 +32,11 @@ const PRIORITY_STYLES = {
   Low:      { bg: 'bg-stone-100 border-stone-200 text-stone-700', active: 'bg-stone-700 text-white' },
 }
 
+const generateId = () => `task-${Date.now()}`
+const generateTaskId = () => `MRD-0${Math.floor(Math.random() * 80) + 20}`
+
 export default function CreateTaskModal({ open, defaultColumnId = 'todo', onClose, onAdd }) {
+  const { fullName, initials } = useCurrentUser()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState('Medium')
@@ -41,7 +46,15 @@ export default function CreateTaskModal({ open, defaultColumnId = 'todo', onClos
   const [tags, setTags] = useState(['Design', 'Internal Tasks'])
   const [titleErr, setTitleErr] = useState(false)
 
-  if (!open) return null
+  const dynamicAssignees = ASSIGNEES.map((a, i) =>
+    i === 0
+      ? {
+          ...a,
+          name: fullName ? `${fullName} (You)` : a.name,
+          initials: initials || a.initials,
+        }
+      : a
+  )
 
   const handleAdd = () => {
     if (!title.trim()) {
@@ -49,11 +62,11 @@ export default function CreateTaskModal({ open, defaultColumnId = 'todo', onClos
       return
     }
 
-    const a = ASSIGNEES[assigneeIdx]
+    const a = dynamicAssignees[assigneeIdx]
 
     const task = {
-      id: `task-${Date.now()}`,
-      taskId: `MRD-0${Math.floor(Math.random() * 80) + 20}`,
+      id: generateId(),
+      taskId: generateTaskId(),
       title: title.trim(),
       description: description.trim() || 'Prepare and review deliverables for sprint milestones.',
       priority,
@@ -80,6 +93,8 @@ export default function CreateTaskModal({ open, defaultColumnId = 'todo', onClos
     setTitleErr(false)
     onClose?.()
   }
+
+  if (!open) return null
 
   const toggleTag = (t) => {
     setTags(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
@@ -193,9 +208,9 @@ export default function CreateTaskModal({ open, defaultColumnId = 'todo', onClos
             <div>
               <label className="block text-xs font-bold text-stone-700 mb-1.5">Assignee</label>
               <div className="flex items-center gap-2 overflow-x-auto py-1">
-                {ASSIGNEES.map((a, i) => (
+                {dynamicAssignees.map((a, i) => (
                   <button
-                    key={a.initials}
+                    key={a.name}
                     type="button"
                     onClick={() => setAssigneeIdx(i)}
                     className={`w-7 h-7 rounded-full text-[10px] font-bold flex items-center justify-center text-white transition-transform cursor-pointer ${
