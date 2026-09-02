@@ -7,7 +7,9 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import DynamicHeader from '@/components/DynamicHeader'
 import CreateTaskModal from '@/components/CreateTaskModal'
 import TaskDetailDrawer from '@/components/TaskDetailDrawer'
+import OrgOnboarding from '@/components/OrgOnboarding'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
+import { useOrg } from '@/context/OrgContext'
 import {
   CheckIcon, ClockIcon, UsersIcon, BarChartIcon,
   ChevronRightIcon, PlusIcon, MoreHorizontalIcon, FilterIcon,
@@ -182,6 +184,7 @@ export default function Dashboard() {
   const [myWork, setMyWork] = useState(myWorkInitial)
   const [hoveredBar, setHoveredBar] = useState(null)
   const {fullName, initials} = useCurrentUser();
+  const { userState, activeOrg, unseenNotifications, openOrgFromNotification } = useOrg()
 
   const filteredWork = myWork.filter(w => {
     if (workTab === 'todo') return w.tab === 'todo'
@@ -222,72 +225,102 @@ export default function Dashboard() {
             }}
           />
 
-          {/* ── Greeting & Top Headline with Instrument Serif Italic ── */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight font-serif leading-tight">
-                  Good morning, <em className="italic font-serif font-normal text-stone-900">{fullName || 'there'}</em>
-                </h1>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-lime-200 text-lime-900 font-mono shadow-2xs">
-                  Sprint 14 Active
-                </span>
+          {/* Approval Notification Banner */}
+          {unseenNotifications.map(notif => (
+            <div
+              key={notif.id}
+              className="mb-5 flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-3.5 shadow-2xs"
+            >
+              <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                <CheckIcon size={16} strokeWidth={3} />
               </div>
-              <p className="text-sm sm:text-base text-stone-600 font-medium mt-1.5">
-                Command center for <em className="font-serif italic font-normal text-stone-800 text-base sm:text-lg">high-velocity</em> sprint execution · 3 priorities queued
-              </p>
-            </div>
-
-            {/* Quick Summary Pill Badge */}
-            <div className="flex items-center gap-3.5 bg-white px-5 py-2.5 rounded-2xl border border-stone-200/80 shadow-2xs">
-              <div className="text-right">
-                <span className="text-[10px] uppercase tracking-wider font-bold text-stone-400 block font-mono">Tasks done</span>
-                <span className="text-lg font-extrabold text-stone-950 stat-number">2,543</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-bold text-emerald-900">
+                  You&apos;ve been approved to join <strong>{notif.orgName}</strong>!
+                </div>
+                <div className="text-[11px] text-emerald-700 font-medium">
+                  Welcome aboard — your request was accepted by the organization leader.
+                </div>
               </div>
-              <div className="w-9 h-9 rounded-xl bg-lime-100 text-lime-800 flex items-center justify-center font-bold text-xs shadow-2xs">
-                <ArrowUpRightIcon size={16} />
-              </div>
-            </div>
-          </div>
-
-          {/* ── 1. Bento KPI Metric Cards ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {bentoKPIs.map(kpi => (
-              <div
-                key={kpi.id}
-                onClick={() => router.push(kpi.id === 'tasks' ? '/kanban' : '/Analytics')}
-                className={`rounded-3xl p-6 border ${kpi.border} ${kpi.bg} bento-card-interactive cursor-pointer relative overflow-hidden group shadow-2xs`}
+              <button
+                onClick={() => openOrgFromNotification(notif.id, notif.orgId)}
+                className="text-xs font-bold text-emerald-800 hover:text-emerald-950 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl transition-colors cursor-pointer shrink-0"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <span className="p-2.5 rounded-2xl bg-white/85 backdrop-blur-xs shadow-2xs">
-                    {kpi.icon}
-                  </span>
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/95 text-stone-700 shadow-2xs font-mono">
-                    {kpi.delta}
-                  </span>
+                Open →
+              </button>
+            </div>
+          ))}
+
+          {userState !== 'active' ? (
+            <OrgOnboarding />
+          ) : (
+            <>
+              {/* ── Greeting & Top Headline with Instrument Serif Italic ── */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight font-serif leading-tight">
+                      Good morning, <em className="italic font-serif font-normal text-stone-900">{fullName || 'there'}</em>
+                    </h1>
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-lime-200 text-lime-900 font-mono shadow-2xs">
+                      {activeOrg?.name || 'Sprint 14 Active'}
+                    </span>
+                  </div>
+                  <p className="text-sm sm:text-base text-stone-600 font-medium mt-1.5">
+                    Command center for <em className="font-serif italic font-normal text-stone-800 text-base sm:text-lg">{activeOrg?.name || 'high-velocity'}</em> sprint execution · 3 priorities queued
+                  </p>
                 </div>
 
-                <div className="text-4xl sm:text-5xl font-extrabold text-stone-950 tracking-tight mb-1 stat-number">
-                  {kpi.value}
-                </div>
-
-                <div className="text-xs sm:text-sm font-semibold text-stone-700">
-                  {kpi.label}
-                </div>
-
-                {/* Micro sparkline visualizer */}
-                <div className="mt-3.5 flex items-end gap-1 h-6 pt-1">
-                  {kpi.sparkline.map((val, idx) => (
-                    <div
-                      key={idx}
-                      className="flex-1 bg-stone-900/20 rounded-full transition-all duration-300 group-hover:bg-stone-900/40"
-                      style={{ height: `${(val / Math.max(...kpi.sparkline)) * 100}%` }}
-                    />
-                  ))}
+                {/* Quick Summary Pill Badge */}
+                <div className="flex items-center gap-3.5 bg-white px-5 py-2.5 rounded-2xl border border-stone-200/80 shadow-2xs">
+                  <div className="text-right">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-stone-400 block font-mono">Tasks done</span>
+                    <span className="text-lg font-extrabold text-stone-950 stat-number">2,543</span>
+                  </div>
+                  <div className="w-9 h-9 rounded-xl bg-lime-100 text-lime-800 flex items-center justify-center font-bold text-xs shadow-2xs">
+                    <ArrowUpRightIcon size={16} />
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              {/* ── 1. Bento KPI Metric Cards ── */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {bentoKPIs.map(kpi => (
+                  <div
+                    key={kpi.id}
+                    onClick={() => router.push(kpi.id === 'tasks' ? '/kanban' : '/Analytics')}
+                    className={`rounded-3xl p-6 border ${kpi.border} ${kpi.bg} bento-card-interactive cursor-pointer relative overflow-hidden group shadow-2xs`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <span className="p-2.5 rounded-2xl bg-white/85 backdrop-blur-xs shadow-2xs">
+                        {kpi.icon}
+                      </span>
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/95 text-stone-700 shadow-2xs font-mono">
+                        {kpi.delta}
+                      </span>
+                    </div>
+
+                    <div className="text-4xl sm:text-5xl font-extrabold text-stone-950 tracking-tight mb-1 stat-number">
+                      {kpi.value}
+                    </div>
+
+                    <div className="text-xs sm:text-sm font-semibold text-stone-700">
+                      {kpi.label}
+                    </div>
+
+                    {/* Micro sparkline visualizer */}
+                    <div className="mt-3.5 flex items-end gap-1 h-6 pt-1">
+                      {kpi.sparkline.map((val, idx) => (
+                        <div
+                          key={idx}
+                          className="flex-1 bg-stone-900/20 rounded-full transition-all duration-300 group-hover:bg-stone-900/40"
+                          style={{ height: `${(val / Math.max(...kpi.sparkline)) * 100}%` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
           {/* ── 2. Middle Grid: LineUp + Working Activity Schedule ── */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -573,6 +606,9 @@ export default function Dashboard() {
             </div>
 
           </div>
+
+            </>
+          )}
 
         </main>
       </div>

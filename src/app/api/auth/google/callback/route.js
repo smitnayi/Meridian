@@ -54,7 +54,7 @@ export async function GET(request){
             await db.query(`Insert into users (google_id,email,first_name,last_name) values (?,?,?,?)`,[googleId,email,firstName,lastName]);
         }
 
-        const token = jwt.sign({email:email},process.env.JWT_SECRET ,{expiresIn:"7d"});
+        const token = jwt.sign({id:user[0].id,email:email},process.env.JWT_SECRET ,{expiresIn:"7d"});
 
         const response = NextResponse.redirect(new URL(`/dashboard?token=${token}`, request.url));
 

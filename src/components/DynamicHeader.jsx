@@ -5,6 +5,7 @@ import {
   SearchIcon, BellIcon, PlusIcon, VideoIcon, ClockIcon, SparklesIcon, ZapIcon
 } from './Icons'
 import { toast } from 'react-hot-toast'
+import OrgSwitcher from './OrgSwitcher'
 
 export default function DynamicHeader({ onOpenNewTask, onOpenSearch, title = "Workspace" }) {
   const [meetingActive, setMeetingActive] = useState(true)
@@ -82,8 +83,11 @@ export default function DynamicHeader({ onOpenNewTask, onOpenSearch, title = "Wo
           </div>
         </div>
 
-        {/* Global Search & Quick Actions */}
+        {/* Global Search & Organization Switcher & Quick Actions */}
         <div className="flex items-center gap-2.5 justify-end">
+          {/* Organization Switcher Dropdown */}
+          <OrgSwitcher />
+
           {/* Quick Search Trigger */}
           <button
             type="button"

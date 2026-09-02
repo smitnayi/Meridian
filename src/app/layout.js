@@ -1,6 +1,9 @@
 import { Geist, Geist_Mono, Urbanist, Manrope, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { OrgProvider } from "@/context/OrgContext";
+import CreateOrgModal from "@/components/CreateOrgModal";
+import JoinOrgModal from "@/components/JoinOrgModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,7 +45,11 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          {children}
+          <OrgProvider>
+            {children}
+            <CreateOrgModal />
+            <JoinOrgModal />
+          </OrgProvider>
         </AuthProvider>
       </body>
     </html>

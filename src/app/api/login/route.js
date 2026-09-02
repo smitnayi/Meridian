@@ -15,7 +15,7 @@ export async function POST(request){
             },{status:400})
         }
 
-        const [user] = await db.query(`Select first_name,last_name,email,password from users where email = ?`,[email]);
+        const [user] = await db.query(`Select id, first_name,last_name,email,password from users where email = ?`,[email]);
 
 
         if(user.length === 0){

@@ -467,3 +467,28 @@ export const ShieldLockIcon = (p) => (
     <path d="M10.5 10.5V9a1.5 1.5 0 0 1 3 0v1.5" />
   </I>
 );
+
+export const BuildingIcon = (p) => (
+  <I {...p}>
+    <rect x="4" y="2" width="16" height="20" rx="2" />
+    <path d="M9 22v-4h6v4" />
+    <path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01" />
+  </I>
+);
+
+export const CopyIcon = (p) => (
+  <I {...p}>
+    <rect x="9" y="9" width="13" height="13" rx="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </I>
+);
+
+export const UserPlusIcon = (p) => (
+  <I {...p}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <line x1="19" y1="8" x2="19" y2="14" />
+    <line x1="16" y1="11" x2="22" y2="11" />
+  </I>
+);
+

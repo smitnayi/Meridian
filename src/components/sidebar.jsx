@@ -6,12 +6,13 @@ import {
   HomeIcon, GridIcon, BarChartIcon, UsersIcon, MessageIcon,
   CreditCardIcon, SettingsIcon, BellIcon, SearchIcon, ChevronDownIcon,
   ChevronRightIcon, ZapIcon, FolderIcon, CalendarIcon, PlusIcon,
-  SparklesIcon
+  SparklesIcon, BuildingIcon
 } from './Icons'
 import toast from 'react-hot-toast'
 import CommandPalette from './CommandPalette'
 import { useAuth } from '@/context/AuthContext'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
+import OrgSwitcher from './OrgSwitcher'
 
 const CollapseIcon = ({ collapsed }) => (
   <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ transform: collapsed ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s ease' }}>
@@ -33,9 +34,10 @@ const CloseIcon = ({ size = 20 }) => (
 
 const navItems = [
   { id: 'dashboard', label: 'Overview', href: '/dashboard', icon: <HomeIcon size={17} /> },
+  { id: 'organization', label: 'Organization', href: '/organization', icon: <BuildingIcon size={17} /> },
   { id: 'kanban', label: 'Tasks Board', href: '/kanban', icon: <GridIcon size={17} />, badge: '12' },
   { id: 'calendar', label: 'Schedule', href: '/calendar', icon: <CalendarIcon size={17} /> },
-  { id: 'analytics', label: 'Activity', href: '/analytics', icon: <BarChartIcon size={17} /> },
+  { id: 'analytics', label: 'Activity', href: '/Analytics', icon: <BarChartIcon size={17} /> },
   { id: 'team', label: 'Members', href: '/team', icon: <UsersIcon size={17} /> },
   { id: 'chat', label: 'Chat', href: '/messages', icon: <MessageIcon size={17} />, badge: '3' },
   { id: 'billing', label: 'Billing', href: '/billing', icon: <CreditCardIcon size={17} /> },
