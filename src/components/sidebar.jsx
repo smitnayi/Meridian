@@ -35,26 +35,19 @@ const CloseIcon = ({ size = 20 }) => (
 const navItems = [
   { id: 'dashboard', label: 'Overview', href: '/dashboard', icon: <HomeIcon size={17} /> },
   { id: 'organization', label: 'Organization', href: '/organization', icon: <BuildingIcon size={17} /> },
-  { id: 'kanban', label: 'Tasks Board', href: '/kanban', icon: <GridIcon size={17} />, badge: '12' },
+  { id: 'kanban', label: 'Tasks Board', href: '/kanban', icon: <GridIcon size={17} /> },
   { id: 'calendar', label: 'Schedule', href: '/calendar', icon: <CalendarIcon size={17} /> },
   { id: 'analytics', label: 'Activity', href: '/Analytics', icon: <BarChartIcon size={17} /> },
   { id: 'team', label: 'Members', href: '/team', icon: <UsersIcon size={17} /> },
-  { id: 'chat', label: 'Chat', href: '/messages', icon: <MessageIcon size={17} />, badge: '3' },
+  { id: 'chat', label: 'Chat', href: '/messages', icon: <MessageIcon size={17} /> },
   { id: 'billing', label: 'Billing', href: '/billing', icon: <CreditCardIcon size={17} /> },
   { id: 'settings', label: 'Settings', href: '/settings', icon: <SettingsIcon size={17} /> },
 ]
 
 const spaces = [
-  { id: 'pub', name: 'Publications', color: '#f43f5e', count: 8, expanded: true, sub: ['Dribbble Shots', 'Behance Case Study', 'Articles'] },
-  { id: 'comm', name: 'Commercial', color: '#8b5cf6', count: 12, expanded: false, sub: ['Client Portals', 'Pitch Decks'] },
-  { id: 'int', name: 'Design Internal', color: '#10b981', count: 5, expanded: false, sub: ['Design System 2.0', 'Brand Assets'] },
-]
-
-const liveMembers = [
-  { name: 'Alex Johnson', initials: 'AJ', color: '#8b5cf6', time: '18:24:12', online: true },
-  { name: 'Sarah Chen', initials: 'SC', color: '#6366f1', time: '14:10:45', online: true },
-  { name: 'Marcus Webb', initials: 'MW', color: '#10b981', time: '11:05:00', online: true },
-  { name: 'Priya Nair', initials: 'PN', color: '#f59e0b', time: '09:42:18', online: false },
+  { id: 'pub', name: 'Publications', color: '#f43f5e', expanded: false, sub: ['Dribbble Shots', 'Behance Case Study', 'Articles'] },
+  { id: 'comm', name: 'Commercial', color: '#8b5cf6', expanded: false, sub: ['Client Portals', 'Pitch Decks'] },
+  { id: 'int', name: 'Design Internal', color: '#10b981', expanded: false, sub: ['Design System 2.0', 'Brand Assets'] },
 ]
 
 export default function Sidebar() {
@@ -68,9 +61,15 @@ export default function Sidebar() {
   const [spaceList, setSpaceList] = useState(spaces)
   const [selectedSpace, setSelectedSpace] = useState('Publications')
 
-  const dynamicLiveMembers = liveMembers.map((m, i) =>
-    i === 0 ? { ...m, name: fullName || m.name, initials: initials || m.initials } : m
-  )
+  const dynamicLiveMembers = user ? [
+    {
+      name: fullName || user.email?.split('@')[0] || 'User',
+      initials: initials || 'U',
+      color: '#8b5cf6',
+      time: 'Online',
+      online: true
+    }
+  ] : []
 
   // Global shortcut (Cmd+K / Ctrl+K) listener
   useEffect(() => {
@@ -220,7 +219,6 @@ export default function Sidebar() {
                     </div>
 
                     <div className="flex items-center gap-1">
-                      <span className="text-[10px] text-stone-400 font-mono">{s.count}</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation()

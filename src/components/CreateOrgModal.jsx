@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react'
 import { useOrg } from '@/context/OrgContext'
+import { createOrganization } from '@/Service/organization'
 import { BuildingIcon, CopyIcon, CheckIcon, PlusIcon } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
 
 export default function CreateOrgModal() {
-  const { isCreateModalOpen, closeCreateModal, createOrg } = useOrg()
+  const { isCreateModalOpen, closeCreateModal, addRealOrg } = useOrg()
   const [name, setName] = useState('')
   const [companyName, setCompanyName] = useState('')
   const [description, setDescription] = useState('')
@@ -16,27 +17,61 @@ export default function CreateOrgModal() {
 
   if (!isCreateModalOpen) return null
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault()
     if (!name.trim()) {
       toast.error('Organization Name is required')
       return
     }
+    if (!companyName.trim()) {
+      toast.error('Company Name is required')
+      return
+    }
+    if (!description.trim()) {
+      toast.error('Description is required')
+      return
+    }
 
-    setLoading(true)
-    setTimeout(() => {
-      const org = createOrg({ name, companyName, description })
-      setCreatedOrg(org)
+    try {
+      setLoading(true)
+      const res = await createOrganization({
+        name: name.trim(),
+        company_name: companyName.trim(),
+        description: description.trim()
+      })
+
+      if (res && res.success) {
+        const newOrgData = {
+          id: res.organization_id,
+          name: name.trim(),
+          company_name: companyName.trim(),
+          companyName: companyName.trim(),
+          description: description.trim(),
+          invite_code: res.invite_code,
+          code: res.invite_code,
+          created_by: res.created_by,
+          role: 'Owner / Leader'
+        }
+        addRealOrg(newOrgData)
+        setCreatedOrg(newOrgData)
+        toast.success(res.message || 'Organization created successfully!')
+      } else {
+        toast.error(res?.message || 'Failed to create organization')
+      }
+    } catch (err) {
+      toast.error(err.message || 'An error occurred while creating organization')
+    } finally {
       setLoading(false)
-      toast.success('Organization created successfully!')
-    }, 600)
+    }
   }
 
   const handleCopyCode = () => {
-    navigator.clipboard?.writeText('123456')
-    setCopied(true)
-    toast.success('Invite code copied to clipboard!')
-    setTimeout(() => setCopied(false), 2500)
+    if (createdOrg?.invite_code) {
+      navigator.clipboard?.writeText(String(createdOrg.invite_code))
+      setCopied(true)
+      toast.success('Invite code copied to clipboard!')
+      setTimeout(() => setCopied(false), 2500)
+    }
   }
 
   const handleClose = () => {
@@ -79,7 +114,7 @@ export default function CreateOrgModal() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Meridian Technologies"
+                  placeholder="e.g. Acme Studio"
                   value={name}
                   onChange={e => setName(e.target.value)}
                   className="w-full px-4 py-2.5 text-xs font-medium bg-white rounded-2xl border border-stone-200 outline-none focus:border-stone-400 focus:ring-2 focus:ring-stone-200 transition-all font-sans"
@@ -88,11 +123,12 @@ export default function CreateOrgModal() {
 
               <div>
                 <label className="block text-xs font-bold text-stone-700 mb-1.5">
-                  Company Name
+                  Company Name <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Meridian Tech Inc."
+                  required
+                  placeholder="e.g. Acme Corp"
                   value={companyName}
                   onChange={e => setCompanyName(e.target.value)}
                   className="w-full px-4 py-2.5 text-xs font-medium bg-white rounded-2xl border border-stone-200 outline-none focus:border-stone-400 focus:ring-2 focus:ring-stone-200 transition-all font-sans"
@@ -101,10 +137,11 @@ export default function CreateOrgModal() {
 
               <div>
                 <label className="block text-xs font-bold text-stone-700 mb-1.5">
-                  Description
+                  Description <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows={3}
+                  required
                   placeholder="Briefly describe your team's project goals and scope..."
                   value={description}
                   onChange={e => setDescription(e.target.value)}
@@ -163,7 +200,7 @@ export default function CreateOrgModal() {
 
               <div className="flex items-center justify-between gap-3 bg-white p-3 rounded-xl border border-stone-200 shadow-2xs">
                 <span className="font-mono text-2xl font-black tracking-widest text-stone-900">
-                  123456
+                  {createdOrg.invite_code}
                 </span>
                 <button
                   type="button"

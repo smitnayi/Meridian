@@ -2,16 +2,19 @@
 
 import React, { useState, useRef } from 'react'
 import { useOrg } from '@/context/OrgContext'
+import { verifyOrganizationCode, joinOrganization } from '@/Service/organization'
 import { BuildingIcon, CheckIcon, ShieldIcon } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
 
 export default function JoinOrgModal() {
-  const { isJoinModalOpen, closeJoinModal, sendJoinRequest } = useOrg()
+  const { isJoinModalOpen, closeJoinModal } = useOrg()
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
   const [verifying, setVerifying] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [orgFound, setOrgFound] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [requestSent, setRequestSent] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
 
   const inputRefs = [
     useRef(null), useRef(null), useRef(null),
@@ -49,7 +52,7 @@ export default function JoinOrgModal() {
     }
   }
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e?.preventDefault()
     const fullCode = digits.join('')
     if (fullCode.length < 6) {
@@ -60,35 +63,38 @@ export default function JoinOrgModal() {
     setVerifying(true)
     setErrorMsg('')
 
-    setTimeout(() => {
-      setVerifying(false)
-      if (fullCode === '123456') {
-        setOrgFound({
-          name: 'Meridian Technologies',
-          companyName: 'Meridian Tech Inc.',
-          membersCount: 3,
-          description: 'Primary product development workspace for Meridian SaaS.',
-          code: '123456'
-        })
+    try {
+      const res = await verifyOrganizationCode(fullCode)
+      if (res && res.success && res.organization) {
+        setOrgFound(res.organization)
       } else {
-        setErrorMsg('Invalid organization code. Please check the code and try again.')
+        setErrorMsg(res?.message || 'Invalid organization code. Please check and try again.')
       }
-    }, 600)
+    } catch (err) {
+      setErrorMsg(err.message || 'Verification failed. Please try again.')
+    } finally {
+      setVerifying(false)
+    }
   }
 
-  const handleSendJoinRequest = () => {
-    setVerifying(true)
-    setTimeout(() => {
-      const success = sendJoinRequest(orgFound)
-      setVerifying(false)
-      if (success === false) {
-        // Already pending or already a member
-        toast.error('You already have a pending request for this organization.')
-        handleClose()
-        return
+  const handleSendJoinRequest = async () => {
+    if (!orgFound || !orgFound.id) return
+
+    setSubmitting(true)
+    try {
+      const res = await joinOrganization(orgFound.id)
+      if (res && res.success) {
+        setSuccessMessage(res.message || 'Request has been sent to organization admin')
+        setRequestSent(true)
+        toast.success(res.message || 'Join request sent successfully!')
+      } else {
+        toast.error(res?.message || 'Failed to send join request')
       }
-      setRequestSent(true)
-    }, 600)
+    } catch (err) {
+      toast.error(err.message || 'Error sending join request')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleClose = () => {
@@ -96,6 +102,7 @@ export default function JoinOrgModal() {
     setOrgFound(null)
     setErrorMsg('')
     setRequestSent(false)
+    setSuccessMessage('')
     closeJoinModal()
   }
 
@@ -151,9 +158,6 @@ export default function JoinOrgModal() {
                     ⚠ {errorMsg}
                   </div>
                 )}
-                <p className="mt-3 text-center text-[11px] text-stone-400 font-medium italic">
-                  Hint: try <span className="font-bold font-mono text-stone-600">1 2 3 4 5 6</span>
-                </p>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-100">
@@ -199,18 +203,22 @@ export default function JoinOrgModal() {
 
             <div className="bg-[#FAF8F5] border border-stone-200/80 rounded-2xl p-5 mb-6">
               <div className="text-xl font-bold text-stone-950 mb-1">{orgFound.name}</div>
-              <div className="text-xs text-stone-600 font-semibold mb-3">{orgFound.companyName}</div>
-              <p className="text-xs text-stone-500 mb-4">{orgFound.description}</p>
+              <div className="text-xs text-stone-600 font-semibold mb-3">
+                {orgFound.company_name || orgFound.companyName || ''}
+              </div>
+              {orgFound.description && (
+                <p className="text-xs text-stone-500 mb-4">{orgFound.description}</p>
+              )}
               <div className="flex items-center gap-2 text-xs font-mono text-stone-500 bg-white p-2.5 rounded-xl border border-stone-200/60">
                 <ShieldIcon size={14} className="text-lime-600" />
-                <span>{orgFound.membersCount} Active Members · Requires leader approval</span>
+                <span>Requires organization leader approval</span>
               </div>
             </div>
 
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 mb-5 flex items-start gap-2.5">
               <span className="text-amber-500 text-sm mt-0.5">⏳</span>
               <p className="text-xs text-amber-800 font-medium leading-relaxed">
-                After sending your request, you&apos;ll be in <strong>Pending</strong> status until the organization leader approves you. You can still create or join other organizations while you wait.
+                After sending your request, it will remain <strong>Pending</strong> until the organization leader accepts it.
               </p>
             </div>
 
@@ -225,13 +233,13 @@ export default function JoinOrgModal() {
               <button
                 type="button"
                 onClick={handleSendJoinRequest}
-                disabled={verifying}
-                className="flex-1 py-3 rounded-2xl bg-[#111318] hover:bg-black text-white text-xs font-bold shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                disabled={submitting}
+                className="flex-1 py-3 rounded-2xl bg-[#111318] hover:bg-black text-white text-xs font-bold shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {verifying ? (
+                {submitting ? (
                   <>
                     <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Sending...
+                    <span>Sending...</span>
                   </>
                 ) : 'Send Join Request'}
               </button>
@@ -250,10 +258,10 @@ export default function JoinOrgModal() {
               Request <em className="italic font-serif font-normal text-stone-800">Sent!</em>
             </h2>
             <p className="text-xs text-stone-600 font-medium mb-2 max-w-sm mx-auto">
-              Your join request has been sent to the organization leader.
+              {successMessage || 'Your join request has been sent to the organization admin.'}
             </p>
             <p className="text-xs text-stone-400 font-medium mb-7 max-w-sm mx-auto">
-              You will be notified once your access is approved. You can create or join another organization while you wait.
+              You will be notified once your access is approved.
             </p>
 
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 mb-6 text-left">
@@ -262,7 +270,7 @@ export default function JoinOrgModal() {
                 <span className="text-xs font-bold text-amber-900">Status: Pending Approval</span>
               </div>
               <p className="text-[11px] text-amber-700 font-medium pl-4">
-                Meridian Technologies · Waiting for leader review
+                {orgFound?.name} · Waiting for leader review
               </p>
             </div>
 

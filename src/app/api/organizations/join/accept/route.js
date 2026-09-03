@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/Lib/db";
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export async function POST(request){
     try{
@@ -23,9 +23,6 @@ export async function POST(request){
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-
-        console.log("DECODDE",decoded)
 
         const [user] = await db.query(`SELECT * FROM users WHERE id = ?`, [decoded.id])
 
@@ -73,6 +70,9 @@ export async function POST(request){
 
         const [updateJoinRequest] = await db.query(`UPDATE join_requests SET status = 'ACCEPTED' WHERE id = ?`,[join_request])
 
+        const [notification] = await db.query(`INSERT INTO notifications(user_id,message,organization_id,join_request_id) VALUES(?,?,?,?)`,[request_id[0].user_id,"Your Join request has been accepted",request_id[0].organization_id,join_request])
+        await db.query(`UPDATE notifications SET message = 'Join request has been accepted' WHERE join_request_id = ? AND organization_id = ? AND message = 'A new user has requested to join your organization'`,[join_request,request_id[0].organization_id]);
+
         return NextResponse.json({
             message: "Request Accepted successfully",
             success: true,
@@ -81,7 +81,6 @@ export async function POST(request){
         },{status:200})
 
     }catch(error){
-        console.log(error)
         return NextResponse.json({
             message: "Server Error",
             success: false

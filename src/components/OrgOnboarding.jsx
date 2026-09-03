@@ -2,13 +2,14 @@
 
 import React from 'react'
 import { useOrg } from '@/context/OrgContext'
-import { BuildingIcon, UserPlusIcon, ZapIcon, ArrowRightIcon, ClockIcon, CheckIcon } from '@/components/Icons'
+import { BuildingIcon, UserPlusIcon, ZapIcon, ArrowRightIcon, ClockIcon } from '@/components/Icons'
 
 // ─── Pending-Only Screen ───────────────────────────────────────────────────
 function PendingScreen() {
-  const { pendingRequests, openCreateModal, openJoinModal, simulateReturningUser, approvePendingRequest } = useOrg()
+  const { pendingRequests = [], openCreateModal, openJoinModal } = useOrg()
 
   const formatDaysAgo = (isoDate) => {
+    if (!isoDate) return 'Recently'
     const diff = Math.floor((Date.now() - new Date(isoDate).getTime()) / 86400000)
     if (diff === 0) return 'Today'
     if (diff === 1) return '1 day ago'
@@ -37,53 +38,45 @@ function PendingScreen() {
             Welcome <em className="italic font-serif font-normal text-stone-800">back!</em>
           </h1>
           <p className="text-sm text-stone-500 font-medium">
-            Your organization request is still pending.
+            Your organization request is pending leader approval.
           </p>
         </div>
 
         {/* Pending Requests */}
-        <div className="space-y-3">
-          <div className="text-[10px] font-extrabold uppercase tracking-widest text-stone-400 font-mono px-1">
-            Pending Requests
-          </div>
-          {pendingRequests.map(req => (
-            <div
-              key={req.id}
-              className="bg-white rounded-3xl p-5 border border-amber-200/80 shadow-2xs"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="text-base font-bold text-stone-900 mb-0.5">{req.name}</div>
-                  <div className="text-xs text-stone-500 font-medium">{req.companyName}</div>
+        {pendingRequests.length > 0 && (
+          <div className="space-y-3">
+            <div className="text-[10px] font-extrabold uppercase tracking-widest text-stone-400 font-mono px-1">
+              Pending Requests
+            </div>
+            {pendingRequests.map(req => (
+              <div
+                key={req.id}
+                className="bg-white rounded-3xl p-5 border border-amber-200/80 shadow-2xs"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="text-base font-bold text-stone-900 mb-0.5">{req.name}</div>
+                    <div className="text-xs text-stone-500 font-medium">{req.company_name || req.companyName}</div>
+                  </div>
+                  <span className="flex items-center gap-1.5 text-[11px] font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block animate-pulse" />
+                    Pending
+                  </span>
                 </div>
-                <span className="flex items-center gap-1.5 text-[11px] font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block animate-pulse" />
-                  Pending
-                </span>
-              </div>
 
-              <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs text-stone-500 font-medium">
-                  <ClockIcon size={13} className="text-stone-400" />
-                  <span>Requested {formatDaysAgo(req.requestedAt)}</span>
-                </div>
-                <div className="flex items-center gap-2">
+                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs text-stone-500 font-medium">
+                    <ClockIcon size={13} className="text-stone-400" />
+                    <span>Requested {formatDaysAgo(req.requestedAt)}</span>
+                  </div>
                   <p className="text-[11px] text-stone-400 font-medium italic">
                     Waiting for leader approval
                   </p>
-                  {/* Demo approve button */}
-                  <button
-                    onClick={() => approvePendingRequest(req.id)}
-                    className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded cursor-pointer hover:bg-emerald-200 transition-colors"
-                    title="[DEMO] Simulate leader accepting"
-                  >
-                    ✓ DEMO: Approve
-                  </button>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Actions while waiting */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -106,21 +99,11 @@ function PendingScreen() {
           >
             <div>
               <div className="text-sm font-bold text-stone-900 mb-0.5">+ Join Another Organization</div>
-              <div className="text-xs text-stone-500 font-medium">Use a different invite code</div>
+              <div className="text-xs text-stone-500 font-medium">Use an invite code</div>
             </div>
             <div className="w-8 h-8 rounded-full bg-stone-100 group-hover:bg-[#111318] group-hover:text-lime-400 flex items-center justify-center transition-all duration-200 shrink-0">
               <ArrowRightIcon size={14} strokeWidth={2.5} />
             </div>
-          </button>
-        </div>
-
-        {/* Demo restore */}
-        <div className="text-center pt-2">
-          <button
-            onClick={simulateReturningUser}
-            className="text-xs font-mono font-semibold text-stone-400 hover:text-stone-700 underline cursor-pointer"
-          >
-            [TEST] Restore demo organizations →
           </button>
         </div>
       </div>
@@ -130,7 +113,7 @@ function PendingScreen() {
 
 // ─── First-Time / New User Screen ──────────────────────────────────────────
 function NewUserScreen() {
-  const { openCreateModal, openJoinModal, simulateReturningUser } = useOrg()
+  const { openCreateModal, openJoinModal } = useOrg()
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center py-12 px-4 select-none">
@@ -206,16 +189,6 @@ function NewUserScreen() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Demo restore */}
-        <div className="pt-4">
-          <button
-            onClick={simulateReturningUser}
-            className="text-xs font-mono font-semibold text-stone-400 hover:text-stone-700 underline cursor-pointer"
-          >
-            [TEST] Skip onboarding — restore demo organizations →
-          </button>
         </div>
       </div>
     </div>

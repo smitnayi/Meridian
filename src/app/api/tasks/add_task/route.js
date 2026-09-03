@@ -40,7 +40,7 @@ export async function POST(request){
             {status:404})
         }
 
-        const [result] = await db.query(`Insert into tasks(title,description,status,priority,due_date,assigned_to,created_by) values(?,?,?,?,?,?,?)`,[title,description,status,priority,due_date,assigned_to]);
+        const [result] = await db.query(`Insert into tasks(title,description,status,priority,due_date,assigned_to,created_by) values(?,?,?,?,?,?,?)`,[title,description,status,priority,due_date,assigned_to,user[0].id]);
 
         return NextResponse.json({
             success:true,

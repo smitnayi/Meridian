@@ -40,6 +40,8 @@ export async function POST(request){
 
         const [joinRequest]= await db.query(`INSERT INTO join_requests (organization_id,user_id,status) VALUES (?,?,?)`,[organization_id, decoded.id, 'pending']) 
 
+        const [notifications] = await db.query(`INSERT INTO notifications (user_id,message,organization_id,join_request_id) VALUES(?,?,?,?)`,[organizations[0].created_by, "A new user has requested to join your organization",organization_id,joinRequest.insertId])
+
         return NextResponse.json({
             message: "Request has been sent to organization admin",
             success: true,
@@ -49,6 +51,7 @@ export async function POST(request){
         }, {status: 200})
 
     }catch(error){
+        console.log(error)
         return NextResponse.json({
             message: "Something went wrong",
             success: false
