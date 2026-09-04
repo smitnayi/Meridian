@@ -68,6 +68,12 @@ export async function POST(request) {
                 user[0].id
             ]
         );
+        await db.query(
+            `INSERT INTO organization_members
+            (organization_id, user_id, role)
+            VALUES (?, ?, ?)`,
+            [create.insertId, user[0].id, 'OWNER']
+        );
 
         return NextResponse.json(
             {

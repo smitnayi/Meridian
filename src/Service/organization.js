@@ -101,3 +101,15 @@ export const getPendingJoinRequests = async() => {
 
     return response.json()
 }
+
+
+export const handleOrganizationUsers = async (organization_id) =>{
+    const response = await fetch(`${API_URL}/member?organization_id=${organization_id}`,{
+        method: "GET",
+        headers:{
+            "Content-Type": "application/json"
+        }
+    }) 
+    
+    return response.json()
+}
