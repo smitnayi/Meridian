@@ -190,18 +190,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Quick Demo 1-Click Access Pill Button */}
-          <button
-            type="button"
-            onClick={() => {
-              demoLogin();
-              toast.success('Logged in as Demo Alex Johnson (Engineering Lead)!');
-            }}
-            className="w-full py-3 px-4 rounded-2xl bg-lime-400 hover:bg-lime-300 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all mb-4 cursor-pointer active:scale-98"
-          >
-            <span>⚡ Instant 1-Click Demo Sign-in</span>
-            <span className="font-mono text-[11px] bg-stone-950/10 px-2 py-0.5 rounded-full font-bold">Alex Johnson</span>
-          </button>
+          
 
           {/* Social Logins */}
           <div className="grid grid-cols-2 gap-2 mb-4">

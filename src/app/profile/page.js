@@ -6,6 +6,7 @@ import Sidebar from '@/components/sidebar'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import DynamicHeader from '@/components/DynamicHeader'
 import { useAuth } from '@/context/AuthContext'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 import {
   UsersIcon, SettingsIcon, CreditCardIcon, MessageIcon,
   CheckIcon, GridIcon, CalendarIcon, ZapIcon, ShieldIcon,
@@ -34,7 +35,8 @@ const assignedProjects = [
 
 export default function ProfilePage() {
   const router = useRouter()
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
+  const { firstName, lastName, initials, email } = useCurrentUser()
   const [bio, setBio] = useState('Lead Product Engineer & Designer crafting high-performance workspace software at Meridian.')
 
   return (
@@ -58,20 +60,20 @@ export default function ProfilePage() {
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-2xs mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
               <div className="w-20 h-20 rounded-3xl bg-[#8B5CF6] text-white text-2xl font-extrabold flex items-center justify-center shadow-md shrink-0 font-serif">
-                AJ
+                {initials || 'ME'}
               </div>
 
               <div>
                 <div className="flex items-center gap-3">
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-stone-950 tracking-tight font-serif">
-                    Alex <em className="italic font-serif font-normal text-stone-900">Johnson</em>
+                    {firstName || 'Workspace'} <em className="italic font-serif font-normal text-stone-900">{lastName || 'Member'}</em>
                   </h1>
                   <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-lime-100 text-lime-800 font-mono">
                     ● Active Now
                   </span>
                 </div>
                 <p className="text-xs text-stone-500 font-medium mt-0.5">
-                  Engineering Lead & UI Architect · alex.johnson@meridian.io
+                  Engineering Lead & UI Architect · {email || 'user@meridian.io'}
                 </p>
                 <div className="flex items-center gap-3 mt-2 text-xs text-stone-400 font-mono">
                   <span>San Francisco, CA</span>

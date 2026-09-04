@@ -5,6 +5,7 @@ import Sidebar from '@/components/sidebar'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import DynamicHeader from '@/components/DynamicHeader'
 import { useAuth } from '@/context/AuthContext'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 import {
   UsersIcon, SettingsIcon, CreditCardIcon, MessageIcon,
   CheckIcon, ZapIcon, ShieldIcon, BellIcon
@@ -19,22 +20,27 @@ const tabs = [
 ]
 
 export default function SettingsPage() {
-  const { user } = useAuth()
+  const { firstName: currentFirstName, lastName: currentLastName, email: currentEmail, initials: currentInitials } = useCurrentUser()
   const [activeTab, setActiveTab] = useState('profile')
-  const [firstName, setFirstName] = useState('Alex')
-  const [lastName, setLastName] = useState('Johnson')
-  const [email, setEmail] = useState(user?.email || 'alex.johnson@meridian.io')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
   const [title, setTitle] = useState('Lead Product Engineer')
-  const [avatarInitials, setAvatarInitials] = useState('AJ')
+  const [customInitials, setCustomInitials] = useState('')
   const [emailNotifs, setEmailNotifs] = useState(true)
   const [slackNotifs, setSlackNotifs] = useState(true)
   const [twoFactor, setTwoFactor] = useState(false)
   const [language, setLanguage] = useState('English (US)')
   const [timezone, setTimezone] = useState('PST (UTC-8)')
 
+  const valFirstName = firstName !== '' ? firstName : (currentFirstName || '')
+  const valLastName = lastName !== '' ? lastName : (currentLastName || '')
+  const valEmail = email !== '' ? email : (currentEmail || '')
+  const valInitials = customInitials || currentInitials || 'AJ'
+
   const handleSaveProfile = (e) => {
     e.preventDefault()
-    setAvatarInitials(`${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase() || 'AJ')
+    setCustomInitials(`${valFirstName[0] || ''}${valLastName[0] || ''}`.toUpperCase() || 'AJ')
     toast.success('Account settings saved successfully!')
   }
 
@@ -91,11 +97,11 @@ export default function SettingsPage() {
                 {/* Avatar Banner */}
                 <div className="flex items-center gap-4 pb-5 border-b border-stone-100">
                   <div className="w-16 h-16 rounded-2xl bg-[#8B5CF6] text-white text-xl font-bold flex items-center justify-center shadow-xs">
-                    {avatarInitials}
+                    {valInitials}
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-stone-900">{firstName} {lastName}</h3>
-                    <p className="text-xs text-stone-400 font-mono">{email}</p>
+                    <h3 className="text-sm font-bold text-stone-900">{valFirstName || 'Workspace'} {valLastName || 'User'}</h3>
+                    <p className="text-xs text-stone-400 font-mono">{valEmail}</p>
                     <button
                       type="button"
                       onClick={() => toast.success('Avatar updated!')}
@@ -111,7 +117,7 @@ export default function SettingsPage() {
                     <label className="block text-xs font-bold text-stone-700 mb-1">First Name</label>
                     <input
                       type="text"
-                      value={firstName}
+                      value={valFirstName}
                       onChange={e => setFirstName(e.target.value)}
                       className="w-full px-3.5 py-2 text-xs font-medium rounded-2xl bg-[#FAF8F5] border border-stone-200 focus:border-stone-400 outline-none"
                     />
@@ -120,7 +126,7 @@ export default function SettingsPage() {
                     <label className="block text-xs font-bold text-stone-700 mb-1">Last Name</label>
                     <input
                       type="text"
-                      value={lastName}
+                      value={valLastName}
                       onChange={e => setLastName(e.target.value)}
                       className="w-full px-3.5 py-2 text-xs font-medium rounded-2xl bg-[#FAF8F5] border border-stone-200 focus:border-stone-400 outline-none"
                     />
@@ -131,7 +137,7 @@ export default function SettingsPage() {
                   <label className="block text-xs font-bold text-stone-700 mb-1">Email Address</label>
                   <input
                     type="email"
-                    value={email}
+                    value={valEmail}
                     onChange={e => setEmail(e.target.value)}
                     className="w-full px-3.5 py-2 text-xs font-medium rounded-2xl bg-[#FAF8F5] border border-stone-200 focus:border-stone-400 outline-none"
                   />

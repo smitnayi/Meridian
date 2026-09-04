@@ -460,6 +460,8 @@ export const WorkflowIcon = (p) => (
   </I>
 );
 
+
+
 export const ShieldLockIcon = (p) => (
   <I {...p}>
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -468,7 +470,24 @@ export const ShieldLockIcon = (p) => (
   </I>
 );
 
-// ── Streamline Core Pop Style Icon Suite ──
+// ── Streamline Core Pop Style Icon Suite & Organization Suite ──
+
+export const BuildingIcon = (p) => (
+  <I {...p}>
+    <rect x="4" y="2" width="16" height="20" rx="2" />
+    <path d="M9 22v-4h6v4" />
+    <path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01" />
+  </I>
+);
+
+export const UserPlusIcon = (p) => (
+  <I {...p}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <line x1="19" y1="8" x2="19" y2="14" />
+    <line x1="16" y1="11" x2="22" y2="11" />
+  </I>
+);
 
 export const ThumbsUpIcon = (p) => (
   <I {...p}>
@@ -618,4 +637,4 @@ export const WaveformIcon = (p) => (
     <path d="M18 5v14" />
     <path d="M22 10v4" />
   </I>
-);
+);

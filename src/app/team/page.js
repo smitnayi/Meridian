@@ -12,24 +12,34 @@ import {
   MessageIcon, CheckIcon, SettingsIcon, ClockIcon, ZapIcon, BarChartIcon
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
-const initialMembers = [
-  { id: 'mem_1', name: 'Alex Johnson', role: 'Engineering Lead', email: 'alex@meridian.io', initials: 'AJ', color: '#8b5cf6', status: 'online', projects: 8, tasks: 32, timeLogged: '18:24:12' },
-  { id: 'mem_2', name: 'Kacie Velasquez', role: 'Lead Product Designer', email: 'kacie@meridian.io', initials: 'KV', color: '#f43f5e', status: 'online', projects: 6, tasks: 29, timeLogged: '14:10:45' },
-  { id: 'mem_3', name: 'Sarah Chen', role: 'Senior Full-Stack', email: 'sarah@meridian.io', initials: 'SC', color: '#6366f1', status: 'online', projects: 6, tasks: 29, timeLogged: '12:05:02' },
-  { id: 'mem_4', name: 'Marcus Webb', role: 'Backend Engineer', email: 'marcus@meridian.io', initials: 'MW', color: '#10b981', status: 'online', projects: 5, tasks: 24, timeLogged: '11:05:00' },
-  { id: 'mem_5', name: 'Priya Nair', role: 'Brand & Visual Designer', email: 'priya@meridian.io', initials: 'PN', color: '#f59e0b', status: 'away', projects: 7, tasks: 22, timeLogged: '09:42:18' },
-  { id: 'mem_6', name: 'Kai Okafor', role: 'DevOps & Infra Engineer', email: 'kai@meridian.io', initials: 'KO', color: '#ef4444', status: 'offline', projects: 4, tasks: 19, timeLogged: '08:15:30' },
-  { id: 'mem_7', name: 'Jordan Lee', role: 'Frontend Engineer', email: 'jordan@meridian.io', initials: 'JL', color: '#0ea5e9', status: 'online', projects: 5, tasks: 21, timeLogged: '07:50:10' },
-  { id: 'mem_8', name: 'Nadia Kowalski', role: 'QA & Test Automation', email: 'nadia@meridian.io', initials: 'NK', color: '#ec4899', status: 'away', projects: 6, tasks: 18, timeLogged: '06:30:00' },
-]
+import { useOrg } from '@/context/OrgContext'
+import { useAuth } from '@/context/AuthContext'
 
 export default function TeamPage() {
   const router = useRouter()
-  const [members, setMembers] = useState(initialMembers)
+  const { user } = useAuth()
+  const { activeOrg } = useOrg()
+  const { fullName, initials, email } = useCurrentUser()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
+
+  const currentMember = user ? [{
+    id: `mem_${user.id || 'me'}`,
+    name: fullName ? `${fullName} (You)` : (user.email || 'You'),
+    role: activeOrg?.role || 'Owner / Leader',
+    email: email || user.email || '',
+    initials: initials || 'U',
+    color: '#8b5cf6',
+    status: 'online',
+    projects: 1,
+    tasks: 0,
+    timeLogged: 'Active'
+  }] : []
+
+  const members = [...currentMember, ...(activeOrg?.members || [])]
 
   const filtered = members.filter(m => {
     const matchSearch = m.name.toLowerCase().includes(search.toLowerCase()) || m.role.toLowerCase().includes(search.toLowerCase()) || m.email.toLowerCase().includes(search.toLowerCase())

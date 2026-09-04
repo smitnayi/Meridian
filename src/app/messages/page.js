@@ -11,6 +11,7 @@ import {
   PartyIcon, CheckCircleIcon, BulbIcon, EyeIcon
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 const CORE_REACTIONS = [
   { id: 'thumbsUp', label: 'Agree', Icon: ThumbsUpIcon, color: 'text-sky-600' },
@@ -73,6 +74,17 @@ export default function MessagesPage() {
   const [msgs, setMsgs] = useState(initialMessages)
   const [showReactionPicker, setShowReactionPicker] = useState(false)
   const [searchChannel, setSearchChannel] = useState('')
+  const { fullName, initials } = useCurrentUser()
+
+  const dynamicOnlineUsers = onlineUsers.map((u, i) =>
+    i === 0
+      ? {
+          ...u,
+          name: fullName ? `${fullName} (You)` : u.name,
+          initials: initials || u.initials,
+        }
+      : u
+  )
 
   const currentMsgs = msgs[activeChannel] || []
   const activeChanObj = channels.find(c => c.id === activeChannel) || channels[0]
@@ -83,8 +95,8 @@ export default function MessagesPage() {
 
     const newM = {
       id: `m_${Date.now()}`,
-      author: 'Alex Johnson (You)',
-      initials: 'AJ',
+      author: `${fullName || 'You'} (You)`,
+      initials: initials || '?',
       color: '#111318',
       time: 'Just now',
       text: draft.trim(),
@@ -204,7 +216,7 @@ export default function MessagesPage() {
                   Active in #{activeChannel}
                 </div>
                 <div className="flex -space-x-1.5 overflow-hidden">
-                  {onlineUsers.map((u, i) => (
+                  {dynamicOnlineUsers.map((u, i) => (
                     <div
                       key={i}
                       className="w-6 h-6 rounded-full text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white"

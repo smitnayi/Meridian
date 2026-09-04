@@ -11,6 +11,7 @@ import {
   ClockIcon, VideoIcon, MoreHorizontalIcon
 } from '@/components/Icons'
 import { toast } from 'react-hot-toast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 // Mock Schedule Data for the Giant Timeline (Inheriting Exact SAI Reference)
 const initialDaySchedules = [
@@ -155,6 +156,7 @@ const calendarMatrix = [
 ]
 
 export default function CalendarPage() {
+  const { fullName, initials } = useCurrentUser()
   const [selectedDay, setSelectedDay] = useState(3)
   const [tasks, setTasks] = useState(initialDailyTasks)
   const [events, setEvents] = useState(initialEventsList)

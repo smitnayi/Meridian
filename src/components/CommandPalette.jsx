@@ -7,6 +7,7 @@ import {
   UsersIcon, MessageIcon, CreditCardIcon, SettingsIcon, ZapIcon,
   CheckIcon
 } from './Icons'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 const searchItems = [
   // Navigation
@@ -33,14 +34,21 @@ const searchItems = [
 ]
 
 export default function CommandPalette({ open, onClose }) {
+  const { fullName } = useCurrentUser()
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const router = useRouter()
   const inputRef = useRef(null)
 
+  const dynamicSearchItems = searchItems.map(item =>
+    item.id === 'task-2'
+      ? { ...item, sub: `In Progress · Assigned to ${fullName || 'Team Lead'}` }
+      : item
+  )
+
   if (!open) return null
 
-  const filteredItems = searchItems.filter(item => {
+  const filteredItems = dynamicSearchItems.filter(item => {
     if (!query.trim()) return true
     const q = query.toLowerCase()
     return (

@@ -8,6 +8,7 @@ import {
   ThumbsUpIcon, HeartIcon, RocketIcon, BulbIcon, FlameIcon, CopyIcon
 } from './Icons'
 import { toast } from 'react-hot-toast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 const ALL_TEAM_MEMBERS = [
   { initials: 'AJ', name: 'Alex Johnson', color: '#8b5cf6', role: 'Product Lead' },
@@ -41,6 +42,7 @@ const REACTION_CONFIG = [
 ]
 
 export default function TaskDetailDrawer({ task, open, onClose, onUpdateTask, onDeleteTask }) {
+  const { fullName, initials } = useCurrentUser()
   const [title, setTitle] = useState(task?.title || '')
   const [description, setDescription] = useState(task?.description || '')
   const [status, setStatus] = useState(task?.status || 'todo')
@@ -209,8 +211,8 @@ export default function TaskDetailDrawer({ task, open, onClose, onUpdateTask, on
     if (!commentInput.trim()) return
     const newComment = {
       id: `c_${Date.now()}`,
-      author: 'Alex Johnson (You)',
-      initials: 'AJ',
+      author: fullName ? `${fullName} (You)` : 'You',
+      initials: initials || 'AJ',
       color: '#111318',
       time: 'Just now',
       text: commentInput.trim(),

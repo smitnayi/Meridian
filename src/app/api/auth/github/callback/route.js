@@ -90,17 +90,18 @@ export async function GET(request){
             await db.query(`insert into users (email,first_name,last_name,github_id) values (?,?,?,?)`,[email,first_name,last_name,githubId]);
         }
 
-        const token = jwt.sign({email:email}, process.env.JWT_SECRET,{expiresIn: "7d"})
+        const token = jwt.sign({id:users[0].id,email:email}, process.env.JWT_SECRET,{expiresIn: "7d"})
 
         const response = NextResponse.redirect(new URL("/dashboard",request.url));
 
         response.cookies.set("token" ,token,{
             httpOnly:true,
-            secure:"production",
+            secure:process.env.NODE_ENV === "production",
             sameSite:"lax",
             maxAge: 7 * 24 * 60 * 60,
             path:"/",
         })
+
 
         //return response
 

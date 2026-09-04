@@ -1,6 +1,9 @@
 import { Plus_Jakarta_Sans, Manrope, Inter, Instrument_Serif, League_Spartan } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { OrgProvider } from "@/context/OrgContext";
+import CreateOrgModal from "@/components/CreateOrgModal";
+import JoinOrgModal from "@/components/JoinOrgModal";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -51,7 +54,11 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col font-sans">
         <AuthProvider>
-          {children}
+          <OrgProvider>
+            {children}
+            <CreateOrgModal />
+            <JoinOrgModal />
+          </OrgProvider>
         </AuthProvider>
       </body>
     </html>
