@@ -372,6 +372,24 @@ export default function CalendarPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCardDay, setSelectedCardDay] = useState(18)
 
+  // Card View (Airbnb UX Audited) Interactive States
+  const [cardCategoryFilter, setCardCategoryFilter] = useState('All')
+  const [focusSessionActive, setFocusSessionActive] = useState(false)
+  const [selectedCardEvent, setSelectedCardEvent] = useState(null)
+  const [cardMilestones, setCardMilestones] = useState([
+    { id: 'ms-1', title: 'Wireframes & User Flows', done: true },
+    { id: 'ms-2', title: 'Interactive Prototypes', done: true },
+    { id: 'ms-3', title: 'UI / UX Design Token Audit', done: false },
+    { id: 'ms-4', title: 'Design System Component Library', done: false },
+  ])
+
+  const toggleCardMilestone = (id) => {
+    setCardMilestones(prev =>
+      prev.map(m => (m.id === id ? { ...m, done: !m.done } : m))
+    )
+    toast.success('Sprint milestone updated')
+  }
+
   // Block View (New Editorial Calendar) states
   const [selectedMatrixDay, setSelectedMatrixDay] = useState(3)
   const [tasks, setTasks] = useState(initialDailyTasks)
@@ -615,113 +633,553 @@ export default function CalendarPage() {
             {/* ── LEFT / MAIN CONTENT AREA (8 cols) ── */}
             <div className="xl:col-span-8 flex flex-col gap-6">
 
-              {/* VIEW MODE 1: CARD VIEW */}
+              {/* VIEW MODE 1: CARD VIEW (AIRBNB UX AUDITED DESIGN) */}
               {viewMode === 'card' && (
-                <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs relative overflow-x-auto">
-                  {/* Days Header */}
-                  <div className="grid grid-cols-5 gap-3 mb-6 min-w-[600px]">
-                    {[
-                      { day: 17, label: 'Mon' },
-                      { day: 18, label: 'Tue', active: true },
-                      { day: 19, label: 'Wed' },
-                      { day: 20, label: 'Thu' },
-                      { day: 21, label: 'Fri' },
-                    ].map(d => (
-                      <div
-                        key={d.day}
-                        onClick={() => setSelectedCardDay(d.day)}
-                        className={`text-center py-2 rounded-2xl cursor-pointer transition-all ${
-                          selectedCardDay === d.day
-                            ? 'bg-[#111318] text-white shadow-md'
-                            : 'hover:bg-stone-100 text-stone-700'
-                        }`}
-                      >
-                        <span className="text-2xl font-extrabold stat-number block leading-none">{d.day}</span>
-                        <span className={`text-[11px] font-bold ${selectedCardDay === d.day ? 'text-stone-300' : 'text-stone-400'}`}>/{d.label}</span>
+                <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-2xs space-y-6">
+                  {/* Top Bar: Live Overview & Category Filter Chips */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-stone-100/90 text-stone-700 text-xs font-semibold">
+                        <CalendarIcon size={13} className="text-stone-500" />
+                        <span>5 Events Scheduled</span>
                       </div>
-                    ))}
-                  </div>
-
-                  {/* Day Tasks Matrix Columns */}
-                  <div className="grid grid-cols-5 gap-4 min-w-[600px]">
-
-                    {/* Column 1 (Mon 17) */}
-                    <div className="space-y-3">
-                      <div className="p-4 rounded-2xl bg-[#FEF9C3] border border-[#FEF08A] shadow-2xs hover:shadow-xs transition-all">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-bold text-amber-950">Customer Call</span>
-                          <span className="text-[10px] font-mono text-amber-700">9:25 - 11:15</span>
-                        </div>
-                        <div className="text-[11px] text-amber-900 font-medium">Sprint retrospective sync</div>
-                        <div className="mt-2 text-[10px] text-amber-700 font-mono">Jane Cooper (Lead)</div>
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-stone-100/90 text-stone-700 text-xs font-mono font-medium hidden md:flex">
+                        <ClockIcon size={13} className="text-stone-500" />
+                        <span>9.5h Booked</span>
                       </div>
-
-                      <div className="p-4 rounded-2xl bg-[#E0F2FE] border border-[#BAE6FD] shadow-2xs hover:shadow-xs transition-all">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-bold text-sky-950">Design Review</span>
-                          <span className="text-[10px] font-mono text-sky-700">9:30 - 12:30</span>
-                        </div>
-                        <div className="text-[11px] text-sky-900 font-medium">Bank App .fig inspection</div>
-                        <div className="mt-2 text-[10px] text-sky-700 font-mono">Jane Cooper (Lead)</div>
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200/60">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span>Tue 18 Active</span>
                       </div>
                     </div>
 
-                    {/* Column 2 (Tue 18 - Active Focus Day) */}
+                    {/* Filter Chips */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                      {['All', 'Design', 'Sales', 'Management', 'Commercial', 'Focus'].map(cat => {
+                        const isSelected = cardCategoryFilter.toLowerCase() === cat.toLowerCase()
+                        return (
+                          <button
+                            key={cat}
+                            type="button"
+                            onClick={() => setCardCategoryFilter(cat)}
+                            className={`px-3 py-1 text-xs font-bold rounded-full transition-all cursor-pointer shrink-0 ${
+                              isSelected
+                                ? 'bg-[#111318] text-white shadow-2xs'
+                                : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70 hover:text-stone-900'
+                            }`}
+                          >
+                            {cat}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Airbnb Style Rhythm Date Scrubber */}
+                  <div className="grid grid-cols-5 gap-3 min-w-[620px] overflow-x-auto pb-1">
+                    {[
+                      { day: 17, label: 'Mon', count: '2 events', type: 'events' },
+                      { day: 18, label: 'Tue', count: 'Live Now', type: 'live' },
+                      { day: 19, label: 'Wed', count: '4 tasks', type: 'tasks' },
+                      { day: 20, label: 'Thu', count: '1 event', type: 'events' },
+                      { day: 21, label: 'Fri', count: '4.0h Flow', type: 'flow' },
+                    ].map(d => {
+                      const isSelected = selectedCardDay === d.day
+                      return (
+                        <div
+                          key={d.day}
+                          onClick={() => {
+                            setSelectedCardDay(d.day)
+                            toast.success(`Focused on ${d.label} May ${d.day}`)
+                          }}
+                          className={`group text-center py-3 px-3 rounded-2xl cursor-pointer transition-all duration-200 select-none border ${
+                            isSelected
+                              ? 'bg-[#111318] text-white border-[#111318] shadow-md -translate-y-0.5 ring-2 ring-lime-400/30'
+                              : 'bg-stone-50/70 hover:bg-stone-100/90 border-stone-200/70 text-stone-700 hover:border-stone-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span className={`text-[10px] font-mono font-bold tracking-widest uppercase ${
+                              isSelected ? 'text-stone-300' : 'text-stone-400 group-hover:text-stone-600'
+                            }`}>
+                              {d.label}
+                            </span>
+                            {d.type === 'live' && (
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-2xl font-extrabold stat-number leading-tight my-0.5">
+                            {d.day}
+                          </div>
+                          <div className={`mt-1 text-[10px] font-medium font-mono px-2 py-0.5 rounded-full inline-block truncate max-w-full ${
+                            isSelected
+                              ? 'bg-white/15 text-lime-300'
+                              : d.type === 'live'
+                              ? 'bg-emerald-100 text-emerald-800 font-bold'
+                              : 'bg-stone-200/70 text-stone-600'
+                          }`}>
+                            {d.count}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* 5 Rhythmic Day Columns with Zero Collision Anatomy */}
+                  <div className="grid grid-cols-5 gap-4 min-w-[620px] overflow-x-auto items-start">
+
+                    {/* Column 1 (Mon 17) */}
                     <div className="space-y-3">
-                      <div className="p-4 rounded-2xl bg-[#EDE9FE] border border-[#DDD6FE] shadow-sm hover:shadow-md transition-all">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="text-xs font-bold text-violet-950">Design Meet</div>
-                          <span className="text-[10px] font-mono text-violet-700 font-bold">10:30 - 14:20</span>
+                      {/* Customer Call Card */}
+                      <div
+                        onClick={() => setSelectedCardEvent({
+                          title: 'Customer Call: Sprint Retrospective Sync',
+                          category: 'Sales',
+                          categoryBg: 'bg-amber-100 text-amber-900 border-amber-300',
+                          time: '09:25 - 11:15 · 1h 50m',
+                          day: 'Mon, May 17',
+                          lead: 'Jane Cooper (Lead)',
+                          location: 'Phone Call / Direct VoIP',
+                          meetUrl: null,
+                          detail: 'Customer retrospective sync on Q2 delivery cadence, scope adjustments, and team feedback alignment.',
+                          attendees: ['Jane Cooper', 'Client Executive Team'],
+                          status: 'Completed'
+                        })}
+                        className={`group relative p-4 rounded-2xl bg-amber-50/90 border border-amber-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer ${
+                          cardCategoryFilter !== 'All' && cardCategoryFilter.toLowerCase() !== 'sales' ? 'opacity-30' : ''
+                        }`}
+                      >
+                        {/* Zone 1: Eyebrow & Duration */}
+                        <div className="flex items-center justify-between gap-1 mb-2">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-200/80 text-amber-900 border border-amber-300/60">
+                            Sales Sync
+                          </span>
+                          <span className="text-[10px] font-mono text-amber-700/90 font-semibold flex items-center gap-1 shrink-0">
+                            <ClockIcon size={10} /> 1h 50m
+                          </span>
                         </div>
-                        <div className="w-full h-20 rounded-xl bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-inner mb-3">
+
+                        {/* Zone 2: Title */}
+                        <h4 className="text-xs font-bold text-amber-950 mb-1 group-hover:text-amber-900 transition-colors">
+                          Customer Call
+                        </h4>
+
+                        {/* Zone 3: Time Slot & Subtitle */}
+                        <div className="text-[11px] font-mono text-amber-800 font-semibold mb-1">
+                          09:25 - 11:15
+                        </div>
+                        <p className="text-[11px] text-amber-900/80 font-medium line-clamp-2 leading-relaxed">
+                          Sprint retrospective sync
+                        </p>
+
+                        {/* Zone 4: Host Footer */}
+                        <div className="mt-3 pt-2.5 border-t border-amber-200/60 flex items-center justify-between text-[10px]">
+                          <div className="flex items-center gap-1.5 font-mono text-amber-800">
+                            <div className="w-4 h-4 rounded-full bg-amber-500 text-white font-bold flex items-center justify-center text-[8px]">
+                              JC
+                            </div>
+                            <span className="truncate max-w-[80px]">Jane Cooper</span>
+                          </div>
+                          <span className="text-amber-700 font-bold group-hover:translate-x-0.5 transition-transform">
+                            Details →
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Design Review Card */}
+                      <div
+                        onClick={() => setSelectedCardEvent({
+                          title: 'Design Review: Bank App .fig Inspection',
+                          category: 'Design',
+                          categoryBg: 'bg-sky-100 text-sky-900 border-sky-300',
+                          time: '09:30 - 12:30 · 3h 00m',
+                          day: 'Mon, May 17',
+                          lead: 'Jane Cooper (Lead)',
+                          location: 'Figma Live Session',
+                          meetUrl: 'https://figma.com',
+                          detail: 'Comprehensive inspection of banking dashboard components, dark-mode tokens, and accessibility contrast standards.',
+                          attendees: ['Jane Cooper', 'Marcus Webb'],
+                          status: 'Completed'
+                        })}
+                        className={`group relative p-4 rounded-2xl bg-sky-50/90 border border-sky-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer ${
+                          cardCategoryFilter !== 'All' && cardCategoryFilter.toLowerCase() !== 'design' ? 'opacity-30' : ''
+                        }`}
+                      >
+                        {/* Zone 1: Eyebrow & Duration */}
+                        <div className="flex items-center justify-between gap-1 mb-2">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-200/80 text-sky-900 border border-sky-300/60">
+                            Design Review
+                          </span>
+                          <span className="text-[10px] font-mono text-sky-700 font-semibold flex items-center gap-1 shrink-0">
+                            <ClockIcon size={10} /> 3h 00m
+                          </span>
+                        </div>
+
+                        {/* Zone 2: Title */}
+                        <h4 className="text-xs font-bold text-sky-950 mb-1 group-hover:text-sky-900 transition-colors">
+                          Design Review
+                        </h4>
+
+                        {/* Zone 3: Time Slot & Subtitle */}
+                        <div className="text-[11px] font-mono text-sky-800 font-semibold mb-1">
+                          09:30 - 12:30
+                        </div>
+                        <p className="text-[11px] text-sky-900/80 font-medium line-clamp-2 leading-relaxed">
+                          Bank App .fig inspection
+                        </p>
+
+                        {/* Zone 4: Host & Figma Badge */}
+                        <div className="mt-3 pt-2.5 border-t border-sky-200/60 flex items-center justify-between text-[10px]">
+                          <div className="flex items-center gap-1.5 font-mono text-sky-800">
+                            <div className="w-4 h-4 rounded-full bg-sky-500 text-white font-bold flex items-center justify-center text-[8px]">
+                              JC
+                            </div>
+                            <span className="truncate max-w-[80px]">Jane Cooper</span>
+                          </div>
+                          <span className="px-1.5 py-0.5 rounded-md bg-sky-200/70 text-sky-800 font-mono font-bold flex items-center gap-1 text-[9px]">
+                            <FigmaIcon size={9} /> Figma
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Column 2 (Tue 18 - Active Hero Focus Day) */}
+                    <div className="space-y-3">
+                      <div
+                        onClick={() => setSelectedCardEvent({
+                          title: 'Design Meet: UI System Audit',
+                          category: 'Design',
+                          categoryBg: 'bg-violet-100 text-violet-900 border-violet-300',
+                          time: '10:30 - 14:20 · 3h 50m',
+                          day: 'Tue, May 18 (Today)',
+                          lead: 'Sarah Chen (Lead)',
+                          location: 'Google Meet',
+                          meetUrl: 'https://meet.google.com/audit-design-meridian',
+                          detail: 'Live design token audit across typography scales, color contrast (WCAG AAA), and reusable Figma-to-code components.',
+                          attendees: ['Sarah Chen', 'Marcus Webb', 'Priya Nair', 'Alex Johnson', '+3'],
+                          status: 'In Progress'
+                        })}
+                        className={`group relative p-4 rounded-2xl bg-gradient-to-b from-[#F5F3FF] to-[#EDE9FE] border-2 border-violet-300 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer ring-4 ring-violet-500/10 ${
+                          cardCategoryFilter !== 'All' && cardCategoryFilter.toLowerCase() !== 'design' ? 'opacity-30' : ''
+                        }`}
+                      >
+                        {/* Zone 1: Eyebrow & Live Pill */}
+                        <div className="flex items-center justify-between gap-1 mb-2">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-violet-200 text-violet-950 border border-violet-300">
+                            Design Meet
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Live
+                          </span>
+                        </div>
+
+                        {/* Zone 2: Time & Title */}
+                        <div className="text-[11px] font-mono text-violet-700 font-bold mb-1 flex items-center gap-1">
+                          <ClockIcon size={11} /> 10:30 - 14:20 (3h 50m)
+                        </div>
+                        <h4 className="text-sm font-bold text-violet-950 mb-1">
                           UI System Audit
+                        </h4>
+                        <p className="text-[11px] text-violet-900/80 font-medium mb-3">
+                          High-contrast tokens & accessibility inspection
+                        </p>
+
+                        {/* Zone 3: Refined WCAG AAA Audit Status Panel */}
+                        <div className="rounded-xl p-3 bg-white/85 border border-violet-200 shadow-2xs space-y-2 mb-3">
+                          <div className="flex items-center justify-between text-[10px] font-bold text-violet-900">
+                            <span>WCAG 2.2 AAA Audit</span>
+                            <span className="text-violet-700 font-mono font-bold">85%</span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full bg-violet-100 overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-violet-500 to-indigo-600 rounded-full" style={{ width: '85%' }}></div>
+                          </div>
+                          <div className="flex items-center justify-between text-[9px] text-violet-700 font-mono">
+                            <span>142/168 tokens</span>
+                            <span>12 components</span>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between">
+
+                        {/* Zone 4: Attendees & 1-Click Join Meet */}
+                        <div className="flex items-center justify-between gap-2 pt-1">
                           <div className="flex -space-x-1.5 overflow-hidden">
                             <div className="w-5 h-5 rounded-full bg-violet-600 text-white text-[9px] font-bold flex items-center justify-center ring-1 ring-white">SC</div>
                             <div className="w-5 h-5 rounded-full bg-emerald-600 text-white text-[9px] font-bold flex items-center justify-center ring-1 ring-white">MW</div>
                             <div className="w-5 h-5 rounded-full bg-amber-600 text-white text-[9px] font-bold flex items-center justify-center ring-1 ring-white">PN</div>
                             <div className="w-5 h-5 rounded-full bg-slate-700 text-white text-[8px] font-bold flex items-center justify-center ring-1 ring-white">+3</div>
                           </div>
-                          <span className="text-[10px] font-mono text-violet-700">Google Meet</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              toast.success('Opening Google Meet session...')
+                              window.open('https://meet.google.com', '_blank')
+                            }}
+                            className="px-2.5 py-1 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-[10px] font-bold flex items-center gap-1 shadow-xs transition-colors cursor-pointer shrink-0"
+                          >
+                            <GoogleMeetIcon size={11} />
+                            <span>Join Meet</span>
+                          </button>
                         </div>
                       </div>
                     </div>
 
-                    {/* Column 3 (Wed 19) */}
+                    {/* Column 3 (Wed 19 - Interactive Sprint Review) */}
                     <div className="space-y-3">
-                      <div className="p-4 rounded-2xl bg-[#FFE4E6] border border-[#FECDD3] shadow-2xs hover:shadow-xs transition-all">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="text-xs font-bold text-rose-950">Sprint Review</div>
-                          <span className="text-[10px] font-mono text-rose-700">9:30 - 12:30</span>
+                      <div
+                        className={`group relative p-4 rounded-2xl bg-rose-50/90 border border-rose-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all ${
+                          cardCategoryFilter !== 'All' && cardCategoryFilter.toLowerCase() !== 'management' ? 'opacity-30' : ''
+                        }`}
+                      >
+                        {/* Zone 1: Eyebrow & Duration */}
+                        <div className="flex items-center justify-between gap-1 mb-2">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-200/80 text-rose-950 border border-rose-300/60">
+                            Management
+                          </span>
+                          <span className="text-[10px] font-mono text-rose-700 font-semibold flex items-center gap-1 shrink-0">
+                            <ClockIcon size={10} /> 3h 00m
+                          </span>
                         </div>
-                        <div className="text-[11px] font-bold text-rose-900 mb-2">Completed: 2/4</div>
-                        <div className="space-y-1 text-[10px] text-rose-800">
-                          <div className="flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Wireframes</div>
-                          <div className="flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Prototypes</div>
-                          <div className="flex items-center gap-1.5"><span className="text-rose-400">○</span> UI/UX Design</div>
-                          <div className="flex items-center gap-1.5"><span className="text-rose-400">○</span> Design System</div>
+
+                        {/* Zone 2: Title & Time */}
+                        <h4
+                          onClick={() => setSelectedCardEvent({
+                            title: 'Sprint Review & Demo',
+                            category: 'Management',
+                            categoryBg: 'bg-rose-100 text-rose-900 border-rose-300',
+                            time: '09:30 - 12:30 · 3h 00m',
+                            day: 'Wed, May 19',
+                            lead: 'Alex Johnson (Product)',
+                            location: 'Conference Room B / Hybrid',
+                            meetUrl: 'https://meet.google.com',
+                            detail: 'Sprint 14 deliverables review: wireframe validation, interactive prototypes demo, and design system token progress.',
+                            attendees: ['Alex Johnson', 'Engineering Team', 'Stakeholders'],
+                            status: 'Upcoming'
+                          })}
+                          className="text-xs font-bold text-rose-950 mb-1 cursor-pointer hover:text-rose-800 transition-colors"
+                        >
+                          Sprint Review & Demo
+                        </h4>
+                        <div className="text-[11px] font-mono text-rose-800 font-semibold mb-2">
+                          09:30 - 12:30
+                        </div>
+
+                        {/* Zone 3: Interactive Milestone Progress Bar */}
+                        {(() => {
+                          const doneCount = cardMilestones.filter(m => m.done).length
+                          const totalCount = cardMilestones.length
+                          const pct = Math.round((doneCount / totalCount) * 100)
+                          return (
+                            <div className="mb-3">
+                              <div className="flex items-center justify-between text-[10px] font-bold text-rose-900 mb-1">
+                                <span>Milestones ({doneCount}/{totalCount})</span>
+                                <span className="font-mono text-rose-700">{pct}%</span>
+                              </div>
+                              <div className="w-full h-1.5 rounded-full bg-rose-200/70 overflow-hidden">
+                                <div
+                                  className="h-full bg-rose-500 rounded-full transition-all duration-300"
+                                  style={{ width: `${pct}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )
+                        })()}
+
+                        {/* Zone 4: Interactive Milestone Checklist */}
+                        <div className="space-y-1.5">
+                          {cardMilestones.map(m => (
+                            <div
+                              key={m.id}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                toggleCardMilestone(m.id)
+                              }}
+                              className={`flex items-start gap-2 p-1.5 rounded-xl transition-all cursor-pointer text-[11px] select-none ${
+                                m.done
+                                  ? 'bg-rose-100/60 text-rose-900/70 hover:bg-rose-100'
+                                  : 'bg-white/80 hover:bg-white text-rose-950 shadow-2xs'
+                              }`}
+                            >
+                              <span
+                                className={`w-4 h-4 rounded-md flex items-center justify-center text-[10px] shrink-0 font-bold transition-all ${
+                                  m.done
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'border border-rose-300 text-transparent bg-white'
+                                }`}
+                              >
+                                ✓
+                              </span>
+                              <span
+                                className={`leading-snug text-[10.5px] ${
+                                  m.done ? 'line-through text-rose-800/70' : 'font-medium'
+                                }`}
+                              >
+                                {m.title}
+                              </span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
 
-                    {/* Column 4 (Thu 20) */}
+                    {/* Column 4 (Thu 20 - Executive Advisory Dinner) */}
                     <div className="space-y-3">
-                      <div className="p-4 rounded-2xl bg-[#DCFCE7] border border-[#BBF7D0] shadow-2xs hover:shadow-xs transition-all">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-bold text-emerald-950">Business Dinner</span>
-                          <span className="text-[10px] font-mono text-emerald-700">11:30 - 13:05</span>
+                      <div
+                        onClick={() => setSelectedCardEvent({
+                          title: 'Business Dinner & Strategic Advisory',
+                          category: 'Commercial',
+                          categoryBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                          time: '11:30 - 13:05 · 1h 35m',
+                          day: 'Thu, May 20',
+                          lead: 'Marcus Webb (VP)',
+                          location: 'Downtown Bistro Cafe · Table 12',
+                          meetUrl: null,
+                          detail: 'Quarterly executive advisory dinner with enterprise client partners. Discussion of expansion roadmap and SLA tiers.',
+                          attendees: ['Marcus Webb', 'Client Advisory Council (4 guests)'],
+                          status: 'Upcoming'
+                        })}
+                        className={`group relative p-4 rounded-2xl bg-emerald-50/90 border border-emerald-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer ${
+                          cardCategoryFilter !== 'All' && cardCategoryFilter.toLowerCase() !== 'commercial' ? 'opacity-30' : ''
+                        }`}
+                      >
+                        {/* Zone 1: Eyebrow & Duration */}
+                        <div className="flex items-center justify-between gap-1 mb-2">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-200/80 text-emerald-950 border border-emerald-300/60">
+                            Commercial
+                          </span>
+                          <span className="text-[10px] font-mono text-emerald-700 font-semibold flex items-center gap-1 shrink-0">
+                            <ClockIcon size={10} /> 1h 35m
+                          </span>
                         </div>
-                        <div className="text-[11px] text-emerald-900 font-medium">Downtown Bistro Cafe</div>
-                        <div className="mt-2 text-[10px] text-emerald-700 font-mono">Client Advisory Team</div>
+
+                        {/* Zone 2: Title */}
+                        <h4 className="text-xs font-bold text-emerald-950 mb-1 group-hover:text-emerald-900 transition-colors">
+                          Business Dinner
+                        </h4>
+
+                        {/* Zone 3: Time Slot & Subtitle */}
+                        <div className="text-[11px] font-mono text-emerald-800 font-semibold mb-1">
+                          11:30 - 13:05
+                        </div>
+                        <p className="text-[11px] text-emerald-900/80 font-medium leading-relaxed mb-3">
+                          Client advisory council & Q3 kickoff
+                        </p>
+
+                        {/* Zone 4: Venue Card & Host */}
+                        <div className="p-2.5 rounded-xl bg-white/75 border border-emerald-200/80 shadow-2xs mb-3 space-y-1">
+                          <div className="flex items-center gap-1.5 text-[10.5px] font-bold text-emerald-950">
+                            <span>📍</span> Downtown Bistro Cafe
+                          </div>
+                          <div className="text-[9.5px] font-mono text-emerald-700">
+                            Table 12 Reserved · 4 Guests
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-emerald-200/60 flex items-center justify-between text-[10px]">
+                          <div className="flex items-center gap-1.5 font-mono text-emerald-800">
+                            <div className="w-4 h-4 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-[8px]">
+                              MW
+                            </div>
+                            <span className="truncate max-w-[80px]">Marcus Webb</span>
+                          </div>
+                          <span className="text-emerald-700 font-bold group-hover:translate-x-0.5 transition-transform">
+                            Details →
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Column 5 (Fri 21) */}
+                    {/* Column 5 (Fri 21 - Protected Deep Work Flow Block) */}
                     <div className="space-y-3">
-                      <div className="p-4 rounded-2xl bg-stone-100 border border-stone-200/80 border-dashed text-center">
-                        <span className="text-xs font-bold text-stone-500 block mb-1">Focus Time</span>
-                        <span className="text-[10px] text-stone-400">No scheduled meetings</span>
+                      <div
+                        onClick={() => setSelectedCardEvent({
+                          title: 'Deep Work & Flow State Block',
+                          category: 'Focus',
+                          categoryBg: 'bg-stone-200 text-stone-900 border-stone-300',
+                          time: '13:00 - 17:00 · 4.0 Hours',
+                          day: 'Fri, May 21',
+                          lead: fullName || 'Team Lead',
+                          location: 'Deep Work Lab · Quiet Zone',
+                          meetUrl: null,
+                          detail: 'Protected focus time reserved for high-cognitive tasks: algorithm optimization, architectural planning, and deep code refactoring. All notifications silenced.',
+                          attendees: [fullName || 'You'],
+                          status: focusSessionActive ? 'Active Flow' : 'Scheduled'
+                        })}
+                        className={`group relative p-4 rounded-2xl bg-[#111318] text-white border border-stone-800 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer ${
+                          cardCategoryFilter !== 'All' && cardCategoryFilter.toLowerCase() !== 'focus' ? 'opacity-30' : ''
+                        }`}
+                      >
+                        {/* Zone 1: Eyebrow & Duration */}
+                        <div className="flex items-center justify-between gap-1 mb-2">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-lime-400/20 text-lime-400 border border-lime-400/30">
+                            Protected Flow
+                          </span>
+                          <span className="text-[10px] font-mono text-stone-400 font-semibold flex items-center gap-1 shrink-0">
+                            <ClockIcon size={10} /> 4.0 Hours
+                          </span>
+                        </div>
+
+                        {/* Zone 2: Title & Context */}
+                        <h4 className="text-xs font-bold text-white mb-1">
+                          Deep Work & Flow State
+                        </h4>
+                        <p className="text-[11px] text-stone-300/80 font-sans leading-relaxed mb-3">
+                          Calendar blocked. Slack snoozed. No interruption guarantee.
+                        </p>
+
+                        {/* Zone 3: Interactive Focus Timer Trigger */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setFocusSessionActive(!focusSessionActive)
+                            toast(
+                              focusSessionActive
+                                ? 'Focus block paused'
+                                : '🔥 25-minute Pomodoro Flow Session started!',
+                              { icon: focusSessionActive ? '⏸' : '⚡' }
+                            )
+                          }}
+                          className={`w-full py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
+                            focusSessionActive
+                              ? 'bg-amber-400 hover:bg-amber-300 text-stone-950'
+                              : 'bg-lime-400 hover:bg-lime-300 text-stone-950'
+                          }`}
+                        >
+                          {focusSessionActive ? (
+                            <>
+                              <PauseIcon size={12} />
+                              <span>Pause Flow (24:18)</span>
+                            </>
+                          ) : (
+                            <>
+                              <PlayIcon size={12} />
+                              <span>Start 25m Focus Block</span>
+                            </>
+                          )}
+                        </button>
+
+                        {/* Zone 4: Ambient Flow Playlist */}
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toast('Opening Spotify Lo-Fi Flow playlist', { icon: '🎧' })
+                          }}
+                          className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-stone-400 hover:text-white cursor-pointer transition-colors"
+                        >
+                          <span className="flex items-center gap-1.5">
+                            🎧 Lo-Fi Deep Beats
+                          </span>
+                          <span className="text-lime-400 text-[10px] font-bold">
+                            Listen ↗
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -1726,6 +2184,110 @@ export default function CalendarPage() {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════════════ */}
+          {/* AIRBNB AUDITED CARD EVENT DETAIL MODAL                     */}
+          {/* ══════════════════════════════════════════════════════════ */}
+          {selectedCardEvent && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+              <div className="w-full max-w-lg bg-white text-stone-900 rounded-3xl p-6 border border-stone-200 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
+                {/* Header Row */}
+                <div className="flex items-center justify-between border-b border-stone-100 pb-3.5">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${selectedCardEvent.categoryBg}`}>
+                      {selectedCardEvent.category}
+                    </span>
+                    <span className="text-xs font-mono text-stone-400 font-medium">
+                      {selectedCardEvent.day}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCardEvent(null)}
+                    className="w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 hover:text-stone-900 flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Title & Timing */}
+                <div>
+                  <h3 className="text-xl font-bold text-stone-950 font-serif mb-1">
+                    {selectedCardEvent.title}
+                  </h3>
+                  <div className="flex items-center gap-2 text-xs font-mono text-stone-500">
+                    <ClockIcon size={13} className="text-stone-400" />
+                    <span className="font-semibold text-stone-700">{selectedCardEvent.time}</span>
+                    <span>·</span>
+                    <span>{selectedCardEvent.location}</span>
+                  </div>
+                </div>
+
+                {/* Agenda & Details */}
+                <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200/80">
+                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-1">
+                    Agenda & Overview
+                  </h4>
+                  <p className="text-xs text-stone-700 leading-relaxed font-sans">
+                    {selectedCardEvent.detail}
+                  </p>
+                </div>
+
+                {/* Host & Status */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div className="p-3 rounded-2xl border border-stone-200/80">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Lead / Host</div>
+                    <div className="text-xs font-bold text-stone-900">{selectedCardEvent.lead}</div>
+                  </div>
+                  <div className="p-3 rounded-2xl border border-stone-200/80">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Status</div>
+                    <div className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      {selectedCardEvent.status}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-between pt-3 border-t border-stone-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(window.location.href)
+                      toast.success('Event invitation link copied!')
+                    }}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold cursor-pointer transition-colors"
+                  >
+                    <ShareIcon size={12} />
+                    <span>Copy Link</span>
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCardEvent(null)}
+                      className="px-4 py-2 rounded-xl text-xs font-bold text-stone-600 hover:bg-stone-100 cursor-pointer transition-colors"
+                    >
+                      Close
+                    </button>
+                    {selectedCardEvent.meetUrl && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success(`Joining session: ${selectedCardEvent.title}`)
+                          window.open(selectedCardEvent.meetUrl, '_blank')
+                        }}
+                        className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold shadow-xs cursor-pointer transition-colors flex items-center gap-1.5"
+                      >
+                        <GoogleMeetIcon size={12} />
+                        <span>Join Meeting</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
