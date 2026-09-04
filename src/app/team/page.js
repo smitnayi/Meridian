@@ -6,6 +6,7 @@ import Sidebar from '@/components/sidebar'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import DynamicHeader from '@/components/DynamicHeader'
 import InviteModal from '@/components/InviteModal'
+import MetricCard from '@/components/MetricCard'
 import {
   PlusIcon, SearchIcon, MoreHorizontalIcon, UsersIcon,
   MessageIcon, CheckIcon, SettingsIcon, ClockIcon, ZapIcon, BarChartIcon
@@ -73,75 +74,36 @@ export default function TeamPage() {
             </button>
           </div>
 
-          {/* Bento KPI Summary Row (Ref Image 2) */}
+          {/* Bento KPI Summary Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {/* Total Members */}
-            <div className="p-5 rounded-3xl bg-[#EDE9FE] border border-[#DDD6FE] shadow-2xs hover:shadow-xs transition-all bento-card-interactive">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#6D28D9]">Total Members</span>
-                <span className="p-1.5 rounded-xl bg-white/80 text-[#6D28D9] shadow-2xs">
-                  <UsersIcon size={14} />
-                </span>
-              </div>
-              <div className="text-4xl font-extrabold text-stone-950 stat-number mb-1">
-                {members.length}
-              </div>
-              <div className="flex items-center justify-between text-xs font-semibold text-[#6D28D9]">
-                <span>12 seats limit</span>
-                <span className="font-mono text-[10px] bg-white/60 px-2 py-0.5 rounded-full">4 open</span>
-              </div>
-            </div>
-
-            {/* Online Now */}
-            <div className="p-5 rounded-3xl bg-[#ECFCCB] border border-[#D9F99D] shadow-2xs hover:shadow-xs transition-all bento-card-interactive">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#3F6212]">Online Now</span>
-                <span className="p-1.5 rounded-xl bg-white/80 text-[#3F6212] shadow-2xs">
-                  <ZapIcon size={14} />
-                </span>
-              </div>
-              <div className="text-4xl font-extrabold text-stone-950 stat-number mb-1">
-                {members.filter(m => m.status === 'online').length}
-              </div>
-              <div className="flex items-center justify-between text-xs font-semibold text-[#3F6212]">
-                <span>Active collaboration</span>
-                <span className="font-mono text-[10px] bg-white/60 px-2 py-0.5 rounded-full">● Live</span>
-              </div>
-            </div>
-
-            {/* Away / Break */}
-            <div className="p-5 rounded-3xl bg-[#FFEDD5] border border-[#FDBA74] shadow-2xs hover:shadow-xs transition-all bento-card-interactive">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#C2410C]">Away / Break</span>
-                <span className="p-1.5 rounded-xl bg-white/80 text-[#C2410C] shadow-2xs">
-                  <ClockIcon size={14} />
-                </span>
-              </div>
-              <div className="text-4xl font-extrabold text-stone-950 stat-number mb-1">
-                {members.filter(m => m.status === 'away').length}
-              </div>
-              <div className="flex items-center justify-between text-xs font-semibold text-[#C2410C]">
-                <span>Standup in 20m</span>
-                <span className="font-mono text-[10px] bg-white/60 px-2 py-0.5 rounded-full">Sync</span>
-              </div>
-            </div>
-
-            {/* Hours Logged */}
-            <div className="p-5 rounded-3xl bg-[#E0F2FE] border border-[#BAE6FD] shadow-2xs hover:shadow-xs transition-all bento-card-interactive">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#0369A1]">Hours Logged</span>
-                <span className="p-1.5 rounded-xl bg-white/80 text-[#0369A1] shadow-2xs">
-                  <BarChartIcon size={14} />
-                </span>
-              </div>
-              <div className="text-4xl font-extrabold text-stone-950 stat-number mb-1">
-                184h
-              </div>
-              <div className="flex items-center justify-between text-xs font-semibold text-[#0369A1]">
-                <span>Sprint 14 total</span>
-                <span className="font-mono text-[10px] bg-white/60 px-2 py-0.5 rounded-full">+12%</span>
-              </div>
-            </div>
+            <MetricCard
+              icon={UsersIcon}
+              badge="4 open seats"
+              value={String(members.length)}
+              label="Total Members"
+              theme="purple"
+            />
+            <MetricCard
+              icon={ZapIcon}
+              badge="Active live"
+              value={String(members.filter(m => m.status === 'online').length)}
+              label="Online Now"
+              theme="lime"
+            />
+            <MetricCard
+              icon={ClockIcon}
+              badge="Standup in 20m"
+              value={String(members.filter(m => m.status === 'away').length)}
+              label="Away / In Break"
+              theme="amber"
+            />
+            <MetricCard
+              icon={BarChartIcon}
+              badge="+12% tracked"
+              value="184h"
+              label="Hours Logged"
+              theme="sky"
+            />
           </div>
 
           {/* Search & Filter Bar */}

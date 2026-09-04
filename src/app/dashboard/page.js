@@ -7,6 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import DynamicHeader from '@/components/DynamicHeader'
 import CreateTaskModal from '@/components/CreateTaskModal'
 import TaskDetailDrawer from '@/components/TaskDetailDrawer'
+import MetricCard from '@/components/MetricCard'
 import {
   CheckIcon, ClockIcon, UsersIcon, BarChartIcon,
   ChevronRightIcon, PlusIcon, MoreHorizontalIcon, FilterIcon,
@@ -249,41 +250,38 @@ export default function Dashboard() {
 
           {/* ── 1. Bento KPI Metric Cards ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {bentoKPIs.map(kpi => (
-              <div
-                key={kpi.id}
-                onClick={() => router.push(kpi.id === 'tasks' ? '/kanban' : '/Analytics')}
-                className={`rounded-3xl p-6 border ${kpi.border} ${kpi.bg} bento-card-interactive cursor-pointer relative overflow-hidden group shadow-2xs`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <span className="p-2.5 rounded-2xl bg-white/85 backdrop-blur-xs shadow-2xs">
-                    {kpi.icon}
-                  </span>
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/95 text-stone-700 shadow-2xs font-mono">
-                    {kpi.delta}
-                  </span>
-                </div>
-
-                <div className="text-4xl sm:text-5xl font-extrabold text-stone-950 tracking-tight mb-1 stat-number">
-                  {kpi.value}
-                </div>
-
-                <div className="text-xs sm:text-sm font-semibold text-stone-700">
-                  {kpi.label}
-                </div>
-
-                {/* Micro sparkline visualizer */}
-                <div className="mt-3.5 flex items-end gap-1 h-6 pt-1">
-                  {kpi.sparkline.map((val, idx) => (
-                    <div
-                      key={idx}
-                      className="flex-1 bg-stone-900/20 rounded-full transition-all duration-300 group-hover:bg-stone-900/40"
-                      style={{ height: `${(val / Math.max(...kpi.sparkline)) * 100}%` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
+            <MetricCard
+              icon={ClipboardIcon}
+              badge="+20% vs last month"
+              value="137"
+              label="Total Tasks"
+              theme="purple"
+              onClick={() => router.push('/kanban')}
+            />
+            <MetricCard
+              icon={ZapIcon}
+              badge="+0.5 vs last month"
+              value="8.6"
+              label="Efficiency Score"
+              theme="amber"
+              onClick={() => router.push('/Analytics')}
+            />
+            <MetricCard
+              icon={TargetIcon}
+              badge="+10% vs last month"
+              value="74%"
+              label="Sprint Completion"
+              theme="sky"
+              onClick={() => router.push('/kanban')}
+            />
+            <MetricCard
+              icon={RocketIcon}
+              badge="Top 5% speed"
+              value="94%"
+              label="Team Velocity"
+              theme="lime"
+              onClick={() => router.push('/Analytics')}
+            />
           </div>
 
           {/* ── 2. Middle Grid: LineUp + Working Activity Schedule ── */}
@@ -600,18 +598,21 @@ export default function Dashboard() {
         }}
       />
 
-      {/* Task Inspection Drawer */}
-      <TaskDetailDrawer
-        task={selectedTask}
-        open={Boolean(selectedTask)}
-        onClose={() => setSelectedTask(null)}
-        onUpdateTask={(updated) => {
-          setMyWork(prev => prev.map(t => t.id === updated.id ? { ...t, ...updated } : t))
-        }}
-        onDeleteTask={(id) => {
-          setMyWork(prev => prev.filter(t => t.id !== id))
-        }}
-      />
+      {/* Task Inspection Modal */}
+      {selectedTask && (
+        <TaskDetailDrawer
+          key={selectedTask.id}
+          task={selectedTask}
+          open={Boolean(selectedTask)}
+          onClose={() => setSelectedTask(null)}
+          onUpdateTask={(updated) => {
+            setMyWork(prev => prev.map(t => t.id === updated.id ? { ...t, ...updated } : t))
+          }}
+          onDeleteTask={(id) => {
+            setMyWork(prev => prev.filter(t => t.id !== id))
+          }}
+        />
+      )}
     </ProtectedRoute>
   )
 }

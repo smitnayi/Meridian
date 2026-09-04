@@ -37,7 +37,7 @@ export default function DynamicHeader({ onOpenNewTask, onOpenSearch, title = "Wo
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-lime-500"></span>
             </span>
             <div className="flex items-center gap-2 text-xs font-semibold tracking-wide">
-              <span className="text-lime-400 uppercase text-[9px] font-mono font-bold bg-lime-950/90 px-2 py-0.5 rounded-full border border-lime-500/30">
+              <span className="text-lime-400 uppercase text-[9px] font-sans font-bold bg-lime-950/90 px-2 py-0.5 rounded-full border border-lime-500/30">
                 Sprint 14 Live
               </span>
               <span className="text-stone-200 text-xs hidden sm:inline font-medium">
@@ -56,7 +56,7 @@ export default function DynamicHeader({ onOpenNewTask, onOpenSearch, title = "Wo
             </div>
 
             {/* Countdown Badge */}
-            <div className="flex items-center gap-1.5 text-[11px] text-stone-300 font-mono bg-white/10 px-2.5 py-0.5 rounded-full border border-white/5">
+            <div className="flex items-center gap-1.5 text-[11px] text-stone-300 font-sans font-medium bg-white/10 px-2.5 py-0.5 rounded-full border border-white/5">
               <ClockIcon size={12} className="text-lime-400" />
               <span>{formatTime(secondsRemaining)}</span>
             </div>
@@ -66,9 +66,9 @@ export default function DynamicHeader({ onOpenNewTask, onOpenSearch, title = "Wo
               onClick={() => {
                 setInCall(!inCall)
                 if (!inCall) {
-                  toast.success('Joined live sprint room with 6 members', { icon: '🎙️' })
+                  toast.success('Joined live sprint room with 6 members')
                 } else {
-                  toast('Left sprint room', { icon: '👋' })
+                  toast('Left sprint room')
                 }
               }}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-tight cursor-pointer transition-all duration-200 ${inCall
@@ -92,7 +92,7 @@ export default function DynamicHeader({ onOpenNewTask, onOpenSearch, title = "Wo
           >
             <SearchIcon size={14} className="text-stone-400" />
             <span className="hidden sm:inline">Search workspace...</span>
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-semibold text-stone-500 bg-stone-100 rounded-lg border border-stone-200">
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-sans font-semibold text-stone-500 bg-stone-100 rounded-lg border border-stone-200">
               ⌘K
             </kbd>
           </button>
