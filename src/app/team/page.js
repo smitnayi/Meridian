@@ -1,12 +1,13 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/sidebar'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import DynamicHeader from '@/components/DynamicHeader'
 import InviteModal from '@/components/InviteModal'
 import MetricCard from '@/components/MetricCard'
+import { handleOrganizationUsers } from '@/Service/organization'
 import {
   PlusIcon, SearchIcon, MoreHorizontalIcon, UsersIcon,
   MessageIcon, CheckIcon, SettingsIcon, ClockIcon, ZapIcon, BarChartIcon
@@ -24,28 +25,74 @@ export default function TeamPage() {
   const { fullName, initials, email } = useCurrentUser()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [members, setMembers] = useState(() => (
+    user ? [{
+      id: `mem_${user.id || 'me'}`,
+      name: fullName ? `${fullName} (You)` : (user.email || 'You'),
+      role: activeOrg?.role || 'Owner / Leader',
+      email: email || user.email || '',
+      initials: initials || 'U',
+      color: '#8b5cf6',
+      status: 'online',
+      projects: 1,
+      tasks: 0,
+      timeLogged: 'Active'
+    }] : []
+  ))
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
-  const currentMember = user ? [{
-    id: `mem_${user.id || 'me'}`,
-    name: fullName ? `${fullName} (You)` : (user.email || 'You'),
-    role: activeOrg?.role || 'Owner / Leader',
-    email: email || user.email || '',
-    initials: initials || 'U',
-    color: '#8b5cf6',
-    status: 'online',
-    projects: 1,
-    tasks: 0,
-    timeLogged: 'Active'
-  }] : []
-
-  const members = [...currentMember, ...(activeOrg?.members || [])]
-
   const filtered = members.filter(m => {
-    const matchSearch = m.name.toLowerCase().includes(search.toLowerCase()) || m.role.toLowerCase().includes(search.toLowerCase()) || m.email.toLowerCase().includes(search.toLowerCase())
+    const name = (m.name || `${m.first_name || ''} ${m.last_name || ''}`).trim().toLowerCase()
+    const role = (m.role || '').toLowerCase()
+    const memberEmail = (m.email || '').toLowerCase()
+
+    const matchSearch =
+      name.includes(search.toLowerCase()) ||
+      role.includes(search.toLowerCase()) ||
+      memberEmail.includes(search.toLowerCase())
+
     if (statusFilter === 'all') return matchSearch
+
     return matchSearch && m.status === statusFilter
   })
+
+  useEffect(() => {
+    const fetchMember = async () => {
+      if (!activeOrg || !activeOrg.id) return
+
+      try {
+        const res = await handleOrganizationUsers(activeOrg.id)
+        if (res.success && Array.isArray(res.members) && res.members.length > 0) {
+          const formattedMembers = res.members.map((member) => ({
+            ...member,
+            name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || member.email || 'Member',
+            initials: `${member.first_name?.[0] || member.email?.[0] || 'U'}${member.last_name?.[0] || ''}`.toUpperCase(),
+            color: '#8b5cf6',
+            status: 'online',
+            role: member.role || 'Member',
+            timeLogged: 'Active'
+          }))
+          setMembers(formattedMembers)
+        } else if (user) {
+          setMembers([{
+            id: `mem_${user.id || 'me'}`,
+            name: fullName ? `${fullName} (You)` : (user.email || 'You'),
+            role: activeOrg?.role || 'Owner / Leader',
+            email: email || user.email || '',
+            initials: initials || 'U',
+            color: '#8b5cf6',
+            status: 'online',
+            projects: 1,
+            tasks: 0,
+            timeLogged: 'Active'
+          }])
+        }
+      } catch (err) {
+        console.error("Failed to fetch organization members:", err)
+      }
+    }
+    fetchMember()
+  }, [activeOrg, user, fullName, initials, email])
 
   return (
     <ProtectedRoute>
